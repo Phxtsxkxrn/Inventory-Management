@@ -5,7 +5,7 @@
 
 /* หัวข้อ Product List */
 .product-list h2 {
-  margin-bottom: 10px;
+  margin-bottom: 20px;
   color: #333;
   font-size: 24px;
 }
@@ -13,95 +13,12 @@
 /* คอนเทนเนอร์สำหรับปุ่ม Add Product */
 .product-header {
   display: flex;
-  justify-content: flex-end; /* จัดปุ่มไปทางขวา */
+  justify-content: flex-end;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
 }
-
 
 /* ปุ่ม Add Product */
-.add-button {
-  padding: 10px 20px;
-  background-color: #4caf50;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 16px;
-}
-
-.add-button:hover {
-  background-color: #45a049;
-}
-
-/* ตาราง */
-.product-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
-}
-
-.product-table th,
-.product-table td {
-  border: 1px solid #ddd;
-  padding: 12px;
-  text-align: left;
-}
-
-.product-table th {
-  background-color: #f4f4f4;
-  color: #333;
-  font-weight: bold;
-  text-transform: uppercase;
-}
-
-.product-table tr:nth-child(even) {
-  background-color: #f9f9f9;
-}
-
-.product-table tr:hover {
-  background-color: #f1f1f1;
-}
-
-/* ปุ่ม Edit และ Delete */
-button {
-  padding: 5px 10px;
-  margin-right: 5px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-}
-
-button:hover {
-  opacity: 0.9;
-}
-
-button.edit {
-  background-color: #2196f3;
-  color: white;
-}
-
-button.delete {
-  background-color: #f44336;
-  color: white;
-}
-
-button.edit:hover {
-  background-color: #1976d2;
-}
-
-button.delete:hover {
-  background-color: #d32f2f;
-}
-
-/* Dropdown Container */
-.dropdown-container {
-  position: relative;
-  display: inline-block;
-}
-
-/* Add Product Button */
 .add-button {
   padding: 10px 15px;
   background-color: #4caf50;
@@ -119,6 +36,11 @@ button.delete:hover {
 }
 
 /* Dropdown Menu for Add Product */
+.dropdown-container {
+  position: relative;
+  display: inline-block;
+}
+
 .add-product-dropdown-menu {
   position: absolute;
   top: 100%;
@@ -151,3 +73,98 @@ button.delete:hover {
   border-bottom: none;
 }
 
+/* ตารางหลัก */
+.product-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.product-table th {
+  background-color: #f9f9f9;
+  text-align: center;
+  padding: 12px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+  text-transform: uppercase;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.product-table td {
+  padding: 12px;
+  text-align: center;
+  font-size: 14px;
+  color: #555;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+/* สลับสีแถว */
+.product-table tr:nth-child(even) {
+  background-color: #f8fafc;
+}
+
+.product-table tr:hover {
+  background-color: #f1f5f9;
+}
+
+/* Status Badge */
+.status-badge {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  color: white;
+}
+
+.status-badge.delivered {
+  background-color: #d4f4dd;
+  color: #28a745;
+}
+
+.status-badge.process {
+  background-color: #ffeeba;
+  color: #ffc107;
+}
+
+.status-badge.canceled {
+  background-color: #f8d7da;
+  color: #dc3545;
+}
+
+/* Actions */
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.actions button {
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  padding: 8px 12px;
+  font-size: 14px;
+  color: #fff;
+}
+
+.actions .edit {
+  background-color: #3b82f6;
+}
+
+.actions .edit:hover {
+  background-color: #2563eb;
+}
+
+.actions .delete {
+  background-color: #ef4444;
+}
+
+.actions .delete:hover {
+  background-color: #dc2626;
+}

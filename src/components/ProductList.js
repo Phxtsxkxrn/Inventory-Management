@@ -113,7 +113,20 @@ const ProductList = ({ products, categories, onAdd, onEdit, onDelete, onImport }
               <td>{product.Categories || "N/A"}</td>
               <td>{product.Seller || "N/A"}</td>
               <td>{product.NormalPrice || "N/A"}</td>
-              <td>{product.Status || "N/A"}</td>
+              <td className="status">
+  <span
+    className={`status-badge ${
+      product.Status === "active"
+        ? "delivered"
+        : product.Status === "inactive"
+        ? "process"
+        : "canceled"
+    }`}
+  >
+    {product.Status || "N/A"}
+  </span>
+</td>
+
               <td>
   {product.CreatedAt
     ? new Date(product.CreatedAt).toLocaleString()
