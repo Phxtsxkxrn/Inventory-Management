@@ -1,0 +1,65 @@
+.categories-list {
+    padding: 20px;
+  }
+  
+  h2 {
+    margin-bottom: 10px; /* เพิ่มระยะห่างระหว่างชื่อหัวข้อและปุ่ม */
+  }
+  
+  .add-button-container {
+    text-align: right; /* จัดปุ่มให้อยู่ขวา */
+    margin-bottom: 20px; /* เพิ่มระยะห่างระหว่างปุ่มและตาราง */
+  }
+  
+  /* ปุ่ม Add Category */
+  .add-button {
+    background-color: #4caf50; /* สีพื้นหลังปุ่ม */
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease; /* เพิ่มเอฟเฟกต์เคลื่อนไหว */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* เพิ่มเงา */
+  }
+  
+  .add-button:hover {
+    background-color: #45a049; /* สีพื้นหลังเมื่อ hover */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* เพิ่มเงาเมื่อ hover */
+  }
+  
+  .categories-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+  
+  .categories-table th,
+  .categories-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+  
+  .categories-table th {
+    background-color: #f4f4f4; /* สีพื้นหลังของหัวตาราง */
+    font-weight: bold;
+  }
+  
+  .delete {
+    background-color: #f44336; /* สีพื้นหลังปุ่ม Delete */
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .delete:hover {
+    background-color: #d32f2f; /* สีพื้นหลังเมื่อ hover */
+  }
+  

@@ -1,0 +1,117 @@
+/* Modal styles */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 600px; /* ขยายความกว้างของ modal */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .modal-content h3 {
+    margin-top: 0;
+    text-align: center;
+  }
+  
+  /* Form grid */
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* สร้างสองคอลัมน์ */
+    gap: 20px; /* ระยะห่างระหว่างช่อง */
+    margin-bottom: 20px;
+  }
+  
+  /* Cool input styles */
+  .coolinput {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .coolinput label.text {
+    font-size: 0.75rem;
+    color: #818CF8;
+    font-weight: 700;
+    margin-bottom: 5px;
+  }
+  
+  .coolinput input.input,
+  .coolinput select.input {
+    padding: 11px 10px;
+    font-size: 0.75rem;
+    border: 2px #818CF8 solid;
+    border-radius: 5px;
+    background: #ffffff;
+    transition: border-color 0.3s ease;
+  }
+  
+  .coolinput input.input:focus,
+  .coolinput select.input:focus {
+    outline: none;
+    border-color: #4caf50;
+  }
+  
+  /* Dropdown styles */
+  .coolinput select.input {
+    width: 100%;
+  }
+  
+  
+  /* Button styles */
+  .button-group {
+    text-align: center;
+  }
+  
+  .modal-button {
+    padding: 10px 15px;
+    margin: 10px;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  
+  .modal-button.add {
+    background-color: #4caf50;
+    color: white;
+  }
+  
+  .modal-button.add:hover {
+    background-color: #45a049;
+  }
+  
+  .modal-button.cancel {
+    background-color: #f44336;
+    color: white;
+  }
+  
+  .modal-button.cancel:hover {
+    background-color: #d32f2f;
+  }
+  
+  .modal-button.delete {
+    background-color: #f44336;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    margin: 10px; /* ระยะห่างระหว่างปุ่ม */
+    transition: background-color 0.3s ease;
+  }
+  
+  .modal-button.delete:hover {
+    background-color: #d32f2f;
+  }

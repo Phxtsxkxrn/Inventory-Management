@@ -1,0 +1,84 @@
+/* สไตล์พื้นฐานของ Navbar */
+.navbar {
+  width: 250px;
+  background-color: #ffffff; /* สีพื้นหลังที่สดใส */
+  border-right: 1px solid #e5e7eb;
+  padding: 20px;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: none; /* เอาเงาขอบ Navbar ออก */
+}
+
+/* สไตล์เมนูหลัก */
+.navbar-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.navbar-item {
+  margin-bottom: 15px; /* เพิ่มระยะห่างระหว่างรายการเมนู */
+}
+
+.navbar-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-decoration: none;
+  color: #374151; /* สีข้อความ */
+  font-size: 16px;
+  font-weight: 500;
+  padding: 12px 20px;
+  border-radius: 8px;
+  background-color: #f9fafb;
+  cursor: pointer;
+  transition: all 0.3s ease; /* เพิ่มเอฟเฟกต์การเคลื่อนไหว */
+  box-shadow: none; /* เอาเงาหรือเส้นขอบออก */
+  border: none; /* เอาเส้นขอบออก */
+}
+
+.navbar-link:hover {
+  background-color: #e5e7eb; /* สีเมื่อ Hover */
+  box-shadow: none; /* เอาเงาเมื่อ Hover ออก */
+}
+
+/* ไอคอนในเมนูหลัก */
+.icon {
+  margin-right: 12px; /* เพิ่มระยะห่างระหว่างไอคอนและข้อความ */
+  font-size: 20px;
+  color: #6b7280; /* สีไอคอน */
+}
+
+/* ลูกศรเปิด/ปิดเมนู */
+.dropdown-arrow {
+  font-size: 14px;
+  transition: transform 0.3s ease;
+  color: #6b7280;
+}
+
+.dropdown-arrow.open {
+  transform: rotate(180deg); /* หมุนลูกศรเมื่อเมนูเปิด */
+}
+
+/* เมนูย่อย */
+.dropdown-menu {
+  margin-top: 5px;
+  margin-left: 20px; /* ขยับเข้าด้านในสำหรับเมนูย่อย */
+  list-style: none;
+  padding: 0;
+}
+
+.dropdown-link {
+  text-decoration: none;
+  color: #4b5563; /* สีข้อความเมนูย่อย */
+  font-size: 14px;
+  padding: 8px 15px;
+  display: block;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.dropdown-link:hover {
+  background-color: #e5e7eb; /* สีเมื่อ Hover เมนูย่อย */
+}

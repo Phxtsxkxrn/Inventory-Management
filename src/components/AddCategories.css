@@ -1,0 +1,79 @@
+/* Add Categories Modal Styles */
+.add-category-modal .modal-content {
+    background-color: white;
+    padding: 15px;
+    border-radius: 8px;
+    width: 400px; /* ลดขนาด popup */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .add-category-modal h3 {
+    margin-top: 0;
+    text-align: center;
+    font-size: 18px; /* ลดขนาดหัวข้อ */
+  }
+  
+  .add-category-modal .coolinput {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-bottom: 15px;
+  }
+  
+  .add-category-modal .coolinput label.text {
+    font-size: 0.75rem;
+    color: #818CF8;
+    font-weight: 700;
+    margin-bottom: 5px;
+  }
+  
+  .add-category-modal .coolinput input[type="text"].input {
+    padding: 10px;
+    font-size: 0.85rem;
+    border: 2px solid #818CF8;
+    border-radius: 5px;
+    background: #f9f9f9;
+  }
+  
+  .add-category-modal .coolinput input[type="text"].input:focus {
+    outline: none;
+    border-color: #4caf50;
+    background: #ffffff;
+    box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+  }
+  
+  .add-category-modal .coolinput input[type="text"].input::placeholder {
+    color: #cccccc;
+    font-style: italic;
+  }
+  
+  .add-category-modal .button-group {
+    text-align: center;
+  }
+  
+  .add-category-modal .modal-button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  
+  .add-category-modal .modal-button.add {
+    background-color: #4caf50;
+    color: white;
+  }
+  
+  .add-category-modal .modal-button.add:hover {
+    background-color: #45a049;
+  }
+  
+  .add-category-modal .modal-button.cancel {
+    background-color: #f44336;
+    color: white;
+  }
+  
+  .add-category-modal .modal-button.cancel:hover {
+    background-color: #d32f2f;
+  }
+  
