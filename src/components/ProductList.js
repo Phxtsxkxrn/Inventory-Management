@@ -9,21 +9,12 @@ const ProductList = ({ products, categories, onAdd, onEdit, onDelete, onImport }
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState(""); // State สำหรับคำค้นหา
 
-  const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
-  const closeDropdown = () => setIsDropdownOpen(false);
-
-  const openAddModal = () => {
-    setIsAddModalOpen(true);
-    closeDropdown(); // ปิด Dropdown
-  };
+  const openAddModal = () => setIsAddModalOpen(true);
   const closeAddModal = () => setIsAddModalOpen(false);
 
-  const openImportModal = () => {
-    setIsImportModalOpen(true);
-    closeDropdown(); // ปิด Dropdown
-  };
+  const openImportModal = () => setIsImportModalOpen(true);
   const closeImportModal = () => setIsImportModalOpen(false);
 
   const openEditModal = (product) => {
@@ -35,25 +26,34 @@ const ProductList = ({ products, categories, onAdd, onEdit, onDelete, onImport }
     setIsEditModalOpen(false);
   };
 
+  const filteredProducts = products.filter((product) =>
+  Object.values(product) // ดึงค่าในทุกฟิลด์ของ product
+    .join(" ") // รวมค่าทุกฟิลด์เป็นข้อความเดียว
+    .toLowerCase() // แปลงเป็นตัวพิมพ์เล็ก
+    .includes(searchTerm.toLowerCase()) // ตรวจสอบว่ามีคำค้นหาอยู่หรือไม่
+);
+
+
   return (
     <div className="product-list">
       <h2>Product List</h2>
       <div className="product-header">
-        {/* Add Product Dropdown */}
-        <div className="dropdown-container">
-          <button className="add-button" onClick={toggleDropdown}>
-            Add Product ▼
+        {/* Input Search */}
+        <input
+          type="text"
+          className="search-input"
+          placeholder="Search products..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+        {/* Add and Import Product Buttons */}
+        <div className="button-group">
+          <button className="add-button" onClick={openAddModal}>
+            Add Product
           </button>
-          {isDropdownOpen && (
-            <div className="add-product-dropdown-menu">
-              <button onClick={openAddModal} className="add-product-dropdown-item">
-                Add Single Product
-              </button>
-              <button onClick={openImportModal} className="add-product-dropdown-item">
-                Import Products
-              </button>
-            </div>
-          )}
+          <button className="import-button" onClick={openImportModal}>
+            Import Products
+          </button>
         </div>
       </div>
       {isAddModalOpen && (
@@ -105,38 +105,46 @@ const ProductList = ({ products, categories, onAdd, onEdit, onDelete, onImport }
           </tr>
         </thead>
         <tbody>
-          {products.map((product) => (
+          {filteredProducts.map((product) => (
             <tr key={product.id}>
               <td>{product.Brand || "N/A"}</td>
               <td>{product.SKU || "N/A"}</td>
               <td>{product.Name || "N/A"}</td>
               <td>{product.Categories || "N/A"}</td>
               <td>{product.Seller || "N/A"}</td>
-              <td>{product.NormalPrice || "N/A"}</td>
-              <td className="status">
-  <span
-    className={`status-badge ${
-      product.Status === "active"
-        ? "delivered"
-        : product.Status === "inactive"
-        ? "process"
-        : "canceled"
-    }`}
-  >
-    {product.Status || "N/A"}
-  </span>
+              <td>
+  {product.NormalPrice
+    ? `฿${new Intl.NumberFormat("th-TH", {
+        style: "decimal",
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }).format(product.NormalPrice)}`
+    : "N/A"}
 </td>
 
+              <td className="status">
+                <span
+                  className={`status-badge ${
+                    product.Status === "active"
+                      ? "delivered"
+                      : product.Status === "inactive"
+                      ? "process"
+                      : "canceled"
+                  }`}
+                >
+                  {product.Status || "N/A"}
+                </span>
+              </td>
               <td>
-  {product.CreatedAt
-    ? new Date(product.CreatedAt).toLocaleString()
-    : "N/A"}
-</td>
-<td>
-  {product.LastUpdate
-    ? new Date(product.LastUpdate).toLocaleString()
-    : "N/A"}
-</td>
+                {product.CreatedAt
+                  ? new Date(product.CreatedAt).toLocaleString()
+                  : "N/A"}
+              </td>
+              <td>
+                {product.LastUpdate
+                  ? new Date(product.LastUpdate).toLocaleString()
+                  : "N/A"}
+              </td>
               <td className="actions">
                 <button className="edit" onClick={() => openEditModal(product)}>
                   Edit

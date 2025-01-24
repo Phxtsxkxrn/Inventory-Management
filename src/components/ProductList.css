@@ -10,12 +10,38 @@
   font-size: 24px;
 }
 
-/* คอนเทนเนอร์สำหรับปุ่ม Add Product */
+/* คอนเทนเนอร์สำหรับ Input Search และปุ่ม */
 .product-header {
   display: flex;
-  justify-content: flex-end;
-  align-items: center;
+  justify-content: space-between; /* จัด Input และปุ่มให้อยู่คนละฝั่ง */
+  align-items: baseline; /* จัดให้อยู่บนเส้นฐานเดียวกัน */
   margin-bottom: 20px;
+  gap: 10px; /* เพิ่มระยะห่าง */
+}
+
+/* ช่อง Input Search */
+.search-input {
+  flex: 1; /* ขยาย Input ให้พอดีกับพื้นที่ที่เหลือ */
+  max-width: 300px; /* จำกัดความกว้างสูงสุด */
+  padding: 8px; /* ปรับ Padding ให้สอดคล้องกับปุ่ม */
+  font-size: 14px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  outline: none;
+  transition: all 0.3s ease;
+  height: 40px; /* ให้มีความสูงเท่ากับปุ่ม */
+  box-sizing: border-box; /* รวม Padding และ Border ในขนาด */
+}
+
+.search-input:focus {
+  border-color: #4caf50; /* เปลี่ยนสีขอบเมื่อโฟกัส */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* กลุ่มปุ่ม Add และ Import */
+.button-group {
+  display: flex;
+  gap: 10px; /* เพิ่มระยะห่างระหว่างปุ่ม */
 }
 
 /* ปุ่ม Add Product */
@@ -26,52 +52,44 @@
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 14px;
   display: flex;
   align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  height: 40px; /* ความสูงเท่ากับ Input */
 }
 
 .add-button:hover {
   background-color: #45a049;
+  transform: translateY(-2px); /* เพิ่มเอฟเฟคเด้ง */
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
 }
 
-/* Dropdown Menu for Add Product */
-.dropdown-container {
-  position: relative;
-  display: inline-block;
-}
-
-.add-product-dropdown-menu {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  background-color: white;
-  border: 1px solid #ddd;
+/* ปุ่ม Import Products */
+.import-button {
+  padding: 10px 15px;
+  background-color: #2196f3;
+  color: white;
+  border: none;
   border-radius: 5px;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
-  width: 200px;
-  display: flex;
-  flex-direction: column;
-}
-
-.add-product-dropdown-item {
-  padding: 10px;
-  text-align: left;
-  border-bottom: 1px solid #f4f4f4;
-  background-color: white;
   cursor: pointer;
   font-size: 14px;
-  color: #333;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  height: 40px; /* ความสูงเท่ากับ Input */
 }
 
-.add-product-dropdown-item:hover {
-  background-color: #f9f9f9;
+.import-button:hover {
+  background-color: #1e88e5;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
 }
 
-.add-product-dropdown-item:last-child {
-  border-bottom: none;
-}
 
 /* ตารางหลัก */
 .product-table {
