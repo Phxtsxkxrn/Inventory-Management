@@ -1,14 +1,18 @@
 /* สไตล์พื้นฐานของ Navbar */
 .navbar {
   width: 250px;
-  background-color: #ffffff; /* สีพื้นหลังที่สดใส */
+  background-color: #ffffff; /* สีพื้นหลัง */
   border-right: 1px solid #e5e7eb;
   padding: 20px;
-  height: 100vh;
+  min-height: 100vh; /* ความสูงขั้นต่ำเท่ากับ viewport */
   display: flex;
   flex-direction: column;
-  box-shadow: none; /* เอาเงาขอบ Navbar ออก */
+  box-shadow: none;
+  position: sticky; /* ยึดตำแหน่ง */
+  top: 0; /* ให้ติดขอบด้านบน */
+  overflow-y: auto; /* เพิ่มการเลื่อนเมื่อเนื้อหาเกิน */
 }
+
 
 /* สไตล์เมนูหลัก */
 .navbar-menu {
