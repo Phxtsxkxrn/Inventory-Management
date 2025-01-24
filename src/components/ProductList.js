@@ -10,6 +10,10 @@ const ProductList = ({ products, categories, onAdd, onEdit, onDelete, onImport }
   const [editingProduct, setEditingProduct] = useState(null);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState(""); // State สำหรับคำค้นหา
+  const [productsPerPage, setProductsPerPage] = useState(20); // State สำหรับสินค้าต่อหน้า
+  const [currentPage, setCurrentPage] = useState(1); // State สำหรับหน้าปัจจุบัน
+  const [customInputValue, setCustomInputValue] = useState(""); // เก็บค่าชั่วคราวจากช่อง input
+  const [customOptions, setCustomOptions] = useState([20, 30, 50, 100, 200]); // ตัวเลือก dropdown
 
   const openAddModal = () => setIsAddModalOpen(true);
   const closeAddModal = () => setIsAddModalOpen(false);
@@ -27,12 +31,41 @@ const ProductList = ({ products, categories, onAdd, onEdit, onDelete, onImport }
   };
 
   const filteredProducts = products.filter((product) =>
-  Object.values(product) // ดึงค่าในทุกฟิลด์ของ product
-    .join(" ") // รวมค่าทุกฟิลด์เป็นข้อความเดียว
-    .toLowerCase() // แปลงเป็นตัวพิมพ์เล็ก
-    .includes(searchTerm.toLowerCase()) // ตรวจสอบว่ามีคำค้นหาอยู่หรือไม่
-);
+    Object.values(product)
+      .join(" ")
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase())
+  );
 
+  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
+
+  const displayedProducts = filteredProducts.slice(
+    (currentPage - 1) * productsPerPage,
+    currentPage * productsPerPage
+  );
+
+  const handleProductsPerPageChange = (e) => {
+    const value = e.target.value === "custom" ? 0 : parseInt(e.target.value, 10);
+    setProductsPerPage(value);
+    setCurrentPage(1); // Reset to the first page
+  };
+
+  const handleCustomInputChange = (e) => {
+    setCustomInputValue(e.target.value); // เก็บค่าจาก input ชั่วคราว
+  };
+
+  const handleCustomProductsPerPageSubmit = () => {
+    const value = parseInt(customInputValue, 10);
+    if (!isNaN(value) && value > 0) {
+      // อัปเดตรายการ dropdown และตั้งค่า productsPerPage
+      setCustomOptions((prevOptions) =>
+        prevOptions.includes(value) ? prevOptions : [...prevOptions, value].sort((a, b) => a - b)
+      );
+      setProductsPerPage(value); // อัปเดตจำนวนสินค้าต่อหน้า
+      setCurrentPage(1); // Reset to the first page
+      setCustomInputValue(""); // ล้างค่าช่อง input
+    }
+  };
 
   return (
     <div className="product-list">
@@ -56,11 +89,69 @@ const ProductList = ({ products, categories, onAdd, onEdit, onDelete, onImport }
           </button>
         </div>
       </div>
+
+      <div
+  className={`pagination-controls ${
+    productsPerPage === 0 ? "product-pagination-custom" : "product-pagination-default"
+  }`}
+>
+  <label htmlFor="products-per-page">Products per page:</label>
+  <select
+    id="products-per-page"
+    value={productsPerPage === 0 ? "custom" : productsPerPage}
+    onChange={handleProductsPerPageChange}
+  >
+    {customOptions.map((option) => (
+      <option key={option} value={option}>
+        {option}
+      </option>
+    ))}
+    <option value="custom">Custom</option>
+  </select>
+  {productsPerPage === 0 && (
+    <div className="custom-products-per-page">
+      <input
+        type="number"
+        min="1"
+        className="custom-input"
+        placeholder="Enter number"
+        value={customInputValue}
+        onChange={handleCustomInputChange}
+      />
+      <button
+        className="custom-submit-button"
+        onClick={handleCustomProductsPerPageSubmit}
+      >
+        Submit
+      </button>
+    </div>
+  )}
+  <div className="page-navigation">
+    <button
+      onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+      disabled={currentPage === 1}
+    >
+      Previous
+    </button>
+    <span>
+      Page {currentPage} of {totalPages}
+    </span>
+    <button
+      onClick={() =>
+        setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+      }
+      disabled={currentPage === totalPages}
+    >
+      Next
+    </button>
+  </div>
+</div>
+
       {isAddModalOpen && (
         <AddProduct
           onAdd={(newProduct) => {
-            onAdd(newProduct); // เรียกฟังก์ชัน onAdd ที่ส่งมาจาก App.js
-            closeAddModal(); // ปิด popup
+            onAdd(newProduct);
+            closeAddModal();
           }}
           onClose={closeAddModal}
         />
@@ -68,13 +159,13 @@ const ProductList = ({ products, categories, onAdd, onEdit, onDelete, onImport }
       {isEditModalOpen && (
         <EditProduct
           product={editingProduct}
-          categories={categories} // ส่ง categories
+          categories={categories}
           onSave={(id, updatedProduct) => {
-            onEdit(id, updatedProduct); // อัปเดตข้อมูลใน Firebase
+            onEdit(id, updatedProduct);
             closeEditModal();
           }}
           onDelete={(id) => {
-            onDelete(id); // ลบสินค้า
+            onDelete(id);
             closeEditModal();
           }}
           onClose={closeEditModal}
@@ -83,8 +174,8 @@ const ProductList = ({ products, categories, onAdd, onEdit, onDelete, onImport }
       {isImportModalOpen && (
         <ImportProducts
           onImport={(parsedData) => {
-            onImport(parsedData); // ส่งข้อมูลที่อ่านได้ไปยัง parent
-            closeImportModal(); // ปิด modal
+            onImport(parsedData);
+            closeImportModal();
           }}
           onClose={closeImportModal}
         />
@@ -105,7 +196,7 @@ const ProductList = ({ products, categories, onAdd, onEdit, onDelete, onImport }
           </tr>
         </thead>
         <tbody>
-          {filteredProducts.map((product) => (
+          {displayedProducts.map((product) => (
             <tr key={product.id}>
               <td>{product.Brand || "N/A"}</td>
               <td>{product.SKU || "N/A"}</td>
@@ -113,15 +204,14 @@ const ProductList = ({ products, categories, onAdd, onEdit, onDelete, onImport }
               <td>{product.Categories || "N/A"}</td>
               <td>{product.Seller || "N/A"}</td>
               <td>
-  {product.NormalPrice
-    ? `฿${new Intl.NumberFormat("th-TH", {
-        style: "decimal",
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      }).format(product.NormalPrice)}`
-    : "N/A"}
-</td>
-
+                {product.NormalPrice
+                  ? `฿${new Intl.NumberFormat("th-TH", {
+                      style: "decimal",
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    }).format(product.NormalPrice)}`
+                  : "N/A"}
+              </td>
               <td className="status">
                 <span
                   className={`status-badge ${

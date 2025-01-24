@@ -6,30 +6,60 @@ const EditProduct = ({ product, onSave, onDelete, onClose, categories }) => {
     Brand: "",
     SKU: "",
     Name: "",
-    Category: "",
+    Categories: "",
     Seller: "",
-    NormalPrice: 0,
+    NormalPrice: "",
     Status: "active",
   });
 
   useEffect(() => {
     if (product) {
-      setForm(product); // ตั้งค่าเริ่มต้นด้วยข้อมูลสินค้าที่แก้ไข
+      setForm({
+        ...product,
+        NormalPrice: formatCurrency(product.NormalPrice), // ฟอร์แมตราคาเริ่มต้น
+      });
     }
   }, [product]);
 
+  const formatCurrency = (value) => {
+    if (!value) return "";
+    return new Intl.NumberFormat("th-TH", {
+      style: "currency",
+      currency: "THB",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(value);
+  };
+
+  const parseCurrency = (value) => {
+    const numberValue = parseFloat(
+      value.replace(/[฿,]/g, "").replace(/[^0-9.]/g, "")
+    );
+    return isNaN(numberValue) ? "" : numberValue;
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+
+    if (name === "NormalPrice") {
+      const numericValue = parseCurrency(value); // แปลงค่ากลับเป็นตัวเลข
+      setForm((prev) => ({
+        ...prev,
+        [name]: numericValue ? formatCurrency(numericValue) : "",
+      }));
+    } else {
+      setForm((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // ส่งเฉพาะค่าที่แก้ไข ไม่อัปเดต CreatedAt
-    onSave(product.id, { ...form, CreatedAt: product.CreatedAt });
+    onSave(product.id, {
+      ...form,
+      NormalPrice: parseCurrency(form.NormalPrice), // แปลงกลับเป็นตัวเลขก่อนบันทึก
+      CreatedAt: product.CreatedAt,
+    });
   };
-  
-  
 
   return (
     <div className="modal">
@@ -37,44 +67,59 @@ const EditProduct = ({ product, onSave, onDelete, onClose, categories }) => {
         <h3>Edit Product</h3>
         <form onSubmit={handleSubmit}>
           <div className="form-grid">
-            {[{ name: "Brand", type: "text", label: "Brand" },
+            {[
+              { name: "Brand", type: "text", label: "Brand" },
               { name: "SKU", type: "text", label: "SKU" },
               { name: "Name", type: "text", label: "Name" },
               { name: "Seller", type: "text", label: "Seller" },
-              { name: "NormalPrice", type: "number", label: "Normal Price" },
             ].map((input) => (
-                <div className="coolinput" key={input.name}>
-                  <label className="text">{input.label}:</label>
-                  <input
-                    className="input"
-                    type={input.type}
-                    name={input.name}
-                    value={form[input.name]}
-                    onChange={handleChange}
-                    placeholder="Write here..."
-                    required
-                  />
-                </div>
-              ))}
+              <div className="coolinput" key={input.name}>
+                <label className="text">{input.label}:</label>
+                <input
+                  className="input"
+                  type={input.type}
+                  name={input.name}
+                  value={form[input.name]}
+                  onChange={handleChange}
+                  placeholder="Write here..."
+                  required
+                />
+              </div>
+            ))}
+            {/* Normal Price */}
+            <div className="coolinput">
+              <label className="text">Normal Price:</label>
+              <input
+                className="input"
+                type="text"
+                name="NormalPrice"
+                value={form.NormalPrice}
+                onChange={handleChange}
+                placeholder="฿0.00"
+                required
+              />
+            </div>
             {/* Dropdown Categories */}
             <div className="coolinput">
-  <label className="text">Categories:</label>
-  <select
-    name="Categories" // เปลี่ยนจาก Category เป็น Categories
-    className="input"
-    value={form.Categories} // ใช้ Categories ใน form
-    onChange={handleChange}
-    required
-  >
-    <option value="" disabled>Select Categories</option>
-    {categories.map((category) => (
-      <option key={category.id} value={category.Name}>
-        {category.Name}
-      </option>
-    ))}
-  </select>
-</div>
-
+              <label className="text">Categories:</label>
+              <select
+                name="Categories"
+                className="input"
+                value={form.Categories}
+                onChange={handleChange}
+                required
+              >
+                <option value="" disabled>
+                  Select Categories
+                </option>
+                {categories.map((category) => (
+                  <option key={category.id} value={category.Name}>
+                    {category.Name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            {/* Status */}
             <div className="coolinput">
               <label className="text">Status:</label>
               <select
@@ -96,7 +141,9 @@ const EditProduct = ({ product, onSave, onDelete, onClose, categories }) => {
               type="button"
               className="modal-button delete"
               onClick={() => {
-                if (window.confirm("Are you sure you want to delete this product?")) {
+                if (
+                  window.confirm("Are you sure you want to delete this product?")
+                ) {
                   onDelete(product.id);
                   onClose();
                 }

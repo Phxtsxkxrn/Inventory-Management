@@ -66,7 +66,10 @@ const ImportProducts = ({ onImport, onClose }) => {
         header: true,
         skipEmptyLines: true,
         complete: function (results) {
-          const parsedData = results.data;
+          const parsedData = results.data.map((item) => ({
+            ...item,
+            NormalPrice: parseCurrency(item.NormalPrice), // แปลง NormalPrice
+          }));
           onImport(parsedData);
           setUploadStatus("Upload Complete");
         },
@@ -77,21 +80,36 @@ const ImportProducts = ({ onImport, onClose }) => {
     };
     reader.readAsText(file);
   };
+  
 
   const processExcel = (file) => {
     const reader = new FileReader();
     reader.onload = (event) => {
       const binaryData = event.target.result;
       const workbook = XLSX.read(binaryData, { type: "binary" });
-
+  
       const sheetName = workbook.SheetNames[0];
       const worksheet = workbook.Sheets[sheetName];
-      const parsedData = XLSX.utils.sheet_to_json(worksheet);
+      const parsedData = XLSX.utils.sheet_to_json(worksheet).map((item) => ({
+        ...item,
+        NormalPrice: parseCurrency(item.NormalPrice), // แปลง NormalPrice
+      }));
+  
       onImport(parsedData);
       setUploadStatus("Upload Complete");
     };
     reader.readAsBinaryString(file);
   };
+
+  const parseCurrency = (value) => {
+    if (!value) return 0; // กรณีที่ไม่มีค่าใน NormalPrice
+    const numberValue = parseFloat(
+      value.replace(/[฿,]/g, "").replace(/[^0-9.]/g, "")
+    );
+    return isNaN(numberValue) ? 0 : numberValue;
+  };
+  
+  
 
   // จัดการการลากไฟล์เข้า
   const handleDragOver = (e) => {

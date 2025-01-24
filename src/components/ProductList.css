@@ -93,6 +93,7 @@
 
 /* ตารางหลัก */
 .product-table {
+  margin-top: 20px;
   width: 100%;
   border-collapse: collapse;
   background-color: #fff;
@@ -186,3 +187,105 @@
 .actions .delete:hover {
   background-color: #dc2626;
 }
+
+.custom-products-per-page {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.custom-submit-button {
+  margin-right: 20px;
+  padding: 5px 10px;
+  font-size: 14px;
+  border: 1px solid #007bff;
+  background-color: #007bff;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.custom-submit-button:hover {
+  background-color: #0056b3;
+}
+
+/* ขนาดปกติ */
+.pagination-controls.product-pagination-default {
+  max-width: 460px;
+}
+
+/* ขนาดเมื่อเลือก Custom */
+.pagination-controls.product-pagination-custom {
+  max-width: 700px;
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap; /* ป้องกันการขึ้นบรรทัดใหม่ */
+  justify-content: flex-start; /* จัดเรียงให้อยู่ชิดซ้าย */
+  margin-left: auto;
+  gap: 0; /* ไม่มีช่องว่างระหว่างส่วนต่าง ๆ */
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+.pagination-controls label {
+  font-size: 14px;
+  font-weight: 500;
+  margin-right: 5px; /* ลดระยะห่างระหว่าง Label และ Dropdown */
+}
+
+.pagination-controls select{
+  margin-right: 5px; /* ลดระยะห่างระหว่าง Dropdown และปุ่ม Previous */
+  padding: 5px 8px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.pagination-controls .custom-input {
+  width: 80px; /* ลดความกว้างของ input */
+  padding: 5px 8px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  text-align: center; /* จัดข้อความให้อยู่ตรงกลาง */
+}
+
+.page-navigation {
+  display: flex;
+  align-items: center;
+  gap: 5px; /* ลดระยะห่างระหว่างปุ่ม */
+}
+
+.page-navigation button {
+  padding: 5px 8px;
+  font-size: 13px;
+  border: 1px solid #007bff;
+  border-radius: 5px;
+  background-color: #007bff;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.page-navigation button:disabled {
+  background-color: #ccc;
+  border-color: #ccc;
+  cursor: not-allowed;
+}
+
+.page-navigation button:hover:not(:disabled) {
+  background-color: #0056b3;
+  border-color: #0056b3;
+}
+
+.page-navigation span {
+  font-size: 13px;
+  font-weight: 500;
+}
+

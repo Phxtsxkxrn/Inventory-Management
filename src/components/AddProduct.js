@@ -9,7 +9,7 @@ const AddProduct = ({ onAdd, onClose }) => {
     Name: "",
     Categories: "", // ใช้สำหรับเก็บค่าจาก dropdown
     Seller: "",
-    NormalPrice: 0,
+    NormalPrice: "",
     Status: "active",
   });
 
@@ -28,14 +28,45 @@ const AddProduct = ({ onAdd, onClose }) => {
     fetchCategories();
   }, []);
 
+  const formatCurrency = (value) => {
+    if (!value) return "";
+    return new Intl.NumberFormat("th-TH", {
+      style: "currency",
+      currency: "THB",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(value);
+  };
+
+  const parseCurrency = (value) => {
+    const numberValue = parseFloat(
+      value.replace(/[฿,]/g, "").replace(/[^0-9.]/g, "")
+    );
+    return isNaN(numberValue) ? "" : numberValue;
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+
+    if (name === "NormalPrice") {
+      const numericValue = parseCurrency(value); // Convert to numeric value
+      setForm((prev) => ({
+        ...prev,
+        [name]: numericValue ? formatCurrency(numericValue) : "",
+      }));
+    } else {
+      setForm((prev) => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onAdd(form);
+    // Convert NormalPrice back to numeric value before submitting
+    const formData = {
+      ...form,
+      NormalPrice: parseCurrency(form.NormalPrice),
+    };
+    onAdd(formData);
     onClose();
   };
 
@@ -50,7 +81,6 @@ const AddProduct = ({ onAdd, onClose }) => {
               { name: "SKU", type: "text", label: "SKU" },
               { name: "Name", type: "text", label: "Name" },
               { name: "Seller", type: "text", label: "Seller" },
-              { name: "NormalPrice", type: "number", label: "Normal Price" },
             ].map((input) => (
               <div className="coolinput" key={input.name}>
                 <label className="text">{input.label}:</label>
@@ -65,6 +95,18 @@ const AddProduct = ({ onAdd, onClose }) => {
                 />
               </div>
             ))}
+            <div className="coolinput">
+              <label className="text">Normal Price:</label>
+              <input
+                className="input"
+                type="text"
+                name="NormalPrice"
+                value={form.NormalPrice}
+                onChange={handleChange}
+                placeholder="฿0.00"
+                required
+              />
+            </div>
             <div className="coolinput">
               <label className="text">Categories:</label>
               <select

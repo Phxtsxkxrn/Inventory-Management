@@ -34,32 +34,33 @@
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-/* ปุ่ม Add Category */
-.add-button {
+.categories-add-button {
   padding: 10px 15px;
   background-color: #4caf50;
   color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  font-size: 14px; /* ขนาดฟอนต์ */
+  font-size: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* เพิ่มเงา */
-  transition: all 0.3s ease; /* เอฟเฟคเคลื่อนไหว */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  height: 40px; /* ความสูงเท่ากับ Input */
 }
 
-.add-button:hover {
-  background-color: #45a049; /* สีพื้นหลังเมื่อ hover */
-  transform: translateY(-2px); /* ยกปุ่มขึ้น */
-  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15); /* เพิ่มเงาเมื่อ hover */
+.categories-add-button:hover {
+  background-color: #45a049;
+  transform: translateY(-2px); /* เพิ่มเอฟเฟคเด้ง */
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
 }
 
-.add-button:active {
-  transform: translateY(0); /* กลับตำแหน่งเดิมเมื่อคลิก */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* เงาปกติ */
+.categories-add-button:active {
+  transform: translateY(0); /* ลดเด้งเมื่อคลิก */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
+
 
 /* ตาราง Categories */
 .categories-table {
@@ -146,4 +147,99 @@
 .actions .edit:active {
   transform: translateY(0); /* กลับตำแหน่งเดิมเมื่อคลิก */
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* เงาปกติ */
+}
+
+/* ขนาดปกติ */
+.pagination-controls.categories-pagination-default {
+  max-width: 500px; /* กำหนดขนาดสูงสุด */
+  justify-content: flex-end; /* จัดตำแหน่งไปด้านขวา */
+}
+
+/* ขนาดเมื่อเลือก Custom */
+.pagination-controls.categories-pagination-custom {
+  max-width: 800px; /* ขยายขนาดสูงสุด */
+  justify-content: flex-end; /* จัดตำแหน่งไปด้านขวา */
+}
+
+/* Container สำหรับ Pagination (จัดตำแหน่งขวาของตาราง) */
+.pagination-container {
+  display: flex;
+  justify-content: flex-end; /* จัดตำแหน่งไปทางขวา */
+  margin-bottom: 10px; /* ระยะห่างระหว่าง Pagination และตาราง */
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.custom-products-per-page {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.custom-input {
+  width: 80px;
+  padding: 5px 8px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  text-align: center;
+}
+
+.custom-submit-button {
+  padding: 5px 10px;
+  font-size: 14px;
+  border: 1px solid #007bff;
+  background-color: #007bff;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.custom-submit-button:hover {
+  background-color: #0056b3;
+}
+
+.pagination-controls label {
+  font-size: 14px;
+  margin-right: 5px;
+}
+
+.pagination-controls select {
+  padding: 5px 8px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.page-navigation {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* ระยะห่างระหว่างปุ่ม */
+}
+
+.page-navigation button {
+  padding: 5px 10px;
+  font-size: 14px;
+  border: 1px solid #007bff;
+  background-color: #007bff;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.page-navigation button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
+.page-navigation span {
+  font-size: 14px;
 }
