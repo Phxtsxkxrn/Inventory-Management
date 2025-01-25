@@ -289,3 +289,17 @@
   font-weight: 500;
 }
 
+.pagination-and-records {
+  display: flex;
+  justify-content: space-between; /* แยกให้อยู่คนละฝั่ง */
+  align-items: flex-end; /* จัดให้อยู่ด้านล่าง */
+  margin-bottom: 10px; /* ระยะห่างด้านล่างทั้งหมด */
+}
+
+.records-found {
+  font-size: 16px;
+  font-weight: bold;
+  color: #4caf50; /* สีเขียวเพื่อเน้น */
+  margin: 0; /* ลบระยะห่างรอบ ๆ เพื่อให้ชิดเส้นล่าง */
+  padding-bottom: 2px; /* ปรับให้ตรงกับเส้น bottom ของ pagination */
+}

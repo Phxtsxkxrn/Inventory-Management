@@ -90,62 +90,71 @@ const ProductList = ({ products, categories, onAdd, onEdit, onDelete, onImport }
         </div>
       </div>
 
-      <div
-  className={`pagination-controls ${
-    productsPerPage === 0 ? "product-pagination-custom" : "product-pagination-default"
-  }`}
->
-  <label htmlFor="products-per-page">Products per page:</label>
-  <select
-    id="products-per-page"
-    value={productsPerPage === 0 ? "custom" : productsPerPage}
-    onChange={handleProductsPerPageChange}
+      <div className="pagination-and-records">
+  {/* Records Found */}
+  <div className="records-found">
+    {filteredProducts.length} {filteredProducts.length === 1 ? "record" : "records"} found
+  </div>
+
+  {/* Pagination Controls */}
+  <div
+    className={`pagination-controls ${
+      productsPerPage === 0 ? "product-pagination-custom" : "product-pagination-default"
+    }`}
   >
-    {customOptions.map((option) => (
-      <option key={option} value={option}>
-        {option}
-      </option>
-    ))}
-    <option value="custom">Custom</option>
-  </select>
-  {productsPerPage === 0 && (
-    <div className="custom-products-per-page">
-      <input
-        type="number"
-        min="1"
-        className="custom-input"
-        placeholder="Enter number"
-        value={customInputValue}
-        onChange={handleCustomInputChange}
-      />
+    <label htmlFor="products-per-page">Products per page:</label>
+    <select
+      id="products-per-page"
+      value={productsPerPage === 0 ? "custom" : productsPerPage}
+      onChange={handleProductsPerPageChange}
+    >
+      {customOptions.map((option) => (
+        <option key={option} value={option}>
+          {option}
+        </option>
+      ))}
+      <option value="custom">Custom</option>
+    </select>
+    {productsPerPage === 0 && (
+      <div className="custom-products-per-page">
+        <input
+          type="number"
+          min="1"
+          className="custom-input"
+          placeholder="Enter number"
+          value={customInputValue}
+          onChange={handleCustomInputChange}
+        />
+        <button
+          className="custom-submit-button"
+          onClick={handleCustomProductsPerPageSubmit}
+        >
+          Submit
+        </button>
+      </div>
+    )}
+    <div className="page-navigation">
       <button
-        className="custom-submit-button"
-        onClick={handleCustomProductsPerPageSubmit}
+        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+        disabled={currentPage === 1}
       >
-        Submit
+        Previous
+      </button>
+      <span>
+        Page {currentPage} of {totalPages}
+      </span>
+      <button
+        onClick={() =>
+          setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+        }
+        disabled={currentPage === totalPages}
+      >
+        Next
       </button>
     </div>
-  )}
-  <div className="page-navigation">
-    <button
-      onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-      disabled={currentPage === 1}
-    >
-      Previous
-    </button>
-    <span>
-      Page {currentPage} of {totalPages}
-    </span>
-    <button
-      onClick={() =>
-        setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-      }
-      disabled={currentPage === totalPages}
-    >
-      Next
-    </button>
   </div>
 </div>
+
 
       {isAddModalOpen && (
         <AddProduct

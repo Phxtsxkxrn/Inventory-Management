@@ -165,6 +165,7 @@
 /* ลดระยะห่างระหว่าง Pagination และตาราง */
 .pagination-container {
   display: flex;
+  justify-content: space-between; /* แยก Records Found และ Pagination */
   justify-content: flex-end; /* จัดตำแหน่งไปทางขวา */
   margin-bottom: 5px; /* ลดระยะห่างจากเดิม */
 }
@@ -244,4 +245,14 @@
 
 .page-navigation span {
   font-size: 14px;
+}
+
+
+/* Records Found */
+.records-found {
+  font-size: 16px;
+  font-weight: bold;
+  color: #4caf50; /* สีเขียว */
+  margin: 0; /* ไม่มีระยะห่างเพิ่มเติม */
+  align-self: flex-end; /* จัดให้อยู่ตรงกับเส้นล่าง */
 }

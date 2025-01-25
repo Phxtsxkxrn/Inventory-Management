@@ -77,15 +77,20 @@ const CategoriesList = () => {
           className="search-input"
         />
         <button onClick={openAddModal} className="categories-add-button">
-  Add Categories
-</button>
-
+          Add Categories
+        </button>
       </div>
-      {/* Pagination Controls (จัดตำแหน่งด้านขวาของตาราง) */}
+      {/* Pagination Controls และ Records Found */}
       <div className="pagination-container">
+        <div className="records-found">
+          {filteredCategories.length}{" "}
+          {filteredCategories.length === 1 ? "record" : "records"} found
+        </div>
         <div
           className={`pagination-controls ${
-            categoriesPerPage === 0 ? "categories-pagination-custom" : "categories-pagination-default"
+            categoriesPerPage === 0
+              ? "categories-pagination-custom"
+              : "categories-pagination-default"
           }`}
         >
           <label htmlFor="categories-per-page">Categories per page:</label>
@@ -119,7 +124,10 @@ const CategoriesList = () => {
                 value={customInputValue}
                 onChange={(e) => setCustomInputValue(e.target.value)}
               />
-              <button className="custom-submit-button" onClick={handleCustomSubmit}>
+              <button
+                className="custom-submit-button"
+                onClick={handleCustomSubmit}
+              >
                 Submit
               </button>
             </div>
