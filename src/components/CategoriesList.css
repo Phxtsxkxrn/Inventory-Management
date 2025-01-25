@@ -162,10 +162,11 @@
 }
 
 /* Container สำหรับ Pagination (จัดตำแหน่งขวาของตาราง) */
+/* ลดระยะห่างระหว่าง Pagination และตาราง */
 .pagination-container {
   display: flex;
   justify-content: flex-end; /* จัดตำแหน่งไปทางขวา */
-  margin-bottom: 10px; /* ระยะห่างระหว่าง Pagination และตาราง */
+  margin-bottom: 5px; /* ลดระยะห่างจากเดิม */
 }
 
 .pagination-controls {
@@ -173,8 +174,9 @@
   align-items: center;
   justify-content: flex-end;
   gap: 10px;
-  margin-bottom: 10px;
+  margin-bottom: 0; /* ไม่มีระยะห่างเพิ่มเติม */
 }
+
 
 .custom-products-per-page {
   display: flex;
