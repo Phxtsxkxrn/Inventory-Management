@@ -7,7 +7,6 @@ import {
   deleteDoc,
   doc,
   serverTimestamp,
-  getDoc,
 } from "firebase/firestore";
 
 // คอลเลกชันสินค้า

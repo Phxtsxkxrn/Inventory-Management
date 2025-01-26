@@ -118,6 +118,7 @@ function App() {
               element={
                 <ProductList
                   products={products}
+                  setProducts={setProducts}
                   categories={categories}
                   onAdd={handleAddProduct}
                   onEdit={handleEditProduct}

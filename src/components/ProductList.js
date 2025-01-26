@@ -3,8 +3,10 @@ import AddProduct from "./AddProduct";
 import EditProduct from "./EditProduct";
 import ImportProducts from "./ImportProducts";
 import "./ProductList.css"; // นำเข้าไฟล์ CSS
+import { deleteProduct } from "../services/productService";
 
-const ProductList = ({ products, categories, onAdd, onEdit, onDelete, onImport }) => {
+
+const ProductList = ({ products, setProducts, categories, onAdd, onEdit, onDelete, onImport }) => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
@@ -14,6 +16,8 @@ const ProductList = ({ products, categories, onAdd, onEdit, onDelete, onImport }
   const [currentPage, setCurrentPage] = useState(1); // State สำหรับหน้าปัจจุบัน
   const [customInputValue, setCustomInputValue] = useState(""); // เก็บค่าชั่วคราวจากช่อง input
   const [customOptions, setCustomOptions] = useState([20, 30, 50, 100, 200]); // ตัวเลือก dropdown
+  const [selectedProducts, setSelectedProducts] = useState([]); // State สำหรับ product ที่ถูกเลือก
+
 
   const openAddModal = () => setIsAddModalOpen(true);
   const closeAddModal = () => setIsAddModalOpen(false);
@@ -44,6 +48,16 @@ const ProductList = ({ products, categories, onAdd, onEdit, onDelete, onImport }
     currentPage * productsPerPage
   );
 
+  const handleCheckboxChange = (productId) => {
+    setSelectedProducts((prev) =>
+      prev.includes(productId)
+        ? prev.filter((id) => id !== productId) // Uncheck
+        : [...prev, productId] // Check
+    );
+  };
+
+  const isProductSelected = (productId) => selectedProducts.includes(productId);
+
   const handleProductsPerPageChange = (e) => {
     const value = e.target.value === "custom" ? 0 : parseInt(e.target.value, 10);
     setProductsPerPage(value);
@@ -66,6 +80,32 @@ const ProductList = ({ products, categories, onAdd, onEdit, onDelete, onImport }
       setCustomInputValue(""); // ล้างค่าช่อง input
     }
   };
+
+  const deleteSelectedProducts = async () => {
+  if (window.confirm("Are you sure you want to delete the selected products?")) {
+    try {
+      // ลบสินค้าใน Firebase
+      await Promise.all(
+        selectedProducts.map((productId) => deleteProduct(productId))
+      );
+
+      // อัปเดตรายการสินค้าใน State
+      setProducts((prevProducts) =>
+        prevProducts.filter((product) => !selectedProducts.includes(product.id))
+      );
+
+      // ล้างรายการสินค้าที่ถูกเลือก
+      setSelectedProducts([]);
+
+      alert("Selected products have been deleted.");
+    } catch (error) {
+      alert("An error occurred while deleting selected products.");
+    }
+  }
+};
+
+  
+  
 
   return (
     <div className="product-list">
@@ -92,9 +132,16 @@ const ProductList = ({ products, categories, onAdd, onEdit, onDelete, onImport }
 
       <div className="pagination-and-records">
   {/* Records Found */}
-  <div className="records-found">
-    {filteredProducts.length} {filteredProducts.length === 1 ? "record" : "records"} found
-  </div>
+<div className="records-found">
+  {filteredProducts.length} {filteredProducts.length === 1 ? "record" : "records"} found
+  {selectedProducts.length > 0 && (
+    <span>
+      {" "}
+      | {selectedProducts.length} {selectedProducts.length === 1 ? "selected" : "selected"}
+    </span>
+  )}
+</div>
+
 
   {/* Pagination Controls */}
   <div
@@ -192,6 +239,20 @@ const ProductList = ({ products, categories, onAdd, onEdit, onDelete, onImport }
       <table className="product-table">
         <thead>
           <tr>
+          <th>
+              <input
+                type="checkbox"
+                onChange={(e) =>
+                  e.target.checked
+                    ? setSelectedProducts(displayedProducts.map((p) => p.id))
+                    : setSelectedProducts([])
+                }
+                checked={
+                  displayedProducts.every((p) => isProductSelected(p.id)) &&
+                  displayedProducts.length > 0
+                }
+              />
+            </th>
             <th>Brand</th>
             <th>SKU</th>
             <th>Name</th>
@@ -207,6 +268,14 @@ const ProductList = ({ products, categories, onAdd, onEdit, onDelete, onImport }
         <tbody>
           {displayedProducts.map((product) => (
             <tr key={product.id}>
+              <td>
+                <input
+                  type="checkbox"
+                  className="custom-checkbox"
+                  checked={isProductSelected(product.id)}
+                  onChange={() => handleCheckboxChange(product.id)}
+                />
+              </td>
               <td>{product.Brand || "N/A"}</td>
               <td>{product.SKU || "N/A"}</td>
               <td>{product.Name || "N/A"}</td>
@@ -253,6 +322,23 @@ const ProductList = ({ products, categories, onAdd, onEdit, onDelete, onImport }
           ))}
         </tbody>
       </table>
+  {/* Action Bar */}
+  {selectedProducts.length > 0 && (
+  <div className="action-bar">
+    <span className="selected-info">
+      {selectedProducts.length} of {filteredProducts.length} Selected
+    </span>
+    <div className="divider"></div>
+    <button className="action-button export-selected">Export Selected</button>
+    <div className="divider"></div>
+    <button
+      className="action-button delete-selected"
+      onClick={deleteSelectedProducts}
+    >
+      Delete Selected
+    </button>
+  </div>
+)}
     </div>
   );
 };

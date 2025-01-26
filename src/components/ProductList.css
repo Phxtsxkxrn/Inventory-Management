@@ -303,3 +303,100 @@
   margin: 0; /* ลบระยะห่างรอบ ๆ เพื่อให้ชิดเส้นล่าง */
   padding-bottom: 2px; /* ปรับให้ตรงกับเส้น bottom ของ pagination */
 }
+
+/* สไตล์ Checkbox */
+input[type="checkbox"] {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  appearance: none; /* ลบสไตล์เริ่มต้น */
+  background-color: #fff;
+  border: 2px solid #ccc;
+  border-radius: 5px;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+input[type="checkbox"]:checked {
+  background-color: #4caf50;
+  border-color: #4caf50;
+}
+
+input[type="checkbox"]::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  width: 12px;
+  height: 12px;
+  background-color: #fff;
+  border-radius: 2px;
+  transition: transform 0.2s ease-in-out;
+}
+
+input[type="checkbox"]:checked::before {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+input[type="checkbox"]:hover {
+  border-color: #4caf50;
+}
+
+/* Action Bar */
+.action-bar {
+  position: fixed;
+  bottom: 60px; /* ระยะห่างจากขอบล่าง */
+  left: 50%;
+  transform: translateX(-50%);
+  width: auto;
+  max-width: 90%;
+  background-color: #000; /* สีดำ */
+  color: #fff; /* สีข้อความ */
+  border-radius: 8px;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  gap: 15px; /* ระยะห่างระหว่างปุ่ม */
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3); /* เงา */
+  z-index: 1000; /* ลอยอยู่ด้านบน */
+}
+
+
+/* ข้อมูลการเลือก */
+.selected-info {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+/* เส้นกั้น */
+.divider {
+  width: 1px;
+  height: 24px; /* ความสูงของเส้น */
+  background-color: #ccc; /* สีของเส้น */
+}
+
+/* ปุ่มใน Action Bar */
+.action-button {
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+}
+
+.action-button:hover {
+  background-color: #2563eb; /* สี hover */
+}
+
+.action-button.delete-selected {
+  background-color: rgba(0, 0, 0, 0.8); /* สีแดงสำหรับ Delete */
+}
+
+.action-button.delete-selected:hover {
+  background-color: #b91c1c;
+}
