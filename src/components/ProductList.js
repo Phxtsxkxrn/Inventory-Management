@@ -48,10 +48,12 @@ const ProductList = ({
   const openEditModal = (product) => {
     setEditingProduct(product);
     setIsEditModalOpen(true);
+    setIsModalOpen(true); // Disable checkbox
   };
   const closeEditModal = () => {
     setEditingProduct(null);
     setIsEditModalOpen(false);
+    setIsModalOpen(false); // Enable checkbox
   };
 
   const filteredProducts = products.filter((product) =>
