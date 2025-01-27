@@ -400,3 +400,11 @@ input[type="checkbox"]:hover {
 .action-button.delete-selected:hover {
   background-color: #b91c1c;
 }
+
+.action-button.cancel-selected {
+  background-color: rgba(0, 0, 0, 0.8); /* สีแดงสำหรับ Delete */
+}
+
+.action-button.cancel-selected:hover {
+  background-color: #b91c1c;
+}

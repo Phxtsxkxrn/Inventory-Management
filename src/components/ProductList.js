@@ -4,6 +4,7 @@ import EditProduct from "./EditProduct";
 import ImportProducts from "./ImportProducts";
 import "./ProductList.css"; // นำเข้าไฟล์ CSS
 import { deleteProduct } from "../services/productService";
+import * as XLSX from "xlsx";
 
 
 const ProductList = ({ products, setProducts, categories, onAdd, onEdit, onDelete, onImport }) => {
@@ -81,6 +82,11 @@ const ProductList = ({ products, setProducts, categories, onAdd, onEdit, onDelet
     }
   };
 
+  const cancelAllSelected = () => {
+    setSelectedProducts([]);
+  };
+  
+
   const deleteSelectedProducts = async () => {
   if (window.confirm("Are you sure you want to delete the selected products?")) {
     try {
@@ -103,6 +109,106 @@ const ProductList = ({ products, setProducts, categories, onAdd, onEdit, onDelet
     }
   }
 };
+
+const exportSelectedProducts = (type) => {
+  if (selectedProducts.length === 0) {
+    alert("Please select products to export.");
+    return;
+  }
+
+  // กรองสินค้าเฉพาะที่เลือก และลบ id ออก
+  const selectedData = products
+    .filter((product) => selectedProducts.includes(product.id))
+    .map(({ id, ...rest }) => rest); // ลบฟิลด์ id ออกจากข้อมูล
+
+  if (type === "csv" || type === "excel") {
+    const worksheet = XLSX.utils.json_to_sheet(selectedData); // แปลงข้อมูลเป็น Worksheet
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Selected Products");
+
+    if (type === "csv") {
+      XLSX.writeFile(workbook, "selected_products.csv", { bookType: "csv" });
+    } else if (type === "excel") {
+      XLSX.writeFile(workbook, "selected_products.xlsx", { bookType: "xlsx" });
+    }
+  } else if (type === "print") {
+    const printableData = selectedData.map((product) => ({
+      Brand: product.Brand || "N/A",
+      SKU: product.SKU || "N/A",
+      Name: product.Name || "N/A",
+      Categories: product.Categories || "N/A",
+      Seller: product.Seller || "N/A",
+      NormalPrice: product.NormalPrice
+        ? `฿${new Intl.NumberFormat("th-TH", {
+            style: "decimal",
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          }).format(product.NormalPrice)}`
+        : "N/A",
+      Status: product.Status || "N/A",
+      CreatedAt: product.CreatedAt
+        ? new Date(product.CreatedAt).toLocaleString()
+        : "N/A",
+      LastUpdate: product.LastUpdate
+        ? new Date(product.LastUpdate).toLocaleString()
+        : "N/A",
+    }));
+
+    const newWindow = window.open("", "_blank");
+    const printContent = `
+      <html>
+        <head>
+          <title>Print Selected Products</title>
+          <style>
+            table { width: 100%; border-collapse: collapse; }
+            th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+            th { background-color: #f4f4f4; }
+          </style>
+        </head>
+        <body>
+          <h2>Selected Products</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Brand</th>
+                <th>SKU</th>
+                <th>Name</th>
+                <th>Categories</th>
+                <th>Seller</th>
+                <th>Normal Price</th>
+                <th>Status</th>
+                <th>Created At</th>
+                <th>Last Update</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${printableData
+                .map(
+                  (row) =>
+                    `<tr>
+                      <td>${row.Brand}</td>
+                      <td>${row.SKU}</td>
+                      <td>${row.Name}</td>
+                      <td>${row.Categories}</td>
+                      <td>${row.Seller}</td>
+                      <td>${row.NormalPrice}</td>
+                      <td>${row.Status}</td>
+                      <td>${row.CreatedAt}</td>
+                      <td>${row.LastUpdate}</td>
+                    </tr>`
+                )
+                .join("")}
+            </tbody>
+          </table>
+        </body>
+      </html>
+    `;
+    newWindow.document.write(printContent);
+    newWindow.document.close();
+    newWindow.print();
+  }
+};
+
 
   
   
@@ -240,18 +346,22 @@ const ProductList = ({ products, setProducts, categories, onAdd, onEdit, onDelet
         <thead>
           <tr>
           <th>
-              <input
-                type="checkbox"
-                onChange={(e) =>
-                  e.target.checked
-                    ? setSelectedProducts(displayedProducts.map((p) => p.id))
-                    : setSelectedProducts([])
-                }
-                checked={
-                  displayedProducts.every((p) => isProductSelected(p.id)) &&
-                  displayedProducts.length > 0
-                }
-              />
+          <input
+  type="checkbox"
+  onChange={(e) => {
+    const productIdsOnPage = displayedProducts.map((p) => p.id); // ดึงเฉพาะ id ของสินค้าบนหน้าปัจจุบัน
+    setSelectedProducts((prevSelected) =>
+      e.target.checked
+        ? [...new Set([...prevSelected, ...productIdsOnPage])] // รวมสินค้าบนหน้าใหม่กับสินค้าที่เคยเลือกไว้
+        : prevSelected.filter((id) => !productIdsOnPage.includes(id)) // เอาสินค้าในหน้าปัจจุบันออก
+    );
+  }}
+  checked={
+    displayedProducts.every((p) => isProductSelected(p.id)) &&
+    displayedProducts.length > 0
+  }
+/>
+
             </th>
             <th>Brand</th>
             <th>SKU</th>
@@ -329,16 +439,42 @@ const ProductList = ({ products, setProducts, categories, onAdd, onEdit, onDelet
       {selectedProducts.length} of {filteredProducts.length} Selected
     </span>
     <div className="divider"></div>
-    <button className="action-button export-selected">Export Selected</button>
-    <div className="divider"></div>
+          <button
+            className="action-button export-selected"
+            onClick={() => exportSelectedProducts("csv")}
+          >
+            Export CSV
+          </button>
+          <div className="divider"></div>
+          <button
+            className="action-button export-selected"
+            onClick={() => exportSelectedProducts("excel")}
+          >
+            Export Excel
+          </button>
+          <div className="divider"></div>
+          <button
+            className="action-button export-selected"
+            onClick={() => exportSelectedProducts("print")}
+          >
+            Print
+          </button>
+          <div className="divider"></div>
+          <button
+            className="action-button delete-selected"
+            onClick={deleteSelectedProducts}
+          >
+            Delete Selected
+          </button>
+          <div className="divider"></div>
     <button
-      className="action-button delete-selected"
-      onClick={deleteSelectedProducts}
+      className="action-button cancel-selected"
+      onClick={cancelAllSelected}
     >
-      Delete Selected
+      Cancel All
     </button>
-  </div>
-)}
+        </div>
+      )}
     </div>
   );
 };
