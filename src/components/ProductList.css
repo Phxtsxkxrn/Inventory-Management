@@ -344,6 +344,14 @@ input[type="checkbox"]:hover {
   border-color: #4caf50;
 }
 
+/* สำหรับ checkbox ที่ disabled */
+input[type="checkbox"]:disabled {
+  cursor: not-allowed; /* เปลี่ยน cursor เป็น not-allowed */
+  opacity: 0.5; /* ลดความทึบเพื่อบ่งบอกว่า disabled */
+  background-color: #f5f5f5; /* เปลี่ยนสีพื้นหลัง */
+  border-color: #ccc; /* เปลี่ยนสีขอบ */
+}
+
 /* Action Bar */
 .action-bar {
   position: fixed;

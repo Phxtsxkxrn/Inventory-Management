@@ -18,13 +18,26 @@ const ProductList = ({ products, setProducts, categories, onAdd, onEdit, onDelet
   const [customInputValue, setCustomInputValue] = useState(""); // เก็บค่าชั่วคราวจากช่อง input
   const [customOptions, setCustomOptions] = useState([20, 30, 50, 100, 200]); // ตัวเลือก dropdown
   const [selectedProducts, setSelectedProducts] = useState([]); // State สำหรับ product ที่ถูกเลือก
+  const [isModalOpen, setIsModalOpen] = useState(false); // State ควบคุมการเปิด Modal
 
 
-  const openAddModal = () => setIsAddModalOpen(true);
-  const closeAddModal = () => setIsAddModalOpen(false);
+  const openAddModal = () => {
+    setIsAddModalOpen(true);
+    setIsModalOpen(true); // Disable checkbox
+  };
+  const closeAddModal = () => {
+    setIsAddModalOpen(false);
+    setIsModalOpen(false); // Enable checkbox
+  };
 
-  const openImportModal = () => setIsImportModalOpen(true);
-  const closeImportModal = () => setIsImportModalOpen(false);
+  const openImportModal = () => {
+    setIsImportModalOpen(true);
+    setIsModalOpen(true); // Disable checkbox
+  };
+  const closeImportModal = () => {
+    setIsImportModalOpen(false);
+    setIsModalOpen(false); // Enable checkbox
+  };
 
   const openEditModal = (product) => {
     setEditingProduct(product);
@@ -347,21 +360,20 @@ const exportSelectedProducts = (type) => {
           <tr>
           <th>
           <input
-  type="checkbox"
-  onChange={(e) => {
-    const productIdsOnPage = displayedProducts.map((p) => p.id); // ดึงเฉพาะ id ของสินค้าบนหน้าปัจจุบัน
-    setSelectedProducts((prevSelected) =>
-      e.target.checked
-        ? [...new Set([...prevSelected, ...productIdsOnPage])] // รวมสินค้าบนหน้าใหม่กับสินค้าที่เคยเลือกไว้
-        : prevSelected.filter((id) => !productIdsOnPage.includes(id)) // เอาสินค้าในหน้าปัจจุบันออก
-    );
-  }}
-  checked={
-    displayedProducts.every((p) => isProductSelected(p.id)) &&
-    displayedProducts.length > 0
-  }
-/>
-
+    type="checkbox"
+    onChange={(e) =>
+      setSelectedProducts(
+        e.target.checked
+          ? displayedProducts.map((p) => p.id)
+          : []
+      )
+    }
+    disabled={isModalOpen} // Disable checkbox เมื่อ modal เปิดอยู่
+    checked={
+      displayedProducts.every((p) => isProductSelected(p.id)) &&
+      displayedProducts.length > 0
+    }
+  />
             </th>
             <th>Brand</th>
             <th>SKU</th>
@@ -379,13 +391,14 @@ const exportSelectedProducts = (type) => {
           {displayedProducts.map((product) => (
             <tr key={product.id}>
               <td>
-                <input
-                  type="checkbox"
-                  className="custom-checkbox"
-                  checked={isProductSelected(product.id)}
-                  onChange={() => handleCheckboxChange(product.id)}
-                />
-              </td>
+  <input
+    type="checkbox"
+    className="custom-checkbox"
+    disabled={isModalOpen} // Disable individual checkboxes
+    checked={isProductSelected(product.id)}
+    onChange={() => handleCheckboxChange(product.id)}
+  />
+</td>
               <td>{product.Brand || "N/A"}</td>
               <td>{product.SKU || "N/A"}</td>
               <td>{product.Name || "N/A"}</td>
