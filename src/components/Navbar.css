@@ -1,88 +1,71 @@
-/* สไตล์พื้นฐานของ Navbar */
+/* Sidebar container */
 .navbar {
-  width: 250px;
-  background-color: #ffffff; /* สีพื้นหลัง */
-  border-right: 1px solid #e5e7eb;
-  padding: 20px;
-  min-height: 100vh; /* ความสูงขั้นต่ำเท่ากับ viewport */
   display: flex;
   flex-direction: column;
-  box-shadow: none;
-  position: sticky; /* ยึดตำแหน่ง */
-  top: 0; /* ให้ติดขอบด้านบน */
-  overflow-y: auto; /* เพิ่มการเลื่อนเมื่อเนื้อหาเกิน */
+  width: 250px;
+  height: 100vh;
+  background-color: #2c3e50;
+  padding: 20px 10px;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
 }
 
-
-/* สไตล์เมนูหลัก */
+/* Menu items */
 .navbar-menu {
-  list-style: none;
+  list-style-type: none;
   padding: 0;
   margin: 0;
 }
 
 .navbar-item {
-  margin-bottom: 15px; /* เพิ่มระยะห่างระหว่างรายการเมนู */
+  margin-bottom: 10px; /* Reduce spacing between menu items */
 }
 
+/* Links and button styling */
 .navbar-link {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  color: #ecf0f1;
   text-decoration: none;
-  color: #374151; /* สีข้อความ */
-  font-size: 16px;
-  font-weight: 500;
-  padding: 12px 20px;
-  border-radius: 8px;
-  background-color: #f9fafb;
+  font-size: 16px; /* Ensure consistent font size */
+  padding: 8px 10px; /* Reduce padding */
+  border: none;
+  background: none;
   cursor: pointer;
-  transition: all 0.3s ease; /* เพิ่มเอฟเฟกต์การเคลื่อนไหว */
-  box-shadow: none; /* เอาเงาหรือเส้นขอบออก */
-  border: none; /* เอาเส้นขอบออก */
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
 }
 
 .navbar-link:hover {
-  background-color: #e5e7eb; /* สีเมื่อ Hover */
-  box-shadow: none; /* เอาเงาเมื่อ Hover ออก */
+  background-color: #34495e;
 }
 
-/* ไอคอนในเมนูหลัก */
-.icon {
-  margin-right: 12px; /* เพิ่มระยะห่างระหว่างไอคอนและข้อความ */
-  font-size: 20px;
-  color: #6b7280; /* สีไอคอน */
-}
-
-/* ลูกศรเปิด/ปิดเมนู */
-.dropdown-arrow {
-  font-size: 14px;
-  transition: transform 0.3s ease;
-  color: #6b7280;
-}
-
-.dropdown-arrow.open {
-  transform: rotate(180deg); /* หมุนลูกศรเมื่อเมนูเปิด */
-}
-
-/* เมนูย่อย */
+/* Dropdown menu */
 .dropdown-menu {
-  margin-top: 5px;
-  margin-left: 20px; /* ขยับเข้าด้านในสำหรับเมนูย่อย */
-  list-style: none;
+  list-style-type: none;
   padding: 0;
+  margin: 5px 0 0 20px; /* Reduce margin and slightly indent */
 }
 
 .dropdown-link {
+  color: #bdc3c7;
   text-decoration: none;
-  color: #4b5563; /* สีข้อความเมนูย่อย */
-  font-size: 14px;
-  padding: 8px 15px;
-  display: block;
-  border-radius: 6px;
-  transition: all 0.3s ease;
+  padding: 5px 10px; /* Reduce padding */
+  display: flex;
+  align-items: center;
+  transition: color 0.3s ease;
 }
 
 .dropdown-link:hover {
-  background-color: #e5e7eb; /* สีเมื่อ Hover เมนูย่อย */
+  color: #ecf0f1;
+}
+
+/* Dropdown arrow */
+.dropdown-arrow {
+  margin-left: 5px;
+  font-size: 12px;
+  transition: transform 0.3s ease;
+}
+
+.dropdown-arrow.open {
+  transform: rotate(180deg);
 }
