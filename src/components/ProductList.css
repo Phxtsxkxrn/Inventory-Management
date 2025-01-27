@@ -90,7 +90,6 @@
   box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
 }
 
-
 /* ตารางหลัก */
 .product-table {
   margin-top: 20px;
@@ -147,11 +146,6 @@
 }
 
 .status-badge.process {
-  background-color: #ffeeba;
-  color: #ffc107;
-}
-
-.status-badge.canceled {
   background-color: #f8d7da;
   color: #dc3545;
 }
@@ -239,7 +233,7 @@
   margin-right: 5px; /* ลดระยะห่างระหว่าง Label และ Dropdown */
 }
 
-.pagination-controls select{
+.pagination-controls select {
   margin-right: 5px; /* ลดระยะห่างระหว่าง Dropdown และปุ่ม Previous */
   padding: 5px 8px;
   font-size: 14px;
@@ -370,7 +364,6 @@ input[type="checkbox"]:disabled {
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3); /* เงา */
   z-index: 1000; /* ลอยอยู่ด้านบน */
 }
-
 
 /* ข้อมูลการเลือก */
 .selected-info {

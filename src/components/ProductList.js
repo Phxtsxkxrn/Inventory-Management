@@ -228,8 +228,8 @@ const ProductList = ({
             <table>
               <thead>
                 <tr>
-                  <th>Brand</th>
                   <th>SKU</th>
+                  <th>Brand</th>
                   <th>Name</th>
                   <th>Categories</th>
                   <th>Seller</th>
@@ -420,8 +420,8 @@ const ProductList = ({
                 }
               />
             </th>
-            <th>Brand</th>
             <th>SKU</th>
+            <th>Brand</th>
             <th>Name</th>
             <th>Categories</th>
             <th>Seller</th>
@@ -454,8 +454,8 @@ const ProductList = ({
                     onChange={() => handleCheckboxChange(product.id)}
                   />
                 </td>
-                <td>{product.Brand || "N/A"}</td>
                 <td>{product.SKU || "N/A"}</td>
+                <td>{product.Brand || "N/A"}</td>
                 <td>{product.Name || "N/A"}</td>
                 <td>{product.Categories || "N/A"}</td>
                 <td>{product.Seller || "N/A"}</td>

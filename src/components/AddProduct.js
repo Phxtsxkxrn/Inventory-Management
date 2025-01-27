@@ -4,8 +4,8 @@ import "./AddProduct.css"; // Import CSS
 
 const AddProduct = ({ onAdd, onClose }) => {
   const [form, setForm] = useState({
-    Brand: "",
     SKU: "",
+    Brand: "",
     Name: "",
     Categories: "", // ใช้สำหรับเก็บค่าจาก dropdown
     Seller: "",
@@ -100,8 +100,8 @@ const AddProduct = ({ onAdd, onClose }) => {
         <form onSubmit={handleSubmit}>
           <div className="form-grid">
             {[
-              { name: "Brand", type: "text", label: "Brand" },
               { name: "SKU", type: "text", label: "SKU" },
+              { name: "Brand", type: "text", label: "Brand" },
               { name: "Name", type: "text", label: "Name" },
               { name: "Seller", type: "text", label: "Seller" },
             ].map((input) => (
