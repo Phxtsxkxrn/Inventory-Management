@@ -6,8 +6,15 @@ import "./ProductList.css"; // นำเข้าไฟล์ CSS
 import { deleteProduct } from "../services/productService";
 import * as XLSX from "xlsx";
 
-
-const ProductList = ({ products, setProducts, categories, onAdd, onEdit, onDelete, onImport }) => {
+const ProductList = ({
+  products,
+  setProducts,
+  categories,
+  onAdd,
+  onEdit,
+  onDelete,
+  onImport,
+}) => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
@@ -19,7 +26,6 @@ const ProductList = ({ products, setProducts, categories, onAdd, onEdit, onDelet
   const [customOptions, setCustomOptions] = useState([20, 30, 50, 100, 200]); // ตัวเลือก dropdown
   const [selectedProducts, setSelectedProducts] = useState([]); // State สำหรับ product ที่ถูกเลือก
   const [isModalOpen, setIsModalOpen] = useState(false); // State ควบคุมการเปิด Modal
-
 
   const openAddModal = () => {
     setIsAddModalOpen(true);
@@ -63,17 +69,19 @@ const ProductList = ({ products, setProducts, categories, onAdd, onEdit, onDelet
   );
 
   const handleCheckboxChange = (productId) => {
-    setSelectedProducts((prev) =>
-      prev.includes(productId)
-        ? prev.filter((id) => id !== productId) // Uncheck
-        : [...prev, productId] // Check
+    setSelectedProducts(
+      (prev) =>
+        prev.includes(productId)
+          ? prev.filter((id) => id !== productId) // Uncheck
+          : [...prev, productId] // Check
     );
   };
 
   const isProductSelected = (productId) => selectedProducts.includes(productId);
 
   const handleProductsPerPageChange = (e) => {
-    const value = e.target.value === "custom" ? 0 : parseInt(e.target.value, 10);
+    const value =
+      e.target.value === "custom" ? 0 : parseInt(e.target.value, 10);
     setProductsPerPage(value);
     setCurrentPage(1); // Reset to the first page
   };
@@ -87,7 +95,9 @@ const ProductList = ({ products, setProducts, categories, onAdd, onEdit, onDelet
     if (!isNaN(value) && value > 0) {
       // อัปเดตรายการ dropdown และตั้งค่า productsPerPage
       setCustomOptions((prevOptions) =>
-        prevOptions.includes(value) ? prevOptions : [...prevOptions, value].sort((a, b) => a - b)
+        prevOptions.includes(value)
+          ? prevOptions
+          : [...prevOptions, value].sort((a, b) => a - b)
       );
       setProductsPerPage(value); // อัปเดตจำนวนสินค้าต่อหน้า
       setCurrentPage(1); // Reset to the first page
@@ -98,77 +108,82 @@ const ProductList = ({ products, setProducts, categories, onAdd, onEdit, onDelet
   const cancelAllSelected = () => {
     setSelectedProducts([]);
   };
-  
 
   const deleteSelectedProducts = async () => {
-  if (window.confirm("Are you sure you want to delete the selected products?")) {
-    try {
-      // ลบสินค้าใน Firebase
-      await Promise.all(
-        selectedProducts.map((productId) => deleteProduct(productId))
-      );
+    if (
+      window.confirm("Are you sure you want to delete the selected products?")
+    ) {
+      try {
+        // ลบสินค้าใน Firebase
+        await Promise.all(
+          selectedProducts.map((productId) => deleteProduct(productId))
+        );
 
-      // อัปเดตรายการสินค้าใน State
-      setProducts((prevProducts) =>
-        prevProducts.filter((product) => !selectedProducts.includes(product.id))
-      );
+        // อัปเดตรายการสินค้าใน State
+        setProducts((prevProducts) =>
+          prevProducts.filter(
+            (product) => !selectedProducts.includes(product.id)
+          )
+        );
 
-      // ล้างรายการสินค้าที่ถูกเลือก
-      setSelectedProducts([]);
+        // ล้างรายการสินค้าที่ถูกเลือก
+        setSelectedProducts([]);
 
-      alert("Selected products have been deleted.");
-    } catch (error) {
-      alert("An error occurred while deleting selected products.");
+        alert("Selected products have been deleted.");
+      } catch (error) {
+        alert("An error occurred while deleting selected products.");
+      }
     }
-  }
-};
+  };
 
-const exportSelectedProducts = (type) => {
-  if (selectedProducts.length === 0) {
-    alert("Please select products to export.");
-    return;
-  }
-
-  // กรองสินค้าเฉพาะที่เลือก และลบ id ออก
-  const selectedData = products
-    .filter((product) => selectedProducts.includes(product.id))
-    .map(({ id, ...rest }) => rest); // ลบฟิลด์ id ออกจากข้อมูล
-
-  if (type === "csv" || type === "excel") {
-    const worksheet = XLSX.utils.json_to_sheet(selectedData); // แปลงข้อมูลเป็น Worksheet
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Selected Products");
-
-    if (type === "csv") {
-      XLSX.writeFile(workbook, "selected_products.csv", { bookType: "csv" });
-    } else if (type === "excel") {
-      XLSX.writeFile(workbook, "selected_products.xlsx", { bookType: "xlsx" });
+  const exportSelectedProducts = (type) => {
+    if (selectedProducts.length === 0) {
+      alert("Please select products to export.");
+      return;
     }
-  } else if (type === "print") {
-    const printableData = selectedData.map((product) => ({
-      Brand: product.Brand || "N/A",
-      SKU: product.SKU || "N/A",
-      Name: product.Name || "N/A",
-      Categories: product.Categories || "N/A",
-      Seller: product.Seller || "N/A",
-      NormalPrice: product.NormalPrice
-        ? `฿${new Intl.NumberFormat("th-TH", {
-            style: "decimal",
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          }).format(product.NormalPrice)}`
-        : "N/A",
-      Status: product.Status || "N/A",
-      CreatedAt: product.CreatedAt
-        ? new Date(product.CreatedAt).toLocaleString()
-        : "N/A",
-      LastUpdate: product.LastUpdate
-        ? new Date(product.LastUpdate).toLocaleString()
-        : "N/A",
-    }));
 
-    const newWindow = window.open("", "_blank");
-    const printContent = `
+    // กรองสินค้าเฉพาะที่เลือก และลบ id ออก
+    const selectedData = products
+      .filter((product) => selectedProducts.includes(product.id))
+      .map(({ id, ...rest }) => rest); // ลบฟิลด์ id ออกจากข้อมูล
+
+    if (type === "csv" || type === "excel") {
+      const worksheet = XLSX.utils.json_to_sheet(selectedData); // แปลงข้อมูลเป็น Worksheet
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Selected Products");
+
+      if (type === "csv") {
+        XLSX.writeFile(workbook, "selected_products.csv", { bookType: "csv" });
+      } else if (type === "excel") {
+        XLSX.writeFile(workbook, "selected_products.xlsx", {
+          bookType: "xlsx",
+        });
+      }
+    } else if (type === "print") {
+      const printableData = selectedData.map((product) => ({
+        Brand: product.Brand || "N/A",
+        SKU: product.SKU || "N/A",
+        Name: product.Name || "N/A",
+        Categories: product.Categories || "N/A",
+        Seller: product.Seller || "N/A",
+        NormalPrice: product.NormalPrice
+          ? `฿${new Intl.NumberFormat("th-TH", {
+              style: "decimal",
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            }).format(product.NormalPrice)}`
+          : "N/A",
+        Status: product.Status || "N/A",
+        CreatedAt: product.CreatedAt
+          ? new Date(product.CreatedAt).toLocaleString()
+          : "N/A",
+        LastUpdate: product.LastUpdate
+          ? new Date(product.LastUpdate).toLocaleString()
+          : "N/A",
+      }));
+
+      const newWindow = window.open("", "_blank");
+      const printContent = `
       <html>
         <head>
           <title>Print Selected Products</title>
@@ -216,15 +231,11 @@ const exportSelectedProducts = (type) => {
         </body>
       </html>
     `;
-    newWindow.document.write(printContent);
-    newWindow.document.close();
-    newWindow.print();
-  }
-};
-
-
-  
-  
+      newWindow.document.write(printContent);
+      newWindow.document.close();
+      newWindow.print();
+    }
+  };
 
   return (
     <div className="product-list">
@@ -250,77 +261,79 @@ const exportSelectedProducts = (type) => {
       </div>
 
       <div className="pagination-and-records">
-  {/* Records Found */}
-<div className="records-found">
-  {filteredProducts.length} {filteredProducts.length === 1 ? "record" : "records"} found
-  {selectedProducts.length > 0 && (
-    <span>
-      {" "}
-      | {selectedProducts.length} {selectedProducts.length === 1 ? "selected" : "selected"}
-    </span>
-  )}
-</div>
+        {/* Records Found */}
+        <div className="records-found">
+          {filteredProducts.length}{" "}
+          {filteredProducts.length === 1 ? "record" : "records"} found
+          {selectedProducts.length > 0 && (
+            <span>
+              {" "}
+              | {selectedProducts.length}{" "}
+              {selectedProducts.length === 1 ? "selected" : "selected"}
+            </span>
+          )}
+        </div>
 
-
-  {/* Pagination Controls */}
-  <div
-    className={`pagination-controls ${
-      productsPerPage === 0 ? "product-pagination-custom" : "product-pagination-default"
-    }`}
-  >
-    <label htmlFor="products-per-page">Products per page:</label>
-    <select
-      id="products-per-page"
-      value={productsPerPage === 0 ? "custom" : productsPerPage}
-      onChange={handleProductsPerPageChange}
-    >
-      {customOptions.map((option) => (
-        <option key={option} value={option}>
-          {option}
-        </option>
-      ))}
-      <option value="custom">Custom</option>
-    </select>
-    {productsPerPage === 0 && (
-      <div className="custom-products-per-page">
-        <input
-          type="number"
-          min="1"
-          className="custom-input"
-          placeholder="Enter number"
-          value={customInputValue}
-          onChange={handleCustomInputChange}
-        />
-        <button
-          className="custom-submit-button"
-          onClick={handleCustomProductsPerPageSubmit}
+        {/* Pagination Controls */}
+        <div
+          className={`pagination-controls ${
+            productsPerPage === 0
+              ? "product-pagination-custom"
+              : "product-pagination-default"
+          }`}
         >
-          Submit
-        </button>
+          <label htmlFor="products-per-page">Products per page:</label>
+          <select
+            id="products-per-page"
+            value={productsPerPage === 0 ? "custom" : productsPerPage}
+            onChange={handleProductsPerPageChange}
+          >
+            {customOptions.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+            <option value="custom">Custom</option>
+          </select>
+          {productsPerPage === 0 && (
+            <div className="custom-products-per-page">
+              <input
+                type="number"
+                min="1"
+                className="custom-input"
+                placeholder="Enter number"
+                value={customInputValue}
+                onChange={handleCustomInputChange}
+              />
+              <button
+                className="custom-submit-button"
+                onClick={handleCustomProductsPerPageSubmit}
+              >
+                Submit
+              </button>
+            </div>
+          )}
+          <div className="page-navigation">
+            <button
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+            >
+              Previous
+            </button>
+            <span>
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              }
+              disabled={currentPage === totalPages}
+            >
+              Next
+            </button>
+          </div>
+        </div>
       </div>
-    )}
-    <div className="page-navigation">
-      <button
-        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-        disabled={currentPage === 1}
-      >
-        Previous
-      </button>
-      <span>
-        Page {currentPage} of {totalPages}
-      </span>
-      <button
-        onClick={() =>
-          setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-        }
-        disabled={currentPage === totalPages}
-      >
-        Next
-      </button>
-    </div>
-  </div>
-</div>
-
 
       {isAddModalOpen && (
         <AddProduct
@@ -358,22 +371,20 @@ const exportSelectedProducts = (type) => {
       <table className="product-table">
         <thead>
           <tr>
-          <th>
-          <input
-    type="checkbox"
-    onChange={(e) =>
-      setSelectedProducts(
-        e.target.checked
-          ? displayedProducts.map((p) => p.id)
-          : []
-      )
-    }
-    disabled={isModalOpen} // Disable checkbox เมื่อ modal เปิดอยู่
-    checked={
-      displayedProducts.every((p) => isProductSelected(p.id)) &&
-      displayedProducts.length > 0
-    }
-  />
+            <th>
+              <input
+                type="checkbox"
+                onChange={(e) =>
+                  setSelectedProducts(
+                    e.target.checked ? displayedProducts.map((p) => p.id) : []
+                  )
+                }
+                disabled={isModalOpen} // Disable checkbox เมื่อ modal เปิดอยู่
+                checked={
+                  displayedProducts.every((p) => isProductSelected(p.id)) &&
+                  displayedProducts.length > 0
+                }
+              />
             </th>
             <th>Brand</th>
             <th>SKU</th>
@@ -381,6 +392,8 @@ const exportSelectedProducts = (type) => {
             <th>Categories</th>
             <th>Seller</th>
             <th>Normal Price</th>
+            <th>Discount (%)</th> {/* เพิ่มคอลัมน์ Discount */}
+            <th>Final Price</th> {/* เพิ่มคอลัมน์ Final Price */}
             <th>Status</th>
             <th>Created At</th>
             <th>Last Update</th>
@@ -388,70 +401,92 @@ const exportSelectedProducts = (type) => {
           </tr>
         </thead>
         <tbody>
-          {displayedProducts.map((product) => (
-            <tr key={product.id}>
-              <td>
-  <input
-    type="checkbox"
-    className="custom-checkbox"
-    disabled={isModalOpen} // Disable individual checkboxes
-    checked={isProductSelected(product.id)}
-    onChange={() => handleCheckboxChange(product.id)}
-  />
-</td>
-              <td>{product.Brand || "N/A"}</td>
-              <td>{product.SKU || "N/A"}</td>
-              <td>{product.Name || "N/A"}</td>
-              <td>{product.Categories || "N/A"}</td>
-              <td>{product.Seller || "N/A"}</td>
-              <td>
-                {product.NormalPrice
-                  ? `฿${new Intl.NumberFormat("th-TH", {
-                      style: "decimal",
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    }).format(product.NormalPrice)}`
-                  : "N/A"}
-              </td>
-              <td className="status">
-                <span
-                  className={`status-badge ${
-                    product.Status === "active"
-                      ? "delivered"
-                      : product.Status === "inactive"
-                      ? "process"
-                      : "canceled"
-                  }`}
-                >
-                  {product.Status || "N/A"}
-                </span>
-              </td>
-              <td>
-                {product.CreatedAt
-                  ? new Date(product.CreatedAt).toLocaleString()
-                  : "N/A"}
-              </td>
-              <td>
-                {product.LastUpdate
-                  ? new Date(product.LastUpdate).toLocaleString()
-                  : "N/A"}
-              </td>
-              <td className="actions">
-                <button className="edit" onClick={() => openEditModal(product)}>
-                  Edit
-                </button>
-              </td>
-            </tr>
-          ))}
+          {displayedProducts.map((product) => {
+            // คำนวณ Final Price
+            const finalPrice =
+              product.NormalPrice && product.Discount
+                ? product.NormalPrice -
+                  (product.NormalPrice * product.Discount) / 100
+                : product.NormalPrice;
+
+            return (
+              <tr key={product.id}>
+                <td>
+                  <input
+                    type="checkbox"
+                    className="custom-checkbox"
+                    disabled={isModalOpen} // Disable individual checkboxes
+                    checked={isProductSelected(product.id)}
+                    onChange={() => handleCheckboxChange(product.id)}
+                  />
+                </td>
+                <td>{product.Brand || "N/A"}</td>
+                <td>{product.SKU || "N/A"}</td>
+                <td>{product.Name || "N/A"}</td>
+                <td>{product.Categories || "N/A"}</td>
+                <td>{product.Seller || "N/A"}</td>
+                <td>
+                  {product.NormalPrice
+                    ? `฿${new Intl.NumberFormat("th-TH", {
+                        style: "decimal",
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      }).format(product.NormalPrice)}`
+                    : "N/A"}
+                </td>
+                <td>{product.Discount ? `${product.Discount}%` : "N/A"}</td>
+                <td>
+                  {finalPrice
+                    ? `฿${new Intl.NumberFormat("th-TH", {
+                        style: "decimal",
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      }).format(finalPrice)}`
+                    : "N/A"}
+                </td>
+                <td className="status">
+                  <span
+                    className={`status-badge ${
+                      product.Status === "active"
+                        ? "delivered"
+                        : product.Status === "inactive"
+                        ? "process"
+                        : "canceled"
+                    }`}
+                  >
+                    {product.Status || "N/A"}
+                  </span>
+                </td>
+                <td>
+                  {product.CreatedAt
+                    ? new Date(product.CreatedAt).toLocaleString()
+                    : "N/A"}
+                </td>
+                <td>
+                  {product.LastUpdate
+                    ? new Date(product.LastUpdate).toLocaleString()
+                    : "N/A"}
+                </td>
+                <td className="actions">
+                  <button
+                    className="edit"
+                    onClick={() => openEditModal(product)}
+                  >
+                    Edit
+                  </button>
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
-  {/* Action Bar */}
-  {selectedProducts.length > 0 && (
-  <div className="action-bar">
-    <span className="selected-info">
-      {selectedProducts.length} of {filteredProducts.length} Selected
-    </span>
-    <div className="divider"></div>
+      {/* Action Bar */}
+      {selectedProducts.length > 0 && (
+        <div className="action-bar">
+          <span className="selected-info">
+            {selectedProducts.length} of {filteredProducts.length} Selected
+          </span>
+          <div className="divider"></div>
           <button
             className="action-button export-selected"
             onClick={() => exportSelectedProducts("csv")}
@@ -480,12 +515,12 @@ const exportSelectedProducts = (type) => {
             Delete Selected
           </button>
           <div className="divider"></div>
-    <button
-      className="action-button cancel-selected"
-      onClick={cancelAllSelected}
-    >
-      Cancel All
-    </button>
+          <button
+            className="action-button cancel-selected"
+            onClick={cancelAllSelected}
+          >
+            Cancel All
+          </button>
         </div>
       )}
     </div>

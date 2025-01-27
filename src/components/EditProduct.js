@@ -9,6 +9,7 @@ const EditProduct = ({ product, onSave, onDelete, onClose, categories }) => {
     Categories: "",
     Seller: "",
     NormalPrice: "",
+    Discount: "",
     Status: "active",
   });
 
@@ -17,6 +18,7 @@ const EditProduct = ({ product, onSave, onDelete, onClose, categories }) => {
       setForm({
         ...product,
         NormalPrice: formatCurrency(product.NormalPrice), // ฟอร์แมตราคาเริ่มต้น
+        Discount: product.Discount || "", // ค่าเริ่มต้น Discount
       });
     }
   }, [product]);
@@ -38,6 +40,12 @@ const EditProduct = ({ product, onSave, onDelete, onClose, categories }) => {
     return isNaN(numberValue) ? "" : numberValue;
   };
 
+  const calculateFinalPrice = () => {
+    const normalPrice = parseCurrency(form.NormalPrice);
+    const discount = parseFloat(form.Discount) || 0;
+    return normalPrice - (normalPrice * discount) / 100 || 0;
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -57,6 +65,8 @@ const EditProduct = ({ product, onSave, onDelete, onClose, categories }) => {
     onSave(product.id, {
       ...form,
       NormalPrice: parseCurrency(form.NormalPrice), // แปลงกลับเป็นตัวเลขก่อนบันทึก
+      Discount: parseFloat(form.Discount) || 0, // เก็บ Discount เป็นตัวเลข
+      FinalPrice: calculateFinalPrice(), // คำนวณ FinalPrice
       CreatedAt: product.CreatedAt,
     });
   };
@@ -99,6 +109,18 @@ const EditProduct = ({ product, onSave, onDelete, onClose, categories }) => {
                 required
               />
             </div>
+            {/* Discount */}
+            <div className="coolinput">
+              <label className="text">Discount (%):</label>
+              <input
+                className="input"
+                type="number"
+                name="Discount"
+                value={form.Discount}
+                onChange={handleChange}
+                placeholder="0"
+              />
+            </div>
             {/* Dropdown Categories */}
             <div className="coolinput">
               <label className="text">Categories:</label>
@@ -118,6 +140,17 @@ const EditProduct = ({ product, onSave, onDelete, onClose, categories }) => {
                   </option>
                 ))}
               </select>
+            </div>
+            {/* Final Price */}
+            <div className="coolinput">
+              <label className="text">Final Price:</label>
+              <p className="final-price">
+                {`฿${new Intl.NumberFormat("th-TH", {
+                  style: "decimal",
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                }).format(calculateFinalPrice())}`}
+              </p>
             </div>
             {/* Status */}
             <div className="coolinput">
@@ -142,7 +175,9 @@ const EditProduct = ({ product, onSave, onDelete, onClose, categories }) => {
               className="modal-button delete"
               onClick={() => {
                 if (
-                  window.confirm("Are you sure you want to delete this product?")
+                  window.confirm(
+                    "Are you sure you want to delete this product?"
+                  )
                 ) {
                   onDelete(product.id);
                   onClose();

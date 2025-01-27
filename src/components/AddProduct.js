@@ -10,6 +10,7 @@ const AddProduct = ({ onAdd, onClose }) => {
     Categories: "", // ใช้สำหรับเก็บค่าจาก dropdown
     Seller: "",
     NormalPrice: "",
+    Discount: "", // เพิ่ม Discount
     Status: "active",
   });
 
@@ -39,6 +40,9 @@ const AddProduct = ({ onAdd, onClose }) => {
   };
 
   const parseCurrency = (value) => {
+    if (typeof value !== "string") {
+      return isNaN(value) ? "" : value; // ถ้าไม่ใช่ string ให้ตรวจสอบว่าเป็นตัวเลขหรือไม่
+    }
     const numberValue = parseFloat(
       value.replace(/[฿,]/g, "").replace(/[^0-9.]/g, "")
     );
@@ -48,24 +52,43 @@ const AddProduct = ({ onAdd, onClose }) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    if (name === "NormalPrice") {
+    if (name === "NormalPrice" || name === "Discount") {
       const numericValue = parseCurrency(value); // Convert to numeric value
       setForm((prev) => ({
         ...prev,
-        [name]: numericValue ? formatCurrency(numericValue) : "",
+        [name]: numericValue ? numericValue : "",
       }));
     } else {
       setForm((prev) => ({ ...prev, [name]: value }));
     }
   };
 
+  const calculateDiscountedPrice = () => {
+    const price = parseCurrency(form.NormalPrice);
+    const discount = parseFloat(form.Discount);
+    if (!price || !discount) return "";
+    const discountedPrice = price - (price * discount) / 100;
+    return formatCurrency(discountedPrice);
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Convert NormalPrice back to numeric value before submitting
+    // Convert NormalPrice and Discount to numeric values
+    const normalPrice = parseCurrency(form.NormalPrice);
+    const discount = parseFloat(form.Discount) || 0;
+
+    // คำนวณราคาหลังหักส่วนลด
+    const finalPrice = normalPrice - (normalPrice * discount) / 100;
+
+    // เตรียมข้อมูลสำหรับบันทึกใน Firebase
     const formData = {
       ...form,
-      NormalPrice: parseCurrency(form.NormalPrice),
+      NormalPrice: normalPrice,
+      Discount: discount,
+      FinalPrice: finalPrice, // เพิ่ม FinalPrice
     };
+
+    // ส่งข้อมูลไปยังฟังก์ชัน onAdd หรือ Firebase
     onAdd(formData);
     onClose();
   };
@@ -108,6 +131,17 @@ const AddProduct = ({ onAdd, onClose }) => {
               />
             </div>
             <div className="coolinput">
+              <label className="text">Discount (%):</label>
+              <input
+                className="input"
+                type="text"
+                name="Discount"
+                value={form.Discount}
+                onChange={handleChange}
+                placeholder="0%"
+              />
+            </div>
+            <div className="coolinput">
               <label className="text">Categories:</label>
               <select
                 name="Categories"
@@ -125,6 +159,12 @@ const AddProduct = ({ onAdd, onClose }) => {
                   </option>
                 ))}
               </select>
+            </div>
+            <div className="coolinput">
+              <label className="text">FinalPrice:</label>
+              <p className="discounted-price">
+                {calculateDiscountedPrice() || "฿0.00"}
+              </p>
             </div>
             <div className="coolinput">
               <label className="text">Status:</label>
