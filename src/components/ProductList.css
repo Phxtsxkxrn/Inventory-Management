@@ -312,36 +312,39 @@ input[type="checkbox"] {
   transition: all 0.2s ease-in-out;
 }
 
+/* เมื่อ Checkbox ถูกเลือก */
 input[type="checkbox"]:checked {
-  background-color: #4caf50;
-  border-color: #4caf50;
+  background-color: #4caf50; /* พื้นหลังสีเขียวเมื่อเลือก */
+  border-color: #4caf50; /* ขอบสีเขียว */
 }
 
-input[type="checkbox"]::before {
-  content: "";
+/* สร้างเครื่องหมายติ๊กถูก */
+input[type="checkbox"]::after {
+  content: "✓"; /* เครื่องหมายติ๊กถูก */
   position: absolute;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%) scale(0);
-  width: 12px;
-  height: 12px;
-  background-color: #fff;
-  border-radius: 2px;
+  transform: translate(-50%, -50%) scale(0); /* ซ่อนในตอนเริ่มต้น */
+  font-size: 14px;
+  font-weight: bold;
+  color: #fff; /* สีเครื่องหมายติ๊กถูก */
   transition: transform 0.2s ease-in-out;
 }
 
-input[type="checkbox"]:checked::before {
-  transform: translate(-50%, -50%) scale(1);
+/* แสดงเครื่องหมายติ๊กถูกเมื่อ Checkbox ถูกเลือก */
+input[type="checkbox"]:checked::after {
+  transform: translate(-50%, -50%) scale(1); /* ขยายเครื่องหมายติ๊กถูก */
 }
 
+/* เพิ่มเอฟเฟกต์ hover */
 input[type="checkbox"]:hover {
-  border-color: #4caf50;
+  border-color: #4caf50; /* ขอบเขียวเมื่อ hover */
 }
 
 /* สำหรับ checkbox ที่ disabled */
 input[type="checkbox"]:disabled {
   cursor: not-allowed; /* เปลี่ยน cursor เป็น not-allowed */
-  opacity: 0.5; /* ลดความทึบเพื่อบ่งบอกว่า disabled */
+  opacity: 0.5; /* ลดความทึบ */
   background-color: #f5f5f5; /* เปลี่ยนสีพื้นหลัง */
   border-color: #ccc; /* เปลี่ยนสีขอบ */
 }
