@@ -3,12 +3,14 @@
   display: flex;
   flex-direction: column;
   width: 200px;
-  min-height: 100vh; /* ให้ Sidebar ขยายความสูงได้ตามเนื้อหา */
+  height: 100vh;
   background-color: #2c3e50;
   padding: 20px 10px;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-  position: sticky; /* ทำให้ Navbar ติดอยู่กับหน้าจอ */
-  top: 0; /* ติดด้านบน */
+  position: fixed; /* เปลี่ยนเป็น fixed เพื่อให้ Navbar อยู่กับที่ */
+  top: 0; /* ติดด้านบนของหน้าจอ */
+  left: 0; /* ติดด้านซ้ายของหน้าจอ */
+  overflow-y: auto; /* เพิ่ม scroll bar ให้ navbar หากเนื้อหายาวเกิน */
 }
 
 /* Menu items */
@@ -39,6 +41,11 @@
 
 .navbar-link:hover {
   background-color: #34495e;
+}
+
+.content {
+  margin-left: 180px; /* เว้นที่สำหรับ Navbar */
+  padding: 20px;
 }
 
 /* Dropdown menu */
