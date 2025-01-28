@@ -5,6 +5,7 @@ import "./AddProduct.css"; // Import CSS
 const AddProduct = ({ onAdd, onClose }) => {
   const [form, setForm] = useState({
     SKU: "",
+    Image: "",
     Brand: "",
     Name: "",
     Categories: "", // ใช้สำหรับเก็บค่าจาก dropdown
@@ -100,6 +101,7 @@ const AddProduct = ({ onAdd, onClose }) => {
         <form onSubmit={handleSubmit}>
           <div className="form-grid">
             {[
+              { name: "Image", type: "text", label: "Image URL" },
               { name: "SKU", type: "text", label: "SKU" },
               { name: "Brand", type: "text", label: "Brand" },
               { name: "Name", type: "text", label: "Name" },
@@ -114,7 +116,7 @@ const AddProduct = ({ onAdd, onClose }) => {
                   value={form[input.name]}
                   onChange={handleChange}
                   placeholder="Write here..."
-                  required
+                  required={input.name !== "Image"} // Image ไม่ต้อง required
                 />
               </div>
             ))}
@@ -128,17 +130,6 @@ const AddProduct = ({ onAdd, onClose }) => {
                 onChange={handleChange}
                 placeholder="฿0.00"
                 required
-              />
-            </div>
-            <div className="coolinput">
-              <label className="text">Discount (%):</label>
-              <input
-                className="input"
-                type="text"
-                name="Discount"
-                value={form.Discount}
-                onChange={handleChange}
-                placeholder="0%"
               />
             </div>
             <div className="coolinput">
@@ -161,10 +152,15 @@ const AddProduct = ({ onAdd, onClose }) => {
               </select>
             </div>
             <div className="coolinput">
-              <label className="text">FinalPrice:</label>
-              <p className="discounted-price">
-                {calculateDiscountedPrice() || "฿0.00"}
-              </p>
+              <label className="text">Discount (%):</label>
+              <input
+                className="input"
+                type="text"
+                name="Discount"
+                value={form.Discount}
+                onChange={handleChange}
+                placeholder="0%"
+              />
             </div>
             <div className="coolinput">
               <label className="text">Status:</label>
@@ -177,6 +173,12 @@ const AddProduct = ({ onAdd, onClose }) => {
                 <option value="active">Active</option>
                 <option value="inactive">Inactive</option>
               </select>
+            </div>
+            <div className="coolinput">
+              <label className="text">FinalPrice:</label>
+              <p className="discounted-price">
+                {calculateDiscountedPrice() || "฿0.00"}
+              </p>
             </div>
           </div>
           <div className="button-group">

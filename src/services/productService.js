@@ -21,22 +21,28 @@ export const getProducts = async () => {
     return {
       id: doc.id,
       ...data,
+      Image: data.Image || "",
       CreatedAt: data.CreatedAt?.toDate(), // แปลงเป็น Date ถ้ามีค่า
       LastUpdate: data.LastUpdate?.toDate(), // แปลงเป็น Date ถ้ามีค่า
     };
   });
 };
 
-
 // เพิ่มสินค้า
 export const addProduct = async (product) => {
   const docRef = await addDoc(productsCollection, {
     ...product,
+    Image: product.Image || "",
     CreatedAt: serverTimestamp(),
     LastUpdate: serverTimestamp(),
   });
 
-  return { id: docRef.id, ...product, CreatedAt: new Date(), LastUpdate: new Date() };
+  return {
+    id: docRef.id,
+    ...product,
+    CreatedAt: new Date(),
+    LastUpdate: new Date(),
+  };
 };
 
 // อัปเดตสินค้า
@@ -44,6 +50,7 @@ export const updateProduct = async (id, updatedProduct) => {
   const productDoc = doc(db, "products", id);
   await updateDoc(productDoc, {
     ...updatedProduct,
+    Image: updatedProduct.Image || "",
     LastUpdate: serverTimestamp(), // อัปเดตเฉพาะ LastUpdate
   });
 };

@@ -117,7 +117,6 @@
   text-align: center;
   font-size: 14px;
   color: #555;
-  border-bottom: 1px solid #f1f5f9;
 }
 
 /* สลับสีแถว */
@@ -153,7 +152,9 @@
 /* Actions */
 .actions {
   display: flex;
-  justify-content: center;
+  flex-direction: column; /* ปรับปุ่มให้อยู่แนวตั้ง */
+  align-items: center; /* จัดให้อยู่ตรงกลาง */
+  margin-top: 10px; /* เพิ่มระยะห่างจากด้านบน */
   gap: 10px;
 }
 

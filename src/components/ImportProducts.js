@@ -76,6 +76,7 @@ const ImportProducts = ({ onImport, onClose }) => {
               NormalPrice: normalPrice,
               Discount: discount,
               FinalPrice: finalPrice,
+              Image: item.Image?.trim() || "",
             };
           });
           onImport(parsedData);
@@ -107,6 +108,7 @@ const ImportProducts = ({ onImport, onClose }) => {
           NormalPrice: normalPrice,
           Discount: discount,
           FinalPrice: finalPrice,
+          Image: item.Image?.trim() || "",
         };
       });
 

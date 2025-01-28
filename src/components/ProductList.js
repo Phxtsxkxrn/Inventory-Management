@@ -420,6 +420,7 @@ const ProductList = ({
                 }
               />
             </th>
+            <th>Image</th>
             <th>SKU</th>
             <th>Brand</th>
             <th>Name</th>
@@ -453,6 +454,21 @@ const ProductList = ({
                     checked={isProductSelected(product.id)}
                     onChange={() => handleCheckboxChange(product.id)}
                   />
+                </td>
+                <td>
+                  {product.Image ? (
+                    <img
+                      src={product.Image}
+                      alt={product.Name || "Product Image"}
+                      style={{
+                        width: "50px",
+                        height: "50px",
+                        objectFit: "cover",
+                      }}
+                    />
+                  ) : (
+                    "No Image"
+                  )}
                 </td>
                 <td>{product.SKU || "N/A"}</td>
                 <td>{product.Brand || "N/A"}</td>

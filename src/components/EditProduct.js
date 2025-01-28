@@ -78,6 +78,7 @@ const EditProduct = ({ product, onSave, onDelete, onClose, categories }) => {
         <form onSubmit={handleSubmit}>
           <div className="form-grid">
             {[
+              { name: "Image", type: "text", label: "Image URL" },
               { name: "SKU", type: "text", label: "SKU" },
               { name: "Brand", type: "text", label: "Brand" },
               { name: "Name", type: "text", label: "Name" },
@@ -92,7 +93,7 @@ const EditProduct = ({ product, onSave, onDelete, onClose, categories }) => {
                   value={form[input.name]}
                   onChange={handleChange}
                   placeholder="Write here..."
-                  required
+                  required={input.name !== "Image"} // ทำให้ Image URL ไม่จำเป็นต้องใส่
                 />
               </div>
             ))}
@@ -107,18 +108,6 @@ const EditProduct = ({ product, onSave, onDelete, onClose, categories }) => {
                 onChange={handleChange}
                 placeholder="฿0.00"
                 required
-              />
-            </div>
-            {/* Discount */}
-            <div className="coolinput">
-              <label className="text">Discount (%):</label>
-              <input
-                className="input"
-                type="number"
-                name="Discount"
-                value={form.Discount}
-                onChange={handleChange}
-                placeholder="0"
               />
             </div>
             {/* Dropdown Categories */}
@@ -141,16 +130,17 @@ const EditProduct = ({ product, onSave, onDelete, onClose, categories }) => {
                 ))}
               </select>
             </div>
-            {/* Final Price */}
+            {/* Discount */}
             <div className="coolinput">
-              <label className="text">Final Price:</label>
-              <p className="final-price">
-                {`฿${new Intl.NumberFormat("th-TH", {
-                  style: "decimal",
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                }).format(calculateFinalPrice())}`}
-              </p>
+              <label className="text">Discount (%):</label>
+              <input
+                className="input"
+                type="number"
+                name="Discount"
+                value={form.Discount}
+                onChange={handleChange}
+                placeholder="0"
+              />
             </div>
             {/* Status */}
             <div className="coolinput">
@@ -164,6 +154,17 @@ const EditProduct = ({ product, onSave, onDelete, onClose, categories }) => {
                 <option value="active">Active</option>
                 <option value="inactive">Inactive</option>
               </select>
+            </div>
+            {/* Final Price */}
+            <div className="coolinput">
+              <label className="text">Final Price:</label>
+              <p className="final-price">
+                {`฿${new Intl.NumberFormat("th-TH", {
+                  style: "decimal",
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                }).format(calculateFinalPrice())}`}
+              </p>
             </div>
           </div>
           <div className="button-group">
