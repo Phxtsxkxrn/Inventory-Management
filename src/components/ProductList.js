@@ -160,6 +160,7 @@ const ProductList = ({
           Name: product.Name || "N/A",
           Categories: product.Categories || "N/A",
           Seller: product.Seller || "N/A",
+          Image: product.Image || "N/A", // ลิงก์รูปภาพสำหรับ CSV/Excel
           NormalPrice: product.NormalPrice
             ? `฿${new Intl.NumberFormat("th-TH", {
                 style: "decimal",
@@ -167,14 +168,14 @@ const ProductList = ({
                 maximumFractionDigits: 2,
               }).format(product.NormalPrice)}`
             : "N/A",
-          Discount: product.Discount ? `${product.Discount}%` : "N/A", // เพิ่ม Discount
+          Discount: product.Discount ? `${product.Discount}%` : "N/A",
           FinalPrice: finalPrice
             ? `฿${new Intl.NumberFormat("th-TH", {
                 style: "decimal",
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
               }).format(finalPrice)}`
-            : "N/A", // เพิ่ม FinalPrice
+            : "N/A",
           Status: product.Status || "N/A",
           CreatedAt: product.CreatedAt
             ? new Date(product.CreatedAt).toLocaleString()
@@ -186,6 +187,7 @@ const ProductList = ({
       });
 
     if (type === "csv" || type === "excel") {
+      // Export CSV or Excel
       const worksheet = XLSX.utils.json_to_sheet(selectedData); // แปลงข้อมูลเป็น Worksheet
       const workbook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(workbook, worksheet, "Selected Products");
@@ -198,19 +200,47 @@ const ProductList = ({
         });
       }
     } else if (type === "print") {
-      const printableData = selectedData.map((product) => ({
-        Brand: product.Brand,
-        SKU: product.SKU,
-        Name: product.Name,
-        Categories: product.Categories,
-        Seller: product.Seller,
-        NormalPrice: product.NormalPrice,
-        Discount: product.Discount, // เพิ่ม Discount
-        FinalPrice: product.FinalPrice, // เพิ่ม FinalPrice
-        Status: product.Status,
-        CreatedAt: product.CreatedAt,
-        LastUpdate: product.LastUpdate,
-      }));
+      // แสดงข้อมูลในรูปแบบที่พิมพ์ได้
+      const printableData = products
+        .filter((product) => selectedProducts.includes(product.id))
+        .map((product) => {
+          const finalPrice =
+            product.NormalPrice && product.Discount
+              ? product.NormalPrice -
+                (product.NormalPrice * product.Discount) / 100
+              : product.NormalPrice;
+
+          return {
+            Image: product.Image || "No Image",
+            Brand: product.Brand || "N/A",
+            SKU: product.SKU || "N/A",
+            Name: product.Name || "N/A",
+            Categories: product.Categories || "N/A",
+            Seller: product.Seller || "N/A",
+            NormalPrice: product.NormalPrice
+              ? `฿${new Intl.NumberFormat("th-TH", {
+                  style: "decimal",
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                }).format(product.NormalPrice)}`
+              : "N/A",
+            Discount: product.Discount ? `${product.Discount}%` : "N/A",
+            FinalPrice: finalPrice
+              ? `฿${new Intl.NumberFormat("th-TH", {
+                  style: "decimal",
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                }).format(finalPrice)}`
+              : "N/A",
+            Status: product.Status || "N/A",
+            CreatedAt: product.CreatedAt
+              ? new Date(product.CreatedAt).toLocaleString()
+              : "N/A",
+            LastUpdate: product.LastUpdate
+              ? new Date(product.LastUpdate).toLocaleString()
+              : "N/A",
+          };
+        });
 
       const newWindow = window.open("", "_blank");
       const printContent = `
@@ -221,6 +251,7 @@ const ProductList = ({
               table { width: 100%; border-collapse: collapse; }
               th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
               th { background-color: #f4f4f4; }
+              img { max-width: 50px; height: auto; object-fit: cover; }
             </style>
           </head>
           <body>
@@ -228,6 +259,7 @@ const ProductList = ({
             <table>
               <thead>
                 <tr>
+                  <th>Image</th>
                   <th>SKU</th>
                   <th>Brand</th>
                   <th>Name</th>
@@ -246,8 +278,15 @@ const ProductList = ({
                   .map(
                     (row) =>
                       `<tr>
-                        <td>${row.Brand}</td>
+                        <td>
+                          ${
+                            row.Image !== "No Image"
+                              ? `<img src="${row.Image}" alt="${row.Name}" />`
+                              : "No Image"
+                          }
+                        </td>
                         <td>${row.SKU}</td>
+                        <td>${row.Brand}</td>
                         <td>${row.Name}</td>
                         <td>${row.Categories}</td>
                         <td>${row.Seller}</td>
