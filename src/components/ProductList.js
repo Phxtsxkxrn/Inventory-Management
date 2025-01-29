@@ -1,10 +1,13 @@
-import React, { useState } from "react";
+import { useNavigate } from "react-router-dom"; // ✅ Import useNavigate
 import AddProduct from "./AddProduct";
 import EditProduct from "./EditProduct";
 import ImportProducts from "./ImportProducts";
 import "./ProductList.css"; // นำเข้าไฟล์ CSS
 import { deleteProduct } from "../services/productService";
 import * as XLSX from "xlsx";
+import React, { useState, useEffect, useCallback } from "react"; // ✅ เพิ่ม useEffect ที่นี่
+import { useLocation } from "react-router-dom";
+import { getProducts } from "../services/productService"; // ✅ โหลดสินค้าใหม่
 
 const ProductList = ({
   products,
@@ -25,7 +28,31 @@ const ProductList = ({
   const [customInputValue, setCustomInputValue] = useState(""); // เก็บค่าชั่วคราวจากช่อง input
   const [customOptions, setCustomOptions] = useState([20, 30, 50, 100, 200]); // ตัวเลือก dropdown
   const [selectedProducts, setSelectedProducts] = useState([]); // State สำหรับ product ที่ถูกเลือก
+  const navigate = useNavigate(); // ✅ ใช้ navigate เพื่อเปลี่ยนหน้า
   const [isModalOpen, setIsModalOpen] = useState(false); // State ควบคุมการเปิด Modal
+  const location = useLocation();
+
+  // ✅ ใช้ useCallback ห่อ fetchProducts พร้อมเพิ่ม setProducts ใน dependency
+  const fetchProducts = useCallback(async () => {
+    try {
+      const data = await getProducts();
+      setProducts(data);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+    }
+  }, [setProducts]); // ✅ แก้ warning โดยเพิ่ม setProducts
+
+  // ✅ โหลดข้อมูลเมื่อเปิดหน้า ProductList
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]); // ✅ ใช้ fetchProducts เป็น dependency ที่ถูกต้อง
+
+  // ✅ โหลดข้อมูลใหม่เมื่อกลับมาจาก ManagePricing
+  useEffect(() => {
+    if (location.state?.updated) {
+      fetchProducts();
+    }
+  }, [location.state, fetchProducts]); // ✅ เพิ่ม fetchProducts ใน dependencies
 
   const openAddModal = () => {
     setIsAddModalOpen(true);
@@ -308,6 +335,19 @@ const ProductList = ({
       newWindow.document.close();
       newWindow.print();
     }
+  };
+
+  // ✅ ฟังก์ชันไปที่หน้า Manage Pricing
+  const goToManagePricing = () => {
+    if (selectedProducts.length === 0) {
+      alert("Please select at least one product.");
+      return;
+    }
+    // ✅ ส่งเฉพาะสินค้าที่เลือกไปหน้า ManagePricing
+    const selectedData = products.filter((product) =>
+      selectedProducts.includes(product.id)
+    );
+    navigate("/manage-pricing", { state: { selectedProducts: selectedData } });
   };
 
   return (
@@ -595,6 +635,10 @@ const ProductList = ({
             onClick={() => exportSelectedProducts("print")}
           >
             Print
+          </button>
+          <div className="divider"></div>
+          <button className="action-button" onClick={goToManagePricing}>
+            Manage Pricing
           </button>
           <div className="divider"></div>
           <button

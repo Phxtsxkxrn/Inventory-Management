@@ -5,9 +5,18 @@ import Home from "./components/Home";
 import ProductList from "./components/ProductList";
 import ProductForm from "./components/ProductForm";
 import CategoriesList from "./components/CategoriesList";
-import { getProducts, addProduct, updateProduct, deleteProduct } from "./services/productService";
-import { getCategories, addCategories, deleteCategories } from "./services/categoriesService";
-
+import ManagePricing from "./components/ManagePricing";
+import {
+  getProducts,
+  addProduct,
+  updateProduct,
+  deleteProduct,
+} from "./services/productService";
+import {
+  getCategories,
+  addCategories,
+  deleteCategories,
+} from "./services/categoriesService";
 
 function App() {
   const [products, setProducts] = useState([]);
@@ -101,8 +110,7 @@ function App() {
     } catch (error) {
       console.error("Error importing products:", error);
     }
-  };  
-  
+  };
 
   return (
     <Router>
@@ -135,6 +143,12 @@ function App() {
                   onAdd={handleAddCategories}
                   onDelete={handleDeleteCategories}
                 />
+              }
+            />
+            <Route
+              path="/manage-pricing"
+              element={
+                <ManagePricing products={products} setProducts={setProducts} />
               }
             />
             <Route

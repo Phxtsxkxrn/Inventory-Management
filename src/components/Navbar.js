@@ -1,6 +1,12 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { FaHome, FaShoppingCart, FaListAlt, FaTags } from "react-icons/fa"; // Import icons
+import {
+  FaHome,
+  FaShoppingCart,
+  FaListAlt,
+  FaTags,
+  FaDollarSign,
+} from "react-icons/fa"; // Import icons
 import "./Navbar.css";
 
 const Navbar = ({ children }) => {
@@ -46,6 +52,13 @@ const Navbar = ({ children }) => {
                     <FaTags style={{ marginRight: "10px" }} />{" "}
                     {/* Categories Icon */}
                     Categories
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/manage-pricing" className="dropdown-link">
+                    <FaDollarSign style={{ marginRight: "10px" }} />{" "}
+                    {/* Product List Icon */}
+                    ManagePricing
                   </Link>
                 </li>
               </ul>

@@ -1,0 +1,222 @@
+.manage-pricing-container {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+/* หัวข้อ Manage Pricing */
+.manage-pricing-container h2 {
+  margin-bottom: 20px;
+  color: #333;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 2px solid #ddd;
+  padding-bottom: 10px;
+}
+
+/* ปุ่มย้อนกลับ */
+.back-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #555;
+  transition: color 0.3s ease;
+}
+
+.back-btn:hover {
+  color: #000;
+}
+
+/* ตารางราคาสินค้า */
+.manage-pricing-table {
+  margin-top: 20px;
+  width: 100%;
+  border-collapse: collapse; /* ทำให้เซลล์แนบกัน */
+  background-color: #fff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* ส่วนหัวของตาราง */
+.manage-pricing-table th {
+  background-color: #f8f9fa;
+  text-align: center;
+  padding: 12px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+  text-transform: uppercase;
+  border-bottom: 2px solid #e5e7eb; /* ✅ คงเส้นใต้หัวข้อ */
+}
+
+/* เซลล์ในตาราง */
+.manage-pricing-table td {
+  padding: 12px;
+  text-align: center;
+  font-size: 14px;
+  color: #555;
+}
+
+/* ✅ ลบเส้นขอบของตารางออกทั้งหมด ยกเว้นเส้นใต้หัวข้อ */
+.manage-pricing-table,
+.manage-pricing-table td {
+  border: none;
+}
+
+/* สลับสีแถว */
+.manage-pricing-table tr:nth-child(even) {
+  background-color: #f8fafc;
+}
+
+.manage-pricing-table tr:hover {
+  background-color: #f1f5f9;
+}
+
+/* ✅ เพิ่มระยะห่างระหว่างรูปภาพและชื่อสินค้า */
+.manage-pricing-product {
+  display: flex;
+  align-items: center;
+  gap: 15px; /* เพิ่มระยะห่าง */
+  padding-left: 10px; /* ให้มีช่องว่างด้านซ้ายเล็กน้อย */
+}
+
+/* รูปภาพสินค้า */
+.manage-pricing-img {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 5px;
+}
+
+/* ✅ ทำให้ช่อง Input ดูสวยงาม */
+.manage-pricing-input {
+  width: 120px;
+  padding: 8px;
+  text-align: center;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.manage-pricing-input:focus {
+  border-color: #007bff;
+  outline: none;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* ✅ สไตล์ Final Price */
+.final-price-display {
+  font-weight: bold;
+  color: #007bff;
+  font-size: 16px;
+}
+
+/* ✅ ปุ่ม Save */
+.manage-pricing-btn {
+  padding: 8px 12px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.manage-pricing-btn:hover {
+  background-color: #45a049;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* ✅ ทำให้ปุ่ม Save อยู่ตรงกลาง */
+.manage-pricing-btn-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* ✅ ข้อความหากไม่มีสินค้าที่เลือก */
+.no-products-message {
+  text-align: center;
+  font-size: 16px;
+  font-weight: bold;
+  color: #777;
+  margin-top: 20px;
+}
+
+/* ✅ แจ้งเตือนเมื่ออัปเดตสำเร็จ */
+.success-message {
+  text-align: center;
+  font-size: 16px;
+  font-weight: bold;
+  color: #28a745;
+  margin-bottom: 15px;
+  background: #d4edda;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #c3e6cb;
+}
+
+/* ✅ ปรับกล่องป้อนส่วนลดและปุ่มให้ชิดขวา */
+.global-discount-container {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end; /* ชิดขวา */
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+/* ✅ ปรับช่องใส่เปอร์เซ็นต์ให้กะทัดรัด */
+.global-discount-input {
+  width: 120px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+  text-align: center;
+  margin-left: auto; /* ดันไปทางขวาสุด */
+}
+
+/* ✅ ปรับปุ่มให้ขนาดเท่ากัน */
+.apply-discount-btn,
+.save-all-btn {
+  padding: 8px 12px;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 140px; /* ทำให้ปุ่มมีขนาดเท่ากัน */
+  justify-content: center;
+}
+
+/* ✅ ปรับสีปุ่ม */
+.apply-discount-btn {
+  background-color: #f59e0b;
+}
+
+.save-all-btn {
+  background-color: #4caf50;
+}
+
+/* ✅ ปรับสีปุ่มเมื่อ Hover */
+.apply-discount-btn:hover {
+  background-color: #d97706;
+}
+
+.save-all-btn:hover {
+  background-color: #388e3c;
+}
