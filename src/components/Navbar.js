@@ -2,20 +2,28 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import {
   FaHome,
-  FaShoppingCart,
+  FaBoxes,
   FaListAlt,
   FaTags,
   FaDollarSign,
   FaPercentage,
-} from "react-icons/fa"; // Import icons
+  FaGift,
+  FaTools,
+} from "react-icons/fa";
 import "./Navbar.css";
-import { FaGift } from "react-icons/fa";
 
 const Navbar = ({ children }) => {
-  // รับ `children` เพื่อแสดงเนื้อหาในส่วน Content
+  // ✅ ใช้ state แยกกัน และไม่ต้องปิดอีกอันอัตโนมัติ
   const [salesOpen, setSalesOpen] = useState(false);
+  const [manageOpen, setManageOpen] = useState(false);
 
-  const toggleSales = () => setSalesOpen(!salesOpen);
+  const toggleSales = () => {
+    setSalesOpen(!salesOpen);
+  };
+
+  const toggleManage = () => {
+    setManageOpen(!manageOpen);
+  };
 
   return (
     <div className="layout">
@@ -25,7 +33,7 @@ const Navbar = ({ children }) => {
           {/* ปุ่ม Home */}
           <li className="navbar-item">
             <Link to="/" className="navbar-link">
-              <FaHome style={{ marginRight: "10px" }} /> {/* Home Icon */}
+              <FaHome style={{ marginRight: "10px" }} />
               Home
             </Link>
           </li>
@@ -33,9 +41,8 @@ const Navbar = ({ children }) => {
           {/* ปุ่ม Sales */}
           <li className="navbar-item">
             <button className="navbar-link" onClick={toggleSales}>
-              <FaShoppingCart style={{ marginRight: "10px" }} />{" "}
-              {/* Sales Icon */}
-              Sales
+              <FaBoxes style={{ marginRight: "10px" }} />
+              Catalog
               <span className={`dropdown-arrow ${salesOpen ? "open" : ""}`}>
                 ▼
               </span>
@@ -44,34 +51,46 @@ const Navbar = ({ children }) => {
               <ul className="dropdown-menu">
                 <li>
                   <Link to="/product-list" className="dropdown-link">
-                    <FaListAlt style={{ marginRight: "10px" }} />{" "}
-                    {/* Product List Icon */}
+                    <FaListAlt style={{ marginRight: "10px" }} />
                     Product List
                   </Link>
                 </li>
                 <li>
                   <Link to="/categories-list" className="dropdown-link">
-                    <FaTags style={{ marginRight: "10px" }} />{" "}
-                    {/* Categories Icon */}
+                    <FaTags style={{ marginRight: "10px" }} />
                     Categories
                   </Link>
                 </li>
                 <li>
+                  <Link to="/promotions" className="dropdown-link">
+                    <FaPercentage style={{ marginRight: "10px" }} />
+                    Promotions
+                  </Link>
+                </li>
+              </ul>
+            )}
+          </li>
+
+          {/* ปุ่ม Manage */}
+          <li className="navbar-item">
+            <button className="navbar-link" onClick={toggleManage}>
+              <FaTools style={{ marginRight: "10px" }} />
+              Manage
+              <span className={`dropdown-arrow ${manageOpen ? "open" : ""}`}>
+                ▼
+              </span>
+            </button>
+            {manageOpen && (
+              <ul className="dropdown-menu">
+                <li>
                   <Link to="/manage-pricing" className="dropdown-link">
-                    <FaDollarSign style={{ marginRight: "10px" }} />{" "}
-                    {/* Product List Icon */}
+                    <FaDollarSign style={{ marginRight: "10px" }} />
                     Manage Pricing
                   </Link>
                 </li>
                 <li>
-                  <Link to="/promotions" className="dropdown-link">
-                    <FaPercentage style={{ marginRight: "10px" }} /> Promotions
-                  </Link>
-                </li>
-                <li>
                   <Link to="/manage-promotions" className="dropdown-link">
-                    <FaGift style={{ marginRight: "10px" }} />{" "}
-                    {/* ✅ ไอคอน Promotions */}
+                    <FaGift style={{ marginRight: "10px" }} />
                     Manage Promotions
                   </Link>
                 </li>
