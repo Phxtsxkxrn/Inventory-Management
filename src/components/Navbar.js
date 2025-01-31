@@ -6,8 +6,10 @@ import {
   FaListAlt,
   FaTags,
   FaDollarSign,
+  FaPercentage,
 } from "react-icons/fa"; // Import icons
 import "./Navbar.css";
+import { FaGift } from "react-icons/fa";
 
 const Navbar = ({ children }) => {
   // รับ `children` เพื่อแสดงเนื้อหาในส่วน Content
@@ -58,7 +60,19 @@ const Navbar = ({ children }) => {
                   <Link to="/manage-pricing" className="dropdown-link">
                     <FaDollarSign style={{ marginRight: "10px" }} />{" "}
                     {/* Product List Icon */}
-                    ManagePricing
+                    Manage Pricing
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/promotions" className="dropdown-link">
+                    <FaPercentage style={{ marginRight: "10px" }} /> Promotions
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/manage-promotions" className="dropdown-link">
+                    <FaGift style={{ marginRight: "10px" }} />{" "}
+                    {/* ✅ ไอคอน Promotions */}
+                    Manage Promotions
                   </Link>
                 </li>
               </ul>

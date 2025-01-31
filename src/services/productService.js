@@ -9,21 +9,49 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 
-// คอลเลกชันสินค้า
+// คอลเลกชันสินค้าและโปรโมชั่น
 const productsCollection = collection(db, "products");
 
-// ดึงข้อมูลสินค้า
+// ดึงข้อมูลสินค้า พร้อมเช็คโปรโมชั่น
 export const getProducts = async () => {
-  const snapshot = await getDocs(productsCollection);
-  return snapshot.docs.map((doc) => {
+  const [productsSnapshot, promotionsSnapshot] = await Promise.all([
+    getDocs(collection(db, "products")),
+    getDocs(collection(db, "promotions")),
+  ]);
+
+  const promotions = promotionsSnapshot.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+  }));
+
+  return productsSnapshot.docs.map((doc) => {
     const data = doc.data();
+    const now = new Date(); // เวลาปัจจุบัน
+
+    let finalPrice = data.NormalPrice || 0;
+    let appliedPromotion = null;
+
+    // ตรวจสอบว่าสินค้ามีโปรโมชั่นที่ยังใช้งานอยู่หรือไม่
+    if (data.promotionId) {
+      const promo = promotions.find((p) => p.id === data.promotionId);
+      if (promo) {
+        const start = new Date(promo.startDateTime);
+        const end = new Date(promo.endDateTime);
+
+        if (now >= start && now <= end) {
+          finalPrice = finalPrice - (finalPrice * promo.discount) / 100;
+          appliedPromotion = promo;
+        }
+      }
+    }
 
     return {
       id: doc.id,
       ...data,
-      Image: data.Image || "",
-      CreatedAt: data.CreatedAt?.toDate(), // แปลงเป็น Date ถ้ามีค่า
-      LastUpdate: data.LastUpdate?.toDate(), // แปลงเป็น Date ถ้ามีค่า
+      FinalPrice: finalPrice, // ✅ ราคาสินค้าหลังลด
+      AppliedPromotion: appliedPromotion, // ✅ เก็บข้อมูลโปรโมชั่นที่ใช้งาน
+      CreatedAt: data.CreatedAt?.toDate(),
+      LastUpdate: data.LastUpdate?.toDate(),
     };
   });
 };
@@ -47,11 +75,21 @@ export const addProduct = async (product) => {
 
 // อัปเดตสินค้า
 export const updateProduct = async (id, updatedProduct) => {
+  console.log("📢 อัปเดตสินค้าใน Firestore:", id, updatedProduct); // ✅ Debug
+
   const productDoc = doc(db, "products", id);
   await updateDoc(productDoc, {
     ...updatedProduct,
-    Image: updatedProduct.Image || "",
-    LastUpdate: serverTimestamp(), // อัปเดตเฉพาะ LastUpdate
+    promotionId: updatedProduct.promotionId
+      ? String(updatedProduct.promotionId)
+      : null, // ✅ แปลงเป็น string
+    startDateTime: updatedProduct.startDateTime
+      ? new Date(updatedProduct.startDateTime).toISOString()
+      : null,
+    endDateTime: updatedProduct.endDateTime
+      ? new Date(updatedProduct.endDateTime).toISOString()
+      : null,
+    LastUpdate: serverTimestamp(),
   });
 };
 

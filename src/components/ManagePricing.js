@@ -1,12 +1,11 @@
 import React, { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { updateProduct } from "../services/productService";
 import "./ManagePricing.css";
-import { FaSave, FaArrowLeft, FaPercentage } from "react-icons/fa";
+import { FaSave, FaPercentage } from "react-icons/fa";
 
 const ManagePricing = () => {
   const location = useLocation();
-  const navigate = useNavigate();
   const [products, setProducts] = useState(
     location.state?.selectedProducts || []
   );
@@ -108,12 +107,7 @@ const ManagePricing = () => {
 
   return (
     <div className="manage-pricing-container">
-      <h2>
-        <button className="back-btn" onClick={() => navigate(-1)}>
-          <FaArrowLeft />
-        </button>
-        Manage Product Pricing
-      </h2>
+      <h2>Manage Product Pricing</h2>
 
       {products.length === 0 ? (
         <p className="no-products-message">No products selected for pricing.</p>

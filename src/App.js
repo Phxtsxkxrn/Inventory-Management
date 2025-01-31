@@ -6,6 +6,8 @@ import ProductList from "./components/ProductList";
 import ProductForm from "./components/ProductForm";
 import CategoriesList from "./components/CategoriesList";
 import ManagePricing from "./components/ManagePricing";
+import Promotions from "./components/Promotions";
+import ManagePromotions from "./components/ManagePromotions";
 import {
   getProducts,
   addProduct,
@@ -149,6 +151,16 @@ function App() {
               path="/manage-pricing"
               element={
                 <ManagePricing products={products} setProducts={setProducts} />
+              }
+            />
+            <Route path="/promotions" element={<Promotions />} />
+            <Route
+              path="/manage-promotions"
+              element={
+                <ManagePromotions
+                  products={products}
+                  setProducts={setProducts}
+                />
               }
             />
             <Route

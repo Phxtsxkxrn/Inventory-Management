@@ -32,6 +32,22 @@ const ProductList = ({
   const [isModalOpen, setIsModalOpen] = useState(false); // State ควบคุมการเปิด Modal
   const location = useLocation();
 
+  // ✅ นำสินค้าไปที่ Manage Promotions
+  const goToManagePromotions = () => {
+    if (selectedProducts.length === 0) {
+      alert("Please select at least one product.");
+      return;
+    }
+
+    const selectedData = products.filter((product) =>
+      selectedProducts.includes(product.id)
+    );
+
+    navigate("/manage-promotions", {
+      state: { selectedProducts: selectedData },
+    });
+  };
+
   // ✅ ใช้ useCallback ห่อ fetchProducts พร้อมเพิ่ม setProducts ใน dependency
   const fetchProducts = useCallback(async () => {
     try {
@@ -53,6 +69,15 @@ const ProductList = ({
       fetchProducts();
     }
   }, [location.state, fetchProducts]); // ✅ เพิ่ม fetchProducts ใน dependencies
+
+  // โหลดข้อมูลใหม่ทุก ๆ 1 นาที
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchProducts(); // ✅ โหลดสินค้าใหม่ทุก ๆ 60 วินาที
+    }, 60000); // 60 วินาที
+
+    return () => clearInterval(interval); // เคลียร์ interval เมื่อออกจากหน้า
+  }, [fetchProducts]);
 
   const openAddModal = () => {
     setIsAddModalOpen(true);
@@ -175,34 +200,28 @@ const ProductList = ({
     const selectedData = products
       .filter((product) => selectedProducts.includes(product.id))
       .map((product) => {
-        const finalPrice =
-          product.NormalPrice && product.Discount
-            ? product.NormalPrice -
-              (product.NormalPrice * product.Discount) / 100
-            : product.NormalPrice;
-
         return {
           Brand: product.Brand || "N/A",
           SKU: product.SKU || "N/A",
           Name: product.Name || "N/A",
           Categories: product.Categories || "N/A",
           Seller: product.Seller || "N/A",
-          Image: product.Image || "N/A", // ลิงก์รูปภาพสำหรับ CSV/Excel
-          NormalPrice: product.NormalPrice
-            ? `฿${new Intl.NumberFormat("th-TH", {
-                style: "decimal",
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              }).format(product.NormalPrice)}`
+          Image: product.Image || "N/A",
+          NormalPrice: `฿${new Intl.NumberFormat("th-TH", {
+            style: "decimal",
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          }).format(product.NormalPrice)}`,
+          Discount: product.AppliedPromotion
+            ? `${product.AppliedPromotion.discount}% (Promo)`
+            : product.Discount
+            ? `${product.Discount}%`
             : "N/A",
-          Discount: product.Discount ? `${product.Discount}%` : "N/A",
-          FinalPrice: finalPrice
-            ? `฿${new Intl.NumberFormat("th-TH", {
-                style: "decimal",
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              }).format(finalPrice)}`
-            : "N/A",
+          FinalPrice: `฿${new Intl.NumberFormat("th-TH", {
+            style: "decimal",
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          }).format(product.FinalPrice)}`, // ✅ ใช้ราคาหลังลดโปรโมชั่น
           Status: product.Status || "N/A",
           CreatedAt: product.CreatedAt
             ? new Date(product.CreatedAt).toLocaleString()
@@ -215,7 +234,7 @@ const ProductList = ({
 
     if (type === "csv" || type === "excel") {
       // Export CSV or Excel
-      const worksheet = XLSX.utils.json_to_sheet(selectedData); // แปลงข้อมูลเป็น Worksheet
+      const worksheet = XLSX.utils.json_to_sheet(selectedData);
       const workbook = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(workbook, worksheet, "Selected Products");
 
@@ -228,46 +247,7 @@ const ProductList = ({
       }
     } else if (type === "print") {
       // แสดงข้อมูลในรูปแบบที่พิมพ์ได้
-      const printableData = products
-        .filter((product) => selectedProducts.includes(product.id))
-        .map((product) => {
-          const finalPrice =
-            product.NormalPrice && product.Discount
-              ? product.NormalPrice -
-                (product.NormalPrice * product.Discount) / 100
-              : product.NormalPrice;
-
-          return {
-            Image: product.Image || "No Image",
-            Brand: product.Brand || "N/A",
-            SKU: product.SKU || "N/A",
-            Name: product.Name || "N/A",
-            Categories: product.Categories || "N/A",
-            Seller: product.Seller || "N/A",
-            NormalPrice: product.NormalPrice
-              ? `฿${new Intl.NumberFormat("th-TH", {
-                  style: "decimal",
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                }).format(product.NormalPrice)}`
-              : "N/A",
-            Discount: product.Discount ? `${product.Discount}%` : "N/A",
-            FinalPrice: finalPrice
-              ? `฿${new Intl.NumberFormat("th-TH", {
-                  style: "decimal",
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                }).format(finalPrice)}`
-              : "N/A",
-            Status: product.Status || "N/A",
-            CreatedAt: product.CreatedAt
-              ? new Date(product.CreatedAt).toLocaleString()
-              : "N/A",
-            LastUpdate: product.LastUpdate
-              ? new Date(product.LastUpdate).toLocaleString()
-              : "N/A",
-          };
-        });
+      const printableData = selectedData; // ✅ ใช้ selectedData ที่มีการคำนวณโปรโมชั่นแล้ว
 
       const newWindow = window.open("", "_blank");
       const printContent = `
@@ -516,11 +496,16 @@ const ProductList = ({
         </thead>
         <tbody>
           {displayedProducts.map((product) => {
-            // คำนวณ Final Price
+            // ตรวจสอบว่ามีโปรโมชั่นที่กำลังใช้งานอยู่หรือไม่
+            const discountPercentage = product.AppliedPromotion
+              ? product.AppliedPromotion.discount
+              : product.Discount || 0; // ใช้ Discount ปกติถ้าไม่มีโปรโมชั่น
+
+            // คำนวณ Final Price ตามโปรโมชั่น (ถ้ามี)
             const finalPrice =
-              product.NormalPrice && product.Discount
+              product.NormalPrice && discountPercentage
                 ? product.NormalPrice -
-                  (product.NormalPrice * product.Discount) / 100
+                  (product.NormalPrice * discountPercentage) / 100
                 : product.NormalPrice;
 
             return (
@@ -529,7 +514,7 @@ const ProductList = ({
                   <input
                     type="checkbox"
                     className="custom-checkbox"
-                    disabled={isModalOpen} // Disable individual checkboxes
+                    disabled={isModalOpen}
                     checked={isProductSelected(product.id)}
                     onChange={() => handleCheckboxChange(product.id)}
                   />
@@ -563,7 +548,13 @@ const ProductList = ({
                       }).format(product.NormalPrice)}`
                     : "N/A"}
                 </td>
-                <td>{product.Discount ? `${product.Discount}%` : "N/A"}</td>
+                <td>
+                  {product.AppliedPromotion
+                    ? `${product.AppliedPromotion.discount}% (Promo)`
+                    : product.Discount
+                    ? `${product.Discount}%`
+                    : "N/A"}
+                </td>
                 <td>
                   {finalPrice
                     ? `฿${new Intl.NumberFormat("th-TH", {
@@ -639,6 +630,13 @@ const ProductList = ({
           <div className="divider"></div>
           <button className="action-button" onClick={goToManagePricing}>
             Manage Pricing
+          </button>
+          <div className="divider"></div>
+          <button
+            className="action-button manage-promotions"
+            onClick={goToManagePromotions}
+          >
+            Manage Promotions
           </button>
           <div className="divider"></div>
           <button

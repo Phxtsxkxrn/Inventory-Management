@@ -356,7 +356,7 @@ input[type="checkbox"]:disabled {
   bottom: 60px; /* ระยะห่างจากขอบล่าง */
   left: 50%;
   transform: translateX(-50%);
-  width: auto;
+  width: 1070px;
   max-width: 90%;
   background-color: #000; /* สีดำ */
   color: #fff; /* สีข้อความ */

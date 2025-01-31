@@ -1,0 +1,155 @@
+.promotions-container {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+/* หัวข้อ Promotions */
+.promotions-container h2 {
+  margin-bottom: 20px;
+  color: #333;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 2px solid #ddd;
+  padding-bottom: 10px;
+}
+
+/* ฟอร์มเพิ่มโปรโมชั่น */
+.promotion-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: #fff;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-width: 500px;
+  margin-bottom: 20px;
+}
+
+/* ช่องป้อนข้อมูล */
+.promotion-form input {
+  width: 480px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.promotion-form input:focus {
+  border-color: #007bff;
+  outline: none;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* กลุ่มวันและเวลา */
+.datetime-group {
+  display: flex;
+  gap: 10px;
+}
+
+/* ปุ่มเพิ่มโปรโมชั่น */
+.add-promotion-btn {
+  padding: 10px 12px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.add-promotion-btn:hover {
+  background-color: #45a049;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* ตารางโปรโมชั่น */
+.promotion-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* ส่วนหัวของตาราง */
+.promotion-table th {
+  background-color: #f8f9fa;
+  text-align: center;
+  padding: 12px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+  text-transform: uppercase;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+/* เซลล์ในตาราง */
+.promotion-table td {
+  padding: 12px;
+  text-align: center;
+  font-size: 14px;
+  color: #555;
+}
+
+/* ลบเส้นขอบของตาราง ยกเว้นเส้นใต้หัวข้อ */
+.promotion-table,
+.promotion-table td {
+  border: none;
+}
+
+/* สลับสีแถว */
+.promotion-table tr:nth-child(even) {
+  background-color: #f8fafc;
+}
+
+.promotion-table tr:hover {
+  background-color: #f1f5f9;
+}
+
+/* ✅ ทำให้ปุ่ม Delete อยู่ตรงกลาง */
+.promotion-table td:last-child {
+  text-align: center;
+}
+
+/* ปุ่มลบโปรโมชั่น */
+.delete-promotion-btn {
+  padding: 8px 12px;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  margin: auto; /* ✅ ทำให้ปุ่มอยู่ตรงกลาง */
+  transition: all 0.3s ease;
+}
+
+.delete-promotion-btn:hover {
+  background-color: #c82333;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* ข้อความแจ้งเตือนเมื่อไม่มีโปรโมชั่น */
+.no-promotions-message {
+  text-align: center;
+  font-size: 16px;
+  font-weight: bold;
+  color: #777;
+  margin-top: 20px;
+}
