@@ -128,25 +128,23 @@
   background-color: #f1f5f9;
 }
 
-/* Status Badge */
-.status-badge {
-  display: inline-block;
-  padding: 5px 10px;
-  border-radius: 20px;
+.status-dropdown {
+  padding: 4px 8px;
+  border-radius: 5px;
   font-size: 14px;
-  font-weight: 600;
-  text-align: center;
-  color: white;
+  cursor: pointer;
+  border: 1px solid #ccc;
+  background: white;
 }
 
-.status-badge.delivered {
-  background-color: #d4f4dd;
-  color: #28a745;
+.status-active {
+  color: green;
+  font-weight: bold;
 }
 
-.status-badge.process {
-  background-color: #f8d7da;
-  color: #dc3545;
+.status-inactive {
+  color: red;
+  font-weight: bold;
 }
 
 /* Actions */

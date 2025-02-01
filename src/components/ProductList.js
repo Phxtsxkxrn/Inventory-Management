@@ -8,6 +8,7 @@ import React, { useState, useEffect, useCallback } from "react"; // ✅ เพ�
 import { useLocation } from "react-router-dom";
 import { getProducts } from "../services/productService"; // ✅ โหลดสินค้าใหม่
 import { exportProducts } from "../services/exportService";
+import { updateProductStatus } from "../services/productService";
 
 const ProductList = ({
   products,
@@ -31,6 +32,24 @@ const ProductList = ({
   const navigate = useNavigate(); // ✅ ใช้ navigate เพื่อเปลี่ยนหน้า
   const [isModalOpen, setIsModalOpen] = useState(false); // State ควบคุมการเปิด Modal
   const location = useLocation();
+
+  const handleStatusChange = async (productId, newStatus) => {
+    try {
+      // ค้นหาสินค้าที่ต้องการเปลี่ยนแปลง
+      const updatedProducts = products.map((product) =>
+        product.id === productId ? { ...product, Status: newStatus } : product
+      );
+
+      // อัปเดตค่าใน State
+      setProducts(updatedProducts);
+
+      // อัปเดตในฐานข้อมูล (Firebase / API)
+      await updateProductStatus(productId, newStatus);
+    } catch (error) {
+      console.error("Error updating status:", error);
+      alert("Failed to update status. Please try again.");
+    }
+  };
 
   // ✅ นำสินค้าไปที่ Manage Promotions
   const goToManagePromotions = () => {
@@ -438,17 +457,22 @@ const ProductList = ({
                     : "N/A"}
                 </td>
                 <td className="status">
-                  <span
-                    className={`status-badge ${
+                  <select
+                    value={product.Status}
+                    onChange={(e) =>
+                      handleStatusChange(product.id, e.target.value)
+                    }
+                    className={`status-dropdown ${
                       product.Status === "active"
-                        ? "delivered"
+                        ? "status-active"
                         : product.Status === "inactive"
-                        ? "process"
-                        : "canceled"
+                        ? "status-inactive"
+                        : "status-other"
                     }`}
                   >
-                    {product.Status || "N/A"}
-                  </span>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                  </select>
                 </td>
                 <td>
                   {product.CreatedAt

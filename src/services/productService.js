@@ -98,3 +98,14 @@ export const deleteProduct = async (id) => {
   const productDoc = doc(db, "products", id);
   await deleteDoc(productDoc);
 };
+
+export const updateProductStatus = async (productId, newStatus) => {
+  try {
+    const productRef = doc(db, "products", productId); // อ้างอิงไปที่เอกสารสินค้า
+    await updateDoc(productRef, { Status: newStatus }); // อัปเดตค่าใน Firestore
+    console.log(`Product ${productId} updated to status: ${newStatus}`);
+  } catch (error) {
+    console.error("Failed to update product status:", error);
+    throw error;
+  }
+};
