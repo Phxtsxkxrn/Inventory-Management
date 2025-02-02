@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Home from "./components/Home";
 import ProductList from "./components/ProductList";
@@ -8,6 +13,10 @@ import CategoriesList from "./components/CategoriesList";
 import ManagePricing from "./components/ManagePricing";
 import Promotions from "./components/Promotions";
 import ManagePromotions from "./components/ManagePromotions";
+import Login from "./components/Login";
+import Register from "./components/Register";
+import { auth } from "./services/firebaseConfig";
+import { useAuthState } from "react-firebase-hooks/auth";
 import {
   getProducts,
   addProduct,
@@ -20,11 +29,11 @@ import {
   deleteCategories,
 } from "./services/categoriesService";
 
-function App() {
+const App = () => {
+  const [user, loading] = useAuthState(auth);
   const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]); // State for categories
+  const [categories, setCategories] = useState([]);
 
-  // Fetch products from Firestore when the component mounts
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -48,54 +57,49 @@ function App() {
     fetchCategories();
   }, []);
 
-  // Add a new product
   const handleAddProduct = async (newProduct) => {
     try {
-      const addedProduct = await addProduct(newProduct); // เพิ่มสินค้าใน Firebase
-      setProducts((prevProducts) => [...prevProducts, addedProduct]); // อัปเดต state
+      const addedProduct = await addProduct(newProduct);
+      setProducts((prevProducts) => [...prevProducts, addedProduct]);
     } catch (error) {
       console.error("Error adding product:", error);
     }
   };
 
-  // Edit an existing product
   const handleEditProduct = async (id, updatedProduct) => {
     try {
-      await updateProduct(id, updatedProduct); // Update in Firestore
-      const updatedProducts = await getProducts(); // Refresh product list
+      await updateProduct(id, updatedProduct);
+      const updatedProducts = await getProducts();
       setProducts(updatedProducts);
     } catch (error) {
       console.error("Error editing product:", error);
     }
   };
 
-  // Delete a product
   const handleDeleteProduct = async (id) => {
     try {
-      await deleteProduct(id); // Delete from Firestore
-      const updatedProducts = await getProducts(); // Refresh product list
+      await deleteProduct(id);
+      const updatedProducts = await getProducts();
       setProducts(updatedProducts);
     } catch (error) {
       console.error("Error deleting product:", error);
     }
   };
 
-  // Add a new categories
   const handleAddCategories = async (newCategories) => {
     try {
-      await addCategories(newCategories); // Add to Firestore
-      const updatedCategories = await getCategories(); // Refresh categories list
+      await addCategories(newCategories);
+      const updatedCategories = await getCategories();
       setCategories(updatedCategories);
     } catch (error) {
       console.error("Error adding categories:", error);
     }
   };
 
-  // Delete a categories
   const handleDeleteCategories = async (id) => {
     try {
-      await deleteCategories(id); // Delete from Firestore
-      const updatedCategories = await getCategories(); // Refresh categories list
+      await deleteCategories(id);
+      const updatedCategories = await getCategories();
       setCategories(updatedCategories);
     } catch (error) {
       console.error("Error deleting categories:", error);
@@ -105,24 +109,37 @@ function App() {
   const handleImportProducts = async (parsedData) => {
     try {
       for (const product of parsedData) {
-        await addProduct(product); // เพิ่มสินค้าแต่ละตัวไปยัง Firebase
+        await addProduct(product);
       }
-      const updatedProducts = await getProducts(); // ดึงข้อมูลใหม่
-      setProducts(updatedProducts); // อัปเดต State
+      const updatedProducts = await getProducts();
+      setProducts(updatedProducts);
     } catch (error) {
       console.error("Error importing products:", error);
     }
   };
 
+  if (loading) return <h1>Loading...</h1>;
+
   return (
     <Router>
       <div style={{ display: "flex" }}>
-        {/* Navbar */}
-        <Navbar />
+        {/* Navbar ควรแสดงเฉพาะเมื่อ user login แล้ว */}
+        {user && <Navbar />}
         <div style={{ flex: 1, padding: "20px" }}>
-          {/* Main Content */}
           <Routes>
-            <Route path="/" element={<Home />} />
+            {/* ถ้ายังไม่ได้ Login, Redirect ไปที่ Login */}
+            <Route
+              path="/"
+              element={user ? <Home /> : <Navigate to="/login" />}
+            />
+            <Route
+              path="/login"
+              element={user ? <Navigate to="/" /> : <Login />}
+            />
+            <Route
+              path="/register"
+              element={user ? <Navigate to="/" /> : <Register />}
+            />
             <Route
               path="/product-list"
               element={
@@ -172,6 +189,6 @@ function App() {
       </div>
     </Router>
   );
-}
+};
 
 export default App;

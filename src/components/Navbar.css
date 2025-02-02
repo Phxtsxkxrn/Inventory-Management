@@ -2,15 +2,16 @@
 .navbar {
   display: flex;
   flex-direction: column;
-  width: 210px;
+  width: 230px;
   height: 100vh;
   background-color: #2c3e50;
   padding: 20px 10px;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-  position: fixed; /* เปลี่ยนเป็น fixed เพื่อให้ Navbar อยู่กับที่ */
-  top: 0; /* ติดด้านบนของหน้าจอ */
-  left: 0; /* ติดด้านซ้ายของหน้าจอ */
-  overflow-y: auto; /* เพิ่ม scroll bar ให้ navbar หากเนื้อหายาวเกิน */
+  position: fixed;
+  top: 0;
+  left: 0;
+  overflow-y: auto;
+  padding-bottom: 40px; /* เพิ่มพื้นที่ว่างด้านล่าง */
 }
 
 /* Menu items */
@@ -18,10 +19,11 @@
   list-style-type: none;
   padding: 0;
   margin: 0;
+  flex-grow: 1; /* ทำให้เมนูขยายเต็มพื้นที่ */
 }
 
 .navbar-item {
-  margin-bottom: 10px; /* Reduce spacing between menu items */
+  margin-bottom: 10px;
 }
 
 /* Links and button styling */
@@ -30,13 +32,19 @@
   align-items: center;
   color: #ecf0f1;
   text-decoration: none;
-  font-size: 16px; /* Ensure consistent font size */
-  padding: 8px 10px; /* Reduce padding */
+  font-size: 16px;
+  padding: 8px 10px;
   border: none;
   background: none;
   cursor: pointer;
   border-radius: 5px;
   transition: background-color 0.3s ease;
+  gap: 5px; /* ✅ เพิ่มช่องว่างระหว่างไอคอนกับข้อความ */
+}
+
+.navbar-link .icon {
+  font-size: 18px;
+  margin-right: 5px; /* ✅ เพิ่มระยะห่างของไอคอน */
 }
 
 .navbar-link:hover {
@@ -44,7 +52,7 @@
 }
 
 .content {
-  margin-left: 180px; /* เว้นที่สำหรับ Navbar */
+  margin-left: 210px;
   padding: 20px;
 }
 
@@ -52,16 +60,22 @@
 .dropdown-menu {
   list-style-type: none;
   padding: 0;
-  margin: 5px 0 0 20px; /* Reduce margin and slightly indent */
+  margin: 5px 0 0 20px;
 }
 
 .dropdown-link {
-  color: #bdc3c7;
-  text-decoration: none;
-  padding: 5px 10px; /* Reduce padding */
   display: flex;
   align-items: center;
+  color: #bdc3c7;
+  text-decoration: none;
+  padding: 5px 10px;
   transition: color 0.3s ease;
+  gap: 10px; /* ✅ เพิ่มช่องว่างระหว่างไอคอนกับข้อความ */
+}
+
+.dropdown-link .icon {
+  font-size: 16px;
+  margin-right: 5px; /* ✅ เพิ่มระยะห่างของไอคอน */
 }
 
 .dropdown-link:hover {
@@ -70,11 +84,74 @@
 
 /* Dropdown arrow */
 .dropdown-arrow {
-  margin-left: 5px;
+  margin-left: auto;
   font-size: 12px;
   transition: transform 0.3s ease;
 }
 
 .dropdown-arrow.open {
   transform: rotate(180deg);
+}
+
+/* ปุ่ม Logout ที่อยู่ล่างสุด */
+.logout-button {
+  margin-top: auto; /* ดันปุ่มไปที่ด้านล่าง */
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  background-color: red;
+  color: white;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background 0.3s ease;
+  margin-bottom: 30px; /* เพิ่มช่องว่างด้านล่าง */
+}
+
+.logout-button:hover {
+  background-color: darkred;
+}
+
+/* แสดงอีเมลของผู้ใช้ */
+.user-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  color: white;
+  margin-top: auto; /* ดันให้อยู่ด้านล่างของเมนู */
+  padding: 15px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.user-icon {
+  font-size: 30px;
+  margin-bottom: 5px;
+}
+
+.user-email {
+  font-size: 14px;
+  color: #ecf0f1;
+  word-break: break-word;
+  text-align: center;
+}
+
+/* ปุ่ม Logout */
+.logout-button {
+  margin-top: 10px; /* เพิ่มระยะห่างจากอีเมล */
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  background-color: red;
+  color: white;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background 0.3s ease;
+}
+
+.logout-button:hover {
+  background-color: darkred;
 }

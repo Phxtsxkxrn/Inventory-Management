@@ -1,5 +1,7 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { logout } from "../services/authService";
+import { auth } from "../services/firebaseConfig"; // ✅ Import Firebase auth
 import {
   FaHome,
   FaBoxes,
@@ -9,20 +11,24 @@ import {
   FaPercentage,
   FaGift,
   FaTools,
+  FaUserCircle,
 } from "react-icons/fa";
 import "./Navbar.css";
 
 const Navbar = ({ children }) => {
-  // ✅ ใช้ state แยกกัน และไม่ต้องปิดอีกอันอัตโนมัติ
   const [salesOpen, setSalesOpen] = useState(false);
   const [manageOpen, setManageOpen] = useState(false);
+  const navigate = useNavigate();
 
-  const toggleSales = () => {
-    setSalesOpen(!salesOpen);
-  };
+  // ✅ ดึงข้อมูล user ปัจจุบัน
+  const user = auth.currentUser;
 
-  const toggleManage = () => {
-    setManageOpen(!manageOpen);
+  const toggleSales = () => setSalesOpen(!salesOpen);
+  const toggleManage = () => setManageOpen(!manageOpen);
+
+  const handleLogout = async () => {
+    await logout();
+    navigate("/login");
   };
 
   return (
@@ -33,7 +39,7 @@ const Navbar = ({ children }) => {
           {/* ปุ่ม Home */}
           <li className="navbar-item">
             <Link to="/" className="navbar-link">
-              <FaHome style={{ marginRight: "10px" }} />
+              <FaHome className="icon" />
               Home
             </Link>
           </li>
@@ -41,7 +47,7 @@ const Navbar = ({ children }) => {
           {/* ปุ่ม Sales */}
           <li className="navbar-item">
             <button className="navbar-link" onClick={toggleSales}>
-              <FaBoxes style={{ marginRight: "10px" }} />
+              <FaBoxes className="icon" />
               Catalog
               <span className={`dropdown-arrow ${salesOpen ? "open" : ""}`}>
                 ▼
@@ -51,19 +57,19 @@ const Navbar = ({ children }) => {
               <ul className="dropdown-menu">
                 <li>
                   <Link to="/product-list" className="dropdown-link">
-                    <FaListAlt style={{ marginRight: "10px" }} />
+                    <FaListAlt className="icon" />
                     Product List
                   </Link>
                 </li>
                 <li>
                   <Link to="/categories-list" className="dropdown-link">
-                    <FaTags style={{ marginRight: "10px" }} />
+                    <FaTags className="icon" />
                     Categories
                   </Link>
                 </li>
                 <li>
                   <Link to="/promotions" className="dropdown-link">
-                    <FaPercentage style={{ marginRight: "10px" }} />
+                    <FaPercentage className="icon" />
                     Promotions
                   </Link>
                 </li>
@@ -74,7 +80,7 @@ const Navbar = ({ children }) => {
           {/* ปุ่ม Manage */}
           <li className="navbar-item">
             <button className="navbar-link" onClick={toggleManage}>
-              <FaTools style={{ marginRight: "10px" }} />
+              <FaTools className="icon" />
               Manage
               <span className={`dropdown-arrow ${manageOpen ? "open" : ""}`}>
                 ▼
@@ -84,13 +90,13 @@ const Navbar = ({ children }) => {
               <ul className="dropdown-menu">
                 <li>
                   <Link to="/manage-pricing" className="dropdown-link">
-                    <FaDollarSign style={{ marginRight: "10px" }} />
+                    <FaDollarSign className="icon" />
                     Manage Pricing
                   </Link>
                 </li>
                 <li>
                   <Link to="/manage-promotions" className="dropdown-link">
-                    <FaGift style={{ marginRight: "10px" }} />
+                    <FaGift className="icon" />
                     Manage Promotions
                   </Link>
                 </li>
@@ -98,6 +104,19 @@ const Navbar = ({ children }) => {
             )}
           </li>
         </ul>
+
+        {/* ✅ แสดงอีเมลของผู้ใช้ (ถ้ามี) */}
+        {user && (
+          <div className="user-info">
+            <FaUserCircle className="user-icon" />
+            <span className="user-email">{user.email}</span>
+          </div>
+        )}
+
+        {/* ปุ่ม Logout */}
+        <button className="logout-button" onClick={handleLogout}>
+          Logout
+        </button>
       </nav>
 
       {/* Content */}
