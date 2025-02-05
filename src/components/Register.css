@@ -1,10 +1,33 @@
 .register-container {
+  text-align: center;
+  width: 100%;
+}
+
+/* ฟอร์ม Register */
+.register-form {
+  width: 100%;
   display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background: #ffffff;
-  overflow: hidden; /* ป้องกันการเลื่อน scroll */
+  flex-direction: column;
+  align-items: center; /* ✅ จัดให้อยู่ตรงกลาง */
+  gap: 15px;
+}
+
+/* ปรับปุ่ม Register */
+.register-button {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  border-radius: 6px;
+  background: #007bff;
+  color: white;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.register-button:hover {
+  background: #0056b3;
 }
 
 .register-card {
@@ -30,8 +53,11 @@
   gap: 15px;
 }
 
+/* ลดขนาดช่อง Input ให้สมดุลกับปุ่ม */
 .register-input {
-  padding: 12px;
+  width: 90%; /* ✅ ปรับขนาดให้เท่ากับปุ่ม */
+  max-width: 320px; /* ✅ ไม่ให้กว้างเกินไป */
+  padding: 10px;
   font-size: 16px;
   border: 1px solid #ced4da;
   border-radius: 6px;
@@ -64,4 +90,113 @@
   color: red;
   font-size: 14px;
   margin-bottom: 10px;
+}
+
+/* ปรับให้ Modal อยู่ตรงกลาง */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+/* ปรับขนาดของ Modal และจัดให้อยู่ตรงกลาง */
+.modal-content {
+  background-color: white;
+  padding: 30px;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 450px; /* ✅ ปรับขนาดให้เหมาะสม */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center; /* ✅ จัดทุกอย่างตรงกลาง */
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* ✅ จัดให้อยู่ตรงกลาง */
+}
+
+/* หัวข้อของ Modal */
+.modal-content h3 {
+  font-size: 22px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+/* ฟอร์ม Register */
+.register-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* ✅ จัดให้อยู่ตรงกลาง */
+  gap: 15px;
+}
+
+/* Input Field */
+.register-input {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  transition: border-color 0.3s ease;
+}
+
+.register-input:focus {
+  border-color: #007bff;
+  outline: none;
+  box-shadow: 0px 0px 6px rgba(0, 123, 255, 0.3);
+}
+
+/* ปุ่ม Register และ Close อยู่ตรงกลาง */
+.modal-buttons {
+  display: flex;
+  justify-content: center; /* ✅ จัดให้อยู่ตรงกลาง */
+  gap: 10px;
+  width: 90%;
+  max-width: 320px; /* ✅ ขนาดเท่ากับ input */
+  margin-top: 15px;
+}
+
+/* ปุ่ม Close */
+.close-modal-button {
+  flex: 1;
+  background: #6c757d;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  text-align: center;
+}
+
+.close-modal-button:hover {
+  background: #5a6268;
+}
+
+/* ปุ่ม Register */
+.register-button {
+  flex: 1;
+  background: #007bff;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  text-align: center;
+}
+
+.register-button:hover {
+  background: #0056b3;
 }

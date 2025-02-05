@@ -120,9 +120,9 @@ const Navbar = ({ children }) => {
             {usersOpen && (
               <ul className="dropdown-menu">
                 <li>
-                  <Link to="/register" className="dropdown-link">
+                  <Link to="/users" className="dropdown-link">
                     <FaUsers className="icon" />
-                    Register Users
+                    Users List
                   </Link>
                 </li>
               </ul>

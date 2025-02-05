@@ -15,6 +15,7 @@ import Promotions from "./components/Promotions";
 import ManagePromotions from "./components/ManagePromotions";
 import Login from "./components/Login";
 import Register from "./components/Register";
+import UserList from "./components/UserList";
 import { auth } from "./services/firebaseConfig";
 import { useAuthState } from "react-firebase-hooks/auth";
 import {
@@ -139,6 +140,10 @@ const App = () => {
             <Route
               path="/register"
               element={user ? <Register /> : <Navigate to="/login" />}
+            />
+            <Route
+              path="/users"
+              element={user ? <UserList /> : <Navigate to="/login" />}
             />
             <Route
               path="/product-list"

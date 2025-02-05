@@ -1,24 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { register } from "../services/authService";
 import { updateProfile } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { db } from "../services/firebaseConfig";
-import Swal from "sweetalert2"; // ✅ Import SweetAlert2
+import Swal from "sweetalert2";
 import "./Register.css";
 
-const Register = () => {
+const Register = ({ onClose }) => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-
-  useEffect(() => {
-    document.body.style.overflow = "hidden"; // ปิด Scroll
-    return () => {
-      document.body.style.overflow = "auto"; // เปิด Scroll เมื่อออกจากหน้านี้
-    };
-  }, []);
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -31,9 +24,7 @@ const Register = () => {
       }
       const user = userCredential.user;
 
-      await updateProfile(user, {
-        displayName: `${firstName} ${lastName}`,
-      });
+      await updateProfile(user, { displayName: `${firstName} ${lastName}` });
 
       await setDoc(doc(db, "users", user.uid), {
         firstName,
@@ -42,19 +33,22 @@ const Register = () => {
         createdAt: new Date(),
       });
 
-      // ✅ แสดงแจ้งเตือนสำเร็จด้วย SweetAlert2
+      // ✅ แจ้งเตือนเมื่อสมัครสำเร็จ
       Swal.fire({
         icon: "success",
-        title: "Registration Successful!",
-        text: "You can now log in with your credentials.",
+        title: "User Registered!",
+        text: "The user has been successfully added.",
         confirmButtonText: "OK",
       });
 
-      // ✅ รีเซ็ตค่าฟอร์ม
+      // ✅ รีเซ็ตฟอร์ม
       setFirstName("");
       setLastName("");
       setEmail("");
       setPassword("");
+
+      // ✅ ปิด Modal หลังจากสมัครเสร็จ
+      if (onClose) onClose();
     } catch (error) {
       console.error("Registration Error:", error);
       setError(error.message);
@@ -62,9 +56,9 @@ const Register = () => {
   };
 
   return (
-    <div className="register-container">
-      <div className="register-card">
-        <h2 className="register-title">Register</h2>
+    <div className="modal">
+      <div className="modal-content">
+        <h3 className="register-title">Register</h3>
         {error && <p className="register-error">{error}</p>}
         <form className="register-form" onSubmit={handleRegister}>
           <input
@@ -99,9 +93,20 @@ const Register = () => {
             className="register-input"
             required
           />
-          <button type="submit" className="register-button">
-            Register
-          </button>
+
+          {/* ✅ ปุ่ม Register และ Close อยู่ข้างกัน */}
+          <div className="modal-buttons">
+            <button
+              type="button"
+              className="close-modal-button"
+              onClick={onClose}
+            >
+              Close
+            </button>
+            <button type="submit" className="register-button">
+              Register
+            </button>
+          </div>
         </form>
       </div>
     </div>
