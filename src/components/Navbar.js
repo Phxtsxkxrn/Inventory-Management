@@ -12,12 +12,15 @@ import {
   FaGift,
   FaTools,
   FaUserCircle,
+  FaUserSecret,
+  FaUsers,
 } from "react-icons/fa";
 import "./Navbar.css";
 
 const Navbar = ({ children }) => {
   const [salesOpen, setSalesOpen] = useState(false);
   const [manageOpen, setManageOpen] = useState(false);
+  const [usersOpen, setUsersOpen] = useState(false);
   const navigate = useNavigate();
 
   // ✅ ดึงข้อมูล user ปัจจุบัน
@@ -25,6 +28,7 @@ const Navbar = ({ children }) => {
 
   const toggleSales = () => setSalesOpen(!salesOpen);
   const toggleManage = () => setManageOpen(!manageOpen);
+  const toggleUsers = () => setUsersOpen(!usersOpen);
 
   const handleLogout = async () => {
     await logout();
@@ -98,6 +102,27 @@ const Navbar = ({ children }) => {
                   <Link to="/manage-promotions" className="dropdown-link">
                     <FaGift className="icon" />
                     Manage Promotions
+                  </Link>
+                </li>
+              </ul>
+            )}
+          </li>
+
+          {/* ปุ่ม Users */}
+          <li className="navbar-item">
+            <button className="navbar-link" onClick={toggleUsers}>
+              <FaUserSecret className="icon" />
+              Users
+              <span className={`dropdown-arrow ${usersOpen ? "open" : ""}`}>
+                ▼
+              </span>
+            </button>
+            {usersOpen && (
+              <ul className="dropdown-menu">
+                <li>
+                  <Link to="/register" className="dropdown-link">
+                    <FaUsers className="icon" />
+                    Register Users
                   </Link>
                 </li>
               </ul>

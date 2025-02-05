@@ -138,7 +138,7 @@ const App = () => {
             />
             <Route
               path="/register"
-              element={user ? <Navigate to="/" /> : <Register />}
+              element={user ? <Register /> : <Navigate to="/login" />}
             />
             <Route
               path="/product-list"

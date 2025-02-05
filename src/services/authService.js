@@ -13,9 +13,10 @@ export const register = async (email, password) => {
       email,
       password
     );
-    return userCredential.user;
+    return userCredential; // ต้อง return ค่าออกมา
   } catch (error) {
-    throw error;
+    console.error("Registration Error:", error);
+    throw error; // ส่ง error กลับไปให้ handleRegister ใช้งาน
   }
 };
 
