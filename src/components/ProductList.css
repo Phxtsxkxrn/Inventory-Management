@@ -41,7 +41,10 @@
 /* กลุ่มปุ่ม Add และ Import */
 .button-group {
   display: flex;
-  gap: 10px; /* เพิ่มระยะห่างระหว่างปุ่ม */
+  gap: 10px;
+  margin-left: auto; /* ✅ ดันปุ่มไปขวาสุด */
+  justify-content: flex-end; /* ✅ จัดปุ่มชิดขวาสุด */
+  flex-wrap: wrap;
 }
 
 /* ปุ่ม Add Product */

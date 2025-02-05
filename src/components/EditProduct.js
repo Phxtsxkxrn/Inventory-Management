@@ -74,9 +74,10 @@ const EditProduct = ({ product, onSave, onDelete, onClose, categories }) => {
   return (
     <div className="modal">
       <div className="modal-content">
-        <h3>Edit Product</h3>
+        <h3 className="modal-title">Edit Product</h3>
         <form onSubmit={handleSubmit}>
-          <div className="form-grid">
+          {/* ✅ ใช้ Grid Layout */}
+          <div className="edit-form-grid">
             {[
               { name: "Image", type: "text", label: "Image URL" },
               { name: "SKU", type: "text", label: "SKU" },
@@ -84,24 +85,25 @@ const EditProduct = ({ product, onSave, onDelete, onClose, categories }) => {
               { name: "Name", type: "text", label: "Name" },
               { name: "Seller", type: "text", label: "Seller" },
             ].map((input) => (
-              <div className="coolinput" key={input.name}>
-                <label className="text">{input.label}:</label>
+              <div className="edit-input-group" key={input.name}>
+                <label className="edit-label">{input.label}:</label>
                 <input
-                  className="input"
+                  className="edit-input"
                   type={input.type}
                   name={input.name}
                   value={form[input.name]}
                   onChange={handleChange}
-                  placeholder="Write here..."
-                  required={input.name !== "Image"} // ทำให้ Image URL ไม่จำเป็นต้องใส่
+                  placeholder="Enter details..."
+                  required={input.name !== "Image"}
                 />
               </div>
             ))}
+
             {/* Normal Price */}
-            <div className="coolinput">
-              <label className="text">Normal Price:</label>
+            <div className="edit-input-group">
+              <label className="edit-label">Normal Price:</label>
               <input
-                className="input"
+                className="edit-input"
                 type="text"
                 name="NormalPrice"
                 value={form.NormalPrice}
@@ -110,12 +112,13 @@ const EditProduct = ({ product, onSave, onDelete, onClose, categories }) => {
                 required
               />
             </div>
+
             {/* Dropdown Categories */}
-            <div className="coolinput">
-              <label className="text">Categories:</label>
+            <div className="edit-input-group">
+              <label className="edit-label">Categories:</label>
               <select
                 name="Categories"
-                className="input"
+                className="edit-input"
                 value={form.Categories}
                 onChange={handleChange}
                 required
@@ -130,11 +133,12 @@ const EditProduct = ({ product, onSave, onDelete, onClose, categories }) => {
                 ))}
               </select>
             </div>
+
             {/* Discount */}
-            <div className="coolinput">
-              <label className="text">Discount (%):</label>
+            <div className="edit-input-group">
+              <label className="edit-label">Discount (%):</label>
               <input
-                className="input"
+                className="edit-input"
                 type="number"
                 name="Discount"
                 value={form.Discount}
@@ -142,12 +146,13 @@ const EditProduct = ({ product, onSave, onDelete, onClose, categories }) => {
                 placeholder="0"
               />
             </div>
+
             {/* Status */}
-            <div className="coolinput">
-              <label className="text">Status:</label>
+            <div className="edit-input-group">
+              <label className="edit-label">Status:</label>
               <select
                 name="Status"
-                className="input"
+                className="edit-input"
                 value={form.Status}
                 onChange={handleChange}
               >
@@ -155,25 +160,22 @@ const EditProduct = ({ product, onSave, onDelete, onClose, categories }) => {
                 <option value="inactive">Inactive</option>
               </select>
             </div>
+
             {/* Final Price */}
-            <div className="coolinput">
-              <label className="text">Final Price:</label>
-              <p className="final-price">
-                {`฿${new Intl.NumberFormat("th-TH", {
-                  style: "decimal",
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                }).format(calculateFinalPrice())}`}
-              </p>
+            <div className="edit-input-group">
+              <label className="edit-label">Final Price:</label>
+              <p className="final-price">฿{calculateFinalPrice().toFixed(2)}</p>
             </div>
           </div>
-          <div className="button-group">
-            <button type="submit" className="modal-button add">
+
+          {/* ✅ ปุ่ม Save, Delete, Cancel */}
+          <div className="edit-button-group">
+            <button type="submit" className="edit-button edit-button-save">
               Save Changes
             </button>
             <button
               type="button"
-              className="modal-button delete"
+              className="edit-button edit-button-delete"
               onClick={() => {
                 if (
                   window.confirm(
@@ -189,7 +191,7 @@ const EditProduct = ({ product, onSave, onDelete, onClose, categories }) => {
             </button>
             <button
               type="button"
-              className="modal-button cancel"
+              className="edit-button edit-button-cancel"
               onClick={onClose}
             >
               Cancel

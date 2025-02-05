@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { addCategories , getCategories} from "../services/categoriesService";
+import { addCategories, getCategories } from "../services/categoriesService";
 import "./AddCategories.css";
 
 const AddCategories = ({ onClose, onCategoryAdded }) => {
@@ -32,39 +32,44 @@ const AddCategories = ({ onClose, onCategoryAdded }) => {
       console.error("Error adding category:", error);
     }
   };
-  
-  
 
   return (
-    <div className="modal add-category-modal">
-  <div className="modal-content">
-    <h3>Add Category</h3>
-    <form onSubmit={handleSubmit}>
-      <div className="coolinput">
-        <label htmlFor="name" className="text">Category Name:</label>
-        <input
-          type="text"
-          id="name"
-          name="Name"
-          value={form.Name}
-          onChange={handleChange}
-          placeholder="Write here..."
-          className="input"
-          required
-        />
+    <div className="add-category-modal">
+      <div className="add-category-modal-content">
+        <h3 className="add-category-title">Add Category</h3>
+        <form onSubmit={handleSubmit}>
+          <div className="add-category-form-grid">
+            <div className="add-category-input-group">
+              <label htmlFor="name" className="add-category-label">
+                Category Name:
+              </label>
+              <input
+                type="text"
+                id="name"
+                name="Name"
+                value={form.Name}
+                onChange={handleChange}
+                placeholder="Enter category name..."
+                className="add-category-input"
+                required
+              />
+            </div>
+          </div>
+          <div className="add-category-button-group">
+            <button type="submit" className="add-category-button save">
+              Save
+            </button>
+            <button
+              type="button"
+              className="add-category-button cancel"
+              onClick={onClose}
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
       </div>
-      <div className="button-group">
-        <button type="submit" className="modal-button add">
-          Save
-        </button>
-        <button type="button" className="modal-button cancel" onClick={onClose}>
-          Cancel
-        </button>
-      </div>
-    </form>
-  </div>
-</div>
-
+    </div>
   );
 };
 

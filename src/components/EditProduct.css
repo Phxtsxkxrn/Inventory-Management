@@ -1,126 +1,89 @@
-/* Modal styles */
-.modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-  
-  .modal-content {
-    background-color: white;
-    padding: 20px;
-    border-radius: 8px;
-    width: 600px; /* ขยายความกว้างของ modal */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
-  
-  .modal-content h3 {
-    margin-top: 0;
-    text-align: center;
-  }
-  
-  /* Form grid */
-.form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr; /* สร้างสองคอลัมน์ */
-    gap: 20px; /* ระยะห่างระหว่างช่อง */
-    margin-bottom: 20px;
-  }
-  
-  /* Cool input styles */
-  .coolinput {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-  }
-  
-  .coolinput label.text {
-    font-size: 0.75rem;
-    color: #818CF8;
-    font-weight: 700;
-    margin-bottom: 5px;
-  }
-  
-  .coolinput input.input,
-  .coolinput select.input {
-    padding: 11px 10px;
-    font-size: 0.75rem;
-    border: 2px #818CF8 solid;
-    border-radius: 5px;
-    background: #ffffff;
-    transition: border-color 0.3s ease;
-  }
-  
-  .coolinput input.input:focus,
-  .coolinput select.input:focus {
-    outline: none;
-    border-color: #4caf50;
-  }
-  
-  /* Dropdown styles */
-  .coolinput select.input {
-    width: 100%;
-  }
-  
-  
-  /* Button styles */
-  .button-group {
-    text-align: center;
-  }
-  
-  .modal-button {
-    padding: 10px 15px;
-    margin: 10px;
-    border: none;
-    border-radius: 5px;
-    font-size: 14px;
-    cursor: pointer;
-  }
-  
-  .modal-button.add {
-    background-color: #4caf50;
-    color: white;
-  }
-  
-  .modal-button.add:hover {
-    background-color: #45a049;
-  }
-  
-  .modal-button.cancel {
-    background-color: #f44336;
-    color: white;
-  }
-  
-  .modal-button.cancel:hover {
-    background-color: #d32f2f;
-  }
-  
-  .modal-button.delete {
-    background-color: #f44336;
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-    margin: 10px; /* ระยะห่างระหว่างปุ่ม */
-    transition: background-color 0.3s ease;
-  }
-  
-  .modal-button.delete:hover {
-    background-color: #d32f2f;
-  }
+/* ✅ ใช้ Grid Layout */
+.edit-form-grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* แบ่ง 2 คอลัมน์ */
+  gap: 20px;
+  margin-bottom: 20px;
+}
 
+/* ✅ ปรับ Input */
+.edit-input-group select {
+  width: 100%;
+  max-width: 225px;
+  cursor: pointer;
+}
 
-/* Records Found */
-.records-found {
+.edit-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 5px;
+  text-align: left;
+  display: block;
+}
+
+.edit-input {
+  width: 100%;
+  max-width: 180px;
+  padding: 10px;
+  font-size: 16px;
+  border: 2px solid #ced4da;
+  border-radius: 6px;
+  transition: border-color 0.3s ease;
+}
+
+.edit-input:focus {
+  border-color: #007bff;
+  outline: none;
+  box-shadow: 0px 0px 6px rgba(0, 123, 255, 0.3);
+}
+
+/* ✅ ปรับปุ่ม */
+.edit-button-group {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.edit-button {
+  flex: 1;
   font-size: 16px;
   font-weight: bold;
-  color: #4caf50; /* สีเขียว */
-  margin: 0; /* ไม่มีระยะห่างเพิ่มเติม */
+  padding: 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+/* ✅ ปุ่ม Save */
+.edit-button-save {
+  background: #28a745;
+  color: white;
+}
+
+.edit-button-save:hover {
+  background: #218838;
+}
+
+/* ✅ ปุ่ม Delete */
+.edit-button-delete {
+  background: #dc3545;
+  color: white;
+}
+
+.edit-button-delete:hover {
+  background: #c82333;
+}
+
+/* ✅ ปุ่ม Cancel */
+.edit-button-cancel {
+  background: #6c757d;
+  color: white;
+}
+
+.edit-button-cancel:hover {
+  background: #5a6268;
 }

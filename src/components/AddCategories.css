@@ -1,79 +1,115 @@
-/* Add Categories Modal Styles */
-.add-category-modal .modal-content {
-    background-color: white;
-    padding: 15px;
-    border-radius: 8px;
-    width: 400px; /* ลดขนาด popup */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
-  
-  .add-category-modal h3 {
-    margin-top: 0;
-    text-align: center;
-    font-size: 18px; /* ลดขนาดหัวข้อ */
-  }
-  
-  .add-category-modal .coolinput {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    margin-bottom: 15px;
-  }
-  
-  .add-category-modal .coolinput label.text {
-    font-size: 0.75rem;
-    color: #818CF8;
-    font-weight: 700;
-    margin-bottom: 5px;
-  }
-  
-  .add-category-modal .coolinput input[type="text"].input {
-    padding: 10px;
-    font-size: 0.85rem;
-    border: 2px solid #818CF8;
-    border-radius: 5px;
-    background: #f9f9f9;
-  }
-  
-  .add-category-modal .coolinput input[type="text"].input:focus {
-    outline: none;
-    border-color: #4caf50;
-    background: #ffffff;
-    box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
-  }
-  
-  .add-category-modal .coolinput input[type="text"].input::placeholder {
-    color: #cccccc;
-    font-style: italic;
-  }
-  
-  .add-category-modal .button-group {
-    text-align: center;
-  }
-  
-  .add-category-modal .modal-button {
-    padding: 8px 12px;
-    border: none;
-    border-radius: 5px;
-    font-size: 14px;
-    cursor: pointer;
-  }
-  
-  .add-category-modal .modal-button.add {
-    background-color: #4caf50;
-    color: white;
-  }
-  
-  .add-category-modal .modal-button.add:hover {
-    background-color: #45a049;
-  }
-  
-  .add-category-modal .modal-button.cancel {
-    background-color: #f44336;
-    color: white;
-  }
-  
-  .add-category-modal .modal-button.cancel:hover {
-    background-color: #d32f2f;
-  }
-  
+/* ✅ ปรับให้ Modal อยู่ตรงกลาง */
+.add-category-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+/* ✅ ปรับขนาดของ Modal */
+.add-category-modal-content {
+  background-color: white;
+  padding: 30px;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 300px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ✅ หัวข้อของ Modal */
+.add-category-title {
+  font-size: 22px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+/* ✅ ใช้ Grid Layout */
+.add-category-form-grid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr; /* มี 1 คอลัมน์ */
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+/* ✅ ปรับ Input */
+.add-category-input-group select {
+  width: 100%;
+  max-width: 300px;
+  cursor: pointer;
+}
+
+.add-category-label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 5px;
+  text-align: left;
+  display: block;
+}
+
+.add-category-input {
+  width: 100%;
+  max-width: 180px;
+  padding: 10px;
+  font-size: 16px;
+  border: 2px solid #ced4da;
+  border-radius: 6px;
+  transition: border-color 0.3s ease;
+}
+
+.add-category-input:focus {
+  border-color: #007bff;
+  outline: none;
+  box-shadow: 0px 0px 6px rgba(0, 123, 255, 0.3);
+}
+
+/* ✅ ปรับปุ่ม */
+.add-category-button-group {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.add-category-button {
+  flex: 1;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+/* ✅ ปุ่ม Save */
+.add-category-button.save {
+  background: #28a745;
+  color: white;
+}
+
+.add-category-button.save:hover {
+  background: #218838;
+}
+
+/* ✅ ปุ่ม Cancel */
+.add-category-button.cancel {
+  background: #6c757d;
+  color: white;
+}
+
+.add-category-button.cancel:hover {
+  background: #5a6268;
+}

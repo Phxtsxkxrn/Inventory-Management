@@ -97,8 +97,9 @@ const AddProduct = ({ onAdd, onClose }) => {
   return (
     <div className="modal">
       <div className="modal-content">
-        <h3>Add Product</h3>
+        <h3 className="modal-title">Add Product</h3>
         <form onSubmit={handleSubmit}>
+          {/* ✅ ใช้ Grid Layout แบ่งฟอร์มซ้าย-ขวา */}
           <div className="form-grid">
             {[
               { name: "Image", type: "text", label: "Image URL" },
@@ -107,23 +108,23 @@ const AddProduct = ({ onAdd, onClose }) => {
               { name: "Name", type: "text", label: "Name" },
               { name: "Seller", type: "text", label: "Seller" },
             ].map((input) => (
-              <div className="coolinput" key={input.name}>
-                <label className="text">{input.label}:</label>
+              <div className="product-input-group" key={input.name}>
+                <label className="product-label">{input.label}:</label>
                 <input
-                  className="input"
+                  className="product-input"
                   type={input.type}
                   name={input.name}
                   value={form[input.name]}
                   onChange={handleChange}
-                  placeholder="Write here..."
-                  required={input.name !== "Image"} // Image ไม่ต้อง required
+                  placeholder="Enter details..."
+                  required={input.name !== "Image"}
                 />
               </div>
             ))}
-            <div className="coolinput">
-              <label className="text">Normal Price:</label>
+            <div className="product-input-group">
+              <label className="product-label">Normal Price:</label>
               <input
-                className="input"
+                className="product-input"
                 type="text"
                 name="NormalPrice"
                 value={form.NormalPrice}
@@ -132,17 +133,17 @@ const AddProduct = ({ onAdd, onClose }) => {
                 required
               />
             </div>
-            <div className="coolinput">
-              <label className="text">Categories:</label>
+            <div className="product-input-group">
+              <label className="product-label">Categories:</label>
               <select
                 name="Categories"
-                className="input"
+                className="product-input"
                 value={form.Categories}
                 onChange={handleChange}
                 required
               >
                 <option value="" disabled>
-                  Select Categories
+                  Select Category
                 </option>
                 {categories.map((category) => (
                   <option key={category.id} value={category.Name}>
@@ -151,10 +152,10 @@ const AddProduct = ({ onAdd, onClose }) => {
                 ))}
               </select>
             </div>
-            <div className="coolinput">
-              <label className="text">Discount (%):</label>
+            <div className="product-input-group">
+              <label className="product-label">Discount (%):</label>
               <input
-                className="input"
+                className="product-input"
                 type="text"
                 name="Discount"
                 value={form.Discount}
@@ -162,11 +163,11 @@ const AddProduct = ({ onAdd, onClose }) => {
                 placeholder="0%"
               />
             </div>
-            <div className="coolinput">
-              <label className="text">Status:</label>
+            <div className="product-input-group">
+              <label className="product-label">Status:</label>
               <select
                 name="Status"
-                className="input"
+                className="product-input"
                 value={form.Status}
                 onChange={handleChange}
               >
@@ -174,13 +175,14 @@ const AddProduct = ({ onAdd, onClose }) => {
                 <option value="inactive">Inactive</option>
               </select>
             </div>
-            <div className="coolinput">
-              <label className="text">FinalPrice:</label>
-              <p className="discounted-price">
+            <div className="product-input-group">
+              <label className="product-label">Final Price:</label>
+              <p className="final-price">
                 {calculateDiscountedPrice() || "฿0.00"}
               </p>
             </div>
           </div>
+          {/* ✅ ปุ่ม Add Product และ Cancel */}
           <div className="button-group">
             <button type="submit" className="modal-button add">
               Add Product

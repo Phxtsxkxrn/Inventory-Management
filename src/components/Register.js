@@ -33,7 +33,6 @@ const Register = ({ onClose }) => {
         createdAt: new Date(),
       });
 
-      // ✅ แจ้งเตือนเมื่อสมัครสำเร็จ
       Swal.fire({
         icon: "success",
         title: "User Registered!",
@@ -41,13 +40,11 @@ const Register = ({ onClose }) => {
         confirmButtonText: "OK",
       });
 
-      // ✅ รีเซ็ตฟอร์ม
       setFirstName("");
       setLastName("");
       setEmail("");
       setPassword("");
 
-      // ✅ ปิด Modal หลังจากสมัครเสร็จ
       if (onClose) onClose();
     } catch (error) {
       console.error("Registration Error:", error);
@@ -56,55 +53,65 @@ const Register = ({ onClose }) => {
   };
 
   return (
-    <div className="modal">
-      <div className="modal-content">
+    <div className="register-modal" onClick={onClose}>
+      <div
+        className="register-modal-content"
+        onClick={(e) => e.stopPropagation()}
+      >
         <h3 className="register-title">Register</h3>
         {error && <p className="register-error">{error}</p>}
         <form className="register-form" onSubmit={handleRegister}>
-          <input
-            type="text"
-            placeholder="First Name"
-            value={firstName}
-            onChange={(e) => setFirstName(e.target.value)}
-            className="register-input"
-            required
-          />
-          <input
-            type="text"
-            placeholder="Last Name"
-            value={lastName}
-            onChange={(e) => setLastName(e.target.value)}
-            className="register-input"
-            required
-          />
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="register-input"
-            required
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="register-input"
-            required
-          />
+          <div className="register-input-group">
+            <label className="register-label">First Name:</label>
+            <input
+              type="text"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              className="register-input"
+              required
+            />
+          </div>
+          <div className="register-input-group">
+            <label className="register-label">Last Name:</label>
+            <input
+              type="text"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              className="register-input"
+              required
+            />
+          </div>
+          <div className="register-input-group">
+            <label className="register-label">Email:</label>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="register-input"
+              required
+            />
+          </div>
+          <div className="register-input-group">
+            <label className="register-label">Password:</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="register-input"
+              required
+            />
+          </div>
 
-          {/* ✅ ปุ่ม Register และ Close อยู่ข้างกัน */}
-          <div className="modal-buttons">
+          <div className="register-button-group">
+            <button type="submit" className="register-button save">
+              Register
+            </button>
             <button
               type="button"
-              className="close-modal-button"
+              className="register-button cancel"
               onClick={onClose}
             >
               Close
-            </button>
-            <button type="submit" className="register-button">
-              Register
             </button>
           </div>
         </form>
