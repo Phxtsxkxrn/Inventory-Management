@@ -12,6 +12,7 @@ import {
   FaUserCircle,
   FaUserSecret,
   FaUsers,
+  FaEdit,
 } from "react-icons/fa";
 import "./Navbar.css";
 
@@ -131,14 +132,22 @@ const Navbar = ({ children }) => {
           </li>
         </ul>
 
-        {/* ✅ แสดงอีเมลของผู้ใช้ (ถ้ามี) และปุ่ม Logout */}
         {user && (
           <div className="user-info">
             <FaUserCircle className="user-icon" />
             <span className="user-email">{user.email}</span>
-            <button className="logout-button" onClick={handleLogout}>
-              Logout
-            </button>
+            <div className="user-actions">
+              <button
+                className="edit-profile-button"
+                onClick={() => navigate("/edit-profile")}
+              >
+                <FaEdit className="icon" />
+                Edit
+              </button>
+              <button className="logout-button" onClick={handleLogout}>
+                Logout
+              </button>
+            </div>
           </div>
         )}
       </nav>

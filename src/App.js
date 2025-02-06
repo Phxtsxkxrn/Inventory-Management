@@ -16,6 +16,7 @@ import ManagePromotions from "./components/ManagePromotions";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import UserList from "./components/UserList";
+import EditProfile from "./components/EditProfile";
 import { db } from "./services/firebaseConfig";
 import { doc, getDoc, setDoc } from "firebase/firestore"; // เชื่อมต่อกับ Firestore
 import {
@@ -202,6 +203,7 @@ const App = () => {
                 )
               }
             />
+            <Route path="/edit-profile" element={<EditProfile />} />
             <Route
               path="/users"
               element={user ? <UserList /> : <Navigate to="/login" />}
