@@ -1,7 +1,5 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { logout } from "../services/authService";
-import { auth } from "../services/firebaseConfig"; // ✅ Import Firebase auth
+import { Link, useNavigate } from "react-router-dom"; // ใช้ useNavigate
 import {
   FaHome,
   FaBoxes,
@@ -20,19 +18,22 @@ import "./Navbar.css";
 const Navbar = ({ children }) => {
   const [salesOpen, setSalesOpen] = useState(false);
   const [manageOpen, setManageOpen] = useState(false);
-  const [usersOpen, setUsersOpen] = useState(false);
+  const [usersOpen, setUsersOpen] = useState(false); // สำหรับแสดง/ซ่อน dropdown ของ Users
+
   const navigate = useNavigate();
 
-  // ✅ ดึงข้อมูล user ปัจจุบัน
-  const user = auth.currentUser;
+  // ดึงข้อมูลผู้ใช้จาก localStorage
+  const userEmail = localStorage.getItem("userEmail");
+  const user = userEmail ? { email: userEmail } : null;
 
   const toggleSales = () => setSalesOpen(!salesOpen);
   const toggleManage = () => setManageOpen(!manageOpen);
-  const toggleUsers = () => setUsersOpen(!usersOpen);
+  const toggleUsers = () => setUsersOpen(!usersOpen); // ฟังก์ชัน toggle สำหรับ Users
 
-  const handleLogout = async () => {
-    await logout();
-    navigate("/login");
+  const handleLogout = () => {
+    localStorage.removeItem("userEmail"); // ลบข้อมูลผู้ใช้จาก localStorage
+    navigate("/login"); // นำไปที่หน้า Login
+    window.location.reload(); // รีเฟรชหน้าเพื่อให้แน่ใจว่าข้อมูลเปลี่ยนแปลง
   };
 
   return (
@@ -130,18 +131,16 @@ const Navbar = ({ children }) => {
           </li>
         </ul>
 
-        {/* ✅ แสดงอีเมลของผู้ใช้ (ถ้ามี) */}
+        {/* ✅ แสดงอีเมลของผู้ใช้ (ถ้ามี) และปุ่ม Logout */}
         {user && (
           <div className="user-info">
             <FaUserCircle className="user-icon" />
             <span className="user-email">{user.email}</span>
+            <button className="logout-button" onClick={handleLogout}>
+              Logout
+            </button>
           </div>
         )}
-
-        {/* ปุ่ม Logout */}
-        <button className="logout-button" onClick={handleLogout}>
-          Logout
-        </button>
       </nav>
 
       {/* Content */}

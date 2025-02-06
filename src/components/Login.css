@@ -1,3 +1,4 @@
+/* General layout for the login page */
 .login-container {
   display: flex;
   justify-content: center;
@@ -7,44 +8,75 @@
   overflow: hidden; /* ป้องกัน Scroll */
 }
 
+/* Card Style for login form */
 .login-card {
   background: #ffffff;
   padding: 40px;
-  border-radius: 10px;
-  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.1);
   text-align: center;
-  max-width: 420px;
+  max-width: 400px;
   width: 100%;
 }
 
+/* Title of the login page */
 .login-title {
-  font-size: 26px;
-  font-weight: bold;
+  font-size: 24px;
+  font-weight: 600;
   color: #333;
   margin-bottom: 20px;
 }
 
+/* Form styling */
 .login-form {
   display: flex;
   flex-direction: column;
   gap: 15px;
 }
 
+/* ปรับขนาดของ input และให้มีความกว้างเหมาะสม */
 .login-input {
+  width: 100%; /* ทำให้ input กว้างขึ้น */
+  max-width: 325px; /* ไม่ให้กว้างเกินไป */
   padding: 12px;
   font-size: 16px;
   border: 1px solid #ced4da;
   border-radius: 6px;
   transition: border-color 0.3s ease;
+  margin: 0 auto; /* จัดให้อยู่ตรงกลาง */
+  display: block;
 }
 
+/* Focus state บน input */
 .login-input:focus {
   border-color: #007bff;
   outline: none;
   box-shadow: 0px 0px 6px rgba(0, 123, 255, 0.3);
 }
 
+/* ปรับขนาดของ input และให้มีความกว้างเหมาะสม */
+.login-input-group {
+  display: flex;
+  flex-direction: column; /* จัดให้อยู่แนวตั้ง */
+  align-items: flex-start; /* ชิดซ้าย */
+  width: 100%;
+  max-width: 350px;
+  margin: 0 auto; /* จัดให้อยู่ตรงกลาง */
+}
+
+/* ปรับ label (Email, Password) ให้อยู่ชิดซ้าย */
+.login-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #555;
+  margin-bottom: 5px;
+  display: block;
+}
+
+/* ปรับปุ่ม Login ให้ขนาดเท่ากับ Input */
 .login-button {
+  width: 100%;
+  max-width: 350px;
   background: #007bff;
   color: white;
   font-size: 16px;
@@ -54,12 +86,16 @@
   border-radius: 6px;
   cursor: pointer;
   transition: background 0.3s ease;
+  margin: 10px auto 0;
+  display: block;
 }
 
+/* Hover effect for login button */
 .login-button:hover {
   background: #0056b3;
 }
 
+/* Error message styling */
 .login-error {
   color: red;
   font-size: 14px;

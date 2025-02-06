@@ -16,8 +16,8 @@ import ManagePromotions from "./components/ManagePromotions";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import UserList from "./components/UserList";
-import { auth } from "./services/firebaseConfig";
-import { useAuthState } from "react-firebase-hooks/auth";
+import { db } from "./services/firebaseConfig";
+import { doc, getDoc, setDoc } from "firebase/firestore"; // เชื่อมต่อกับ Firestore
 import {
   getProducts,
   addProduct,
@@ -31,11 +31,28 @@ import {
 } from "./services/categoriesService";
 
 const App = () => {
-  const [user, loading] = useAuthState(auth);
+  const [user, setUser] = useState(null); // กำหนดสถานะของผู้ใช้
+  const [loading, setLoading] = useState(true);
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [userExists, setUserExists] = useState(false); // เช็คว่า user มีอยู่แล้วหรือไม่
+
+  // ฟังก์ชันที่ใช้ในการตรวจสอบการเข้าสู่ระบบ
+  const checkUserStatus = async () => {
+    const userEmail = localStorage.getItem("userEmail"); // เก็บข้อมูลผู้ใช้ใน localStorage
+    if (userEmail) {
+      const docRef = doc(db, "users", userEmail);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        setUser(docSnap.data());
+      }
+    }
+    setLoading(false); // หลังจากโหลดเสร็จแล้ว
+  };
 
   useEffect(() => {
+    checkUserStatus();
+
     const fetchProducts = async () => {
       try {
         const data = await getProducts();
@@ -119,27 +136,71 @@ const App = () => {
     }
   };
 
+  // ฟังก์ชันเพื่อเข้าสู่ระบบสำเร็จ
+  const handleLoginSuccess = (userData) => {
+    setUser(userData); // เก็บข้อมูลผู้ใช้ที่เข้าสู่ระบบ
+    localStorage.setItem("userEmail", userData.email); // เก็บอีเมลใน localStorage
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("userEmail");
+    setUser(null); // ลบข้อมูลผู้ใช้ในสถานะ
+  };
+
+  // ฟังก์ชันสำหรับการสมัครสมาชิก
+  const handleRegister = async (email, password) => {
+    const userRef = doc(db, "users", email);
+    const docSnap = await getDoc(userRef);
+
+    if (docSnap.exists()) {
+      // หากผู้ใช้มีอยู่แล้วใน Firestore
+      setUserExists(true); // แจ้งว่า user มีอยู่แล้ว
+    } else {
+      // ถ้าผู้ใช้ไม่มีในระบบ ให้ลงทะเบียนใหม่
+      const newUser = {
+        email,
+        password,
+        createdAt: new Date(),
+      };
+
+      await setDoc(userRef, newUser); // เพิ่มผู้ใช้ใหม่ใน Firestore
+      setUserExists(false); // ผู้ใช้ลงทะเบียนได้
+      localStorage.setItem("userEmail", email); // เก็บอีเมลใน localStorage
+      setUser({ email });
+    }
+  };
+
   if (loading) return <h1>Loading...</h1>;
 
   return (
     <Router>
       <div style={{ display: "flex" }}>
-        {/* Navbar ควรแสดงเฉพาะเมื่อ user login แล้ว */}
-        {user && <Navbar />}
+        {user && <Navbar onLogout={handleLogout} />}
         <div style={{ flex: 1, padding: "20px" }}>
           <Routes>
-            {/* ถ้ายังไม่ได้ Login, Redirect ไปที่ Login */}
             <Route
               path="/"
               element={user ? <Home /> : <Navigate to="/login" />}
             />
             <Route
               path="/login"
-              element={user ? <Navigate to="/" /> : <Login />}
+              element={
+                user ? (
+                  <Navigate to="/" />
+                ) : (
+                  <Login onLoginSuccess={handleLoginSuccess} />
+                )
+              }
             />
             <Route
               path="/register"
-              element={user ? <Register /> : <Navigate to="/login" />}
+              element={
+                userExists ? (
+                  <Navigate to="/" />
+                ) : (
+                  <Register onRegister={handleRegister} />
+                )
+              }
             />
             <Route
               path="/users"

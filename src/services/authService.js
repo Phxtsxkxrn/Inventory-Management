@@ -1,42 +1,49 @@
-// services/authService.js
-import { auth } from "./firebaseConfig";
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut,
-} from "firebase/auth";
+import { db } from "./firebaseConfig"; // นำเข้า Firestore
+import { setDoc, doc, serverTimestamp, getDoc } from "firebase/firestore";
 
-export const register = async (email, password) => {
+// ฟังก์ชันลงทะเบียนผู้ใช้ใหม่
+export const registerUser = async (firstName, lastName, email, password) => {
   try {
-    const userCredential = await createUserWithEmailAndPassword(
-      auth,
+    // สร้างข้อมูลผู้ใช้ใหม่
+    const newUser = {
+      firstName,
+      lastName,
       email,
-      password
-    );
-    return userCredential; // ต้อง return ค่าออกมา
+      password, // เก็บรหัสผ่านเป็นข้อความธรรมดา (ไม่แฮช)
+      createdAt: serverTimestamp(),
+      lastUpdate: serverTimestamp(),
+    };
+
+    // บันทึกข้อมูลใน Firestore
+    await setDoc(doc(db, "users", email), newUser); // ใช้ email เป็น document ID
+
+    return { success: true }; // คืนค่าผลลัพธ์สำเร็จ
   } catch (error) {
     console.error("Registration Error:", error);
-    throw error; // ส่ง error กลับไปให้ handleRegister ใช้งาน
+    return { success: false, message: error.message }; // ถ้ามีข้อผิดพลาดให้แสดงข้อความ
   }
 };
 
-export const login = async (email, password) => {
+// ฟังก์ชันเข้าสู่ระบบผู้ใช้
+export const loginUser = async (email, password) => {
   try {
-    const userCredential = await signInWithEmailAndPassword(
-      auth,
-      email,
-      password
-    );
-    return userCredential.user;
-  } catch (error) {
-    throw error;
-  }
-};
+    const docRef = doc(db, "users", email); // ใช้ email เป็น document ID
+    const docSnap = await getDoc(docRef);
 
-export const logout = async () => {
-  try {
-    await signOut(auth); // ✅ เรียกใช้งาน Logout
+    if (docSnap.exists()) {
+      const user = docSnap.data();
+      // ตรวจสอบรหัสผ่านที่กรอกมาตรงกับรหัสผ่านใน Firestore หรือไม่
+      if (password === user.password) {
+        // เปรียบเทียบรหัสผ่าน
+        return { success: true, user }; // คืนข้อมูลผู้ใช้
+      } else {
+        return { success: false, message: "Invalid password" }; // ถ้ารหัสผ่านไม่ตรง
+      }
+    } else {
+      return { success: false, message: "User not found" }; // ถ้าไม่พบผู้ใช้
+    }
   } catch (error) {
-    console.error("Error logging out:", error);
+    console.error("Login Error: ", error);
+    return { success: false, message: error.message };
   }
 };

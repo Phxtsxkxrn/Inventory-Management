@@ -12,55 +12,62 @@
   z-index: 9999;
 }
 
-/* ✅ ปรับขนาดของ Modal ให้แคบลง */
+/* ✅ ปรับขนาดของ Modal ให้กะทัดรัด */
 .register-modal-content {
   background-color: white;
   padding: 30px;
-  border-radius: 8px;
+  border-radius: 10px;
   width: 90%;
-  max-width: 490px; /* ✅ ลดขนาด modal ให้พอดีขึ้น */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-width: 450px; /* ✅ ลดขนาด modal ให้ดูดี */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   text-align: center;
   display: flex;
   flex-direction: column;
-  align-items: center;
 }
 
 /* ✅ หัวข้อของ Modal */
 .register-title {
-  font-size: 22px;
+  font-size: 24px;
   font-weight: bold;
   color: #333;
   margin-bottom: 20px;
+  text-align: center;
 }
 
-/* ✅ ปรับ Input ให้อยู่ตรงกลาง */
+/* ✅ ปรับ Input ให้อยู่ตรงกลางและ Label ชิดซ้าย */
 .register-input-group {
   width: 100%;
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; /* ✅ ทำให้ Label ชิดซ้าย */
   margin-bottom: 15px;
 }
 
+/* ✅ ปรับ Label ชิดซ้าย */
 .register-label {
   font-size: 14px;
-  font-weight: bold;
+  font-weight: 500;
   color: #333;
-  display: block;
   margin-bottom: 5px;
   text-align: left;
+  width: 100%;
 }
 
+:root {
+  --input-width: 420px; /* ✅ เปลี่ยนค่านี้เพื่อปรับขนาด input */
+}
+
+/* ปรับขนาด input ตามค่าตัวแปร */
 .register-input {
-  width: auto; /* ✅ ทำให้ input ไม่ยาวเกินไป */
-  min-width: 250px;
-  max-width: 300px;
-  padding: 10px;
+  width: var(--input-width);
+  padding: 12px;
   font-size: 16px;
-  border: 2px solid #ced4da;
+  border: 1px solid #ced4da;
   border-radius: 6px;
   transition: border-color 0.3s ease;
 }
 
+/* ✅ ปรับ Focus Effect */
 .register-input:focus {
   border-color: #007bff;
   outline: none;
@@ -72,13 +79,15 @@
   display: flex;
   justify-content: center;
   gap: 10px;
-  width: 100%;
-  max-width: 300px; /* ✅ ปรับขนาดให้พอดีกับ input */
-  margin-top: 15px;
+  width: var(--input-width);
+  margin: 20px auto 0; /* ✅ เพิ่มระยะห่างข้างบน */
+  padding-top: 10px; /* ✅ เพิ่ม padding ข้างบน */
 }
 
+/* ✅ ปุ่มกด */
 .register-button {
-  flex: 1;
+  width: 100%; /* ✅ ทำให้ปุ่มเต็มความกว้าง */
+  max-width: 200px; /* ✅ กำหนดขนาดให้พอดี */
   font-size: 16px;
   font-weight: bold;
   padding: 12px;
@@ -86,12 +95,11 @@
   border-radius: 6px;
   cursor: pointer;
   transition: background 0.3s ease;
-  min-width: 120px;
 }
 
 /* ✅ ปุ่ม Register */
 .register-button.save {
-  background: #28a745; /* ✅ ปรับเป็นสีเขียวแทนฟ้า */
+  background: #28a745;
   color: white;
 }
 
@@ -109,7 +117,7 @@
   background: #5a6268;
 }
 
-/* ✅ Error Message */
+/* ✅ ข้อความแจ้ง Error */
 .register-error {
   color: red;
   font-size: 14px;

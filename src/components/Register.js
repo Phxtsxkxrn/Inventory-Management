@@ -1,12 +1,9 @@
 import React, { useState } from "react";
-import { register } from "../services/authService";
-import { updateProfile } from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
-import { db } from "../services/firebaseConfig";
-import Swal from "sweetalert2";
-import "./Register.css";
+import { registerUser } from "../services/authService"; // นำเข้า registerUser
+import Swal from "sweetalert2"; // ใช้ในการแจ้งเตือน
+import "./Register.css"; // นำเข้าไฟล์ CSS
 
-const Register = ({ onClose }) => {
+const Register = ({ onUserAdded, onClose }) => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
@@ -15,24 +12,16 @@ const Register = ({ onClose }) => {
 
   const handleRegister = async (e) => {
     e.preventDefault();
-    setError("");
+    setError(""); // รีเซ็ตข้อผิดพลาดก่อน
 
-    try {
-      const userCredential = await register(email, password);
-      if (!userCredential || !userCredential.user) {
-        throw new Error("User registration failed.");
-      }
-      const user = userCredential.user;
+    const { success, message, userId } = await registerUser(
+      firstName,
+      lastName,
+      email,
+      password
+    );
 
-      await updateProfile(user, { displayName: `${firstName} ${lastName}` });
-
-      await setDoc(doc(db, "users", user.uid), {
-        firstName,
-        lastName,
-        email,
-        createdAt: new Date(),
-      });
-
+    if (success) {
       Swal.fire({
         icon: "success",
         title: "User Registered!",
@@ -40,15 +29,21 @@ const Register = ({ onClose }) => {
         confirmButtonText: "OK",
       });
 
-      setFirstName("");
-      setLastName("");
-      setEmail("");
-      setPassword("");
+      // ✅ ส่งข้อมูลที่เพิ่งลงทะเบียนไปยัง `UserList.js`
+      if (onUserAdded) {
+        onUserAdded({
+          id: userId, // ใช้ ID จาก Firestore
+          firstName,
+          lastName,
+          email,
+          createdAt: new Date(), // ตั้งค่าเวลาเพิ่ม
+          lastUpdate: new Date(),
+        });
+      }
 
-      if (onClose) onClose();
-    } catch (error) {
-      console.error("Registration Error:", error);
-      setError(error.message);
+      onClose(); // ✅ ปิด modal หลังจากลงทะเบียนเสร็จ
+    } else {
+      setError(message); // ✅ แสดงข้อความผิดพลาด
     }
   };
 
@@ -56,11 +51,13 @@ const Register = ({ onClose }) => {
     <div className="register-modal" onClick={onClose}>
       <div
         className="register-modal-content"
-        onClick={(e) => e.stopPropagation()}
+        onClick={(e) => e.stopPropagation()} // ป้องกัน Modal ปิดเมื่อคลิกข้างใน
       >
         <h3 className="register-title">Register</h3>
-        {error && <p className="register-error">{error}</p>}
+        {error && <p className="register-error">{error}</p>}{" "}
+        {/* แสดงข้อผิดพลาด */}
         <form className="register-form" onSubmit={handleRegister}>
+          {/* First Name */}
           <div className="register-input-group">
             <label className="register-label">First Name:</label>
             <input
@@ -71,6 +68,8 @@ const Register = ({ onClose }) => {
               required
             />
           </div>
+
+          {/* Last Name */}
           <div className="register-input-group">
             <label className="register-label">Last Name:</label>
             <input
@@ -81,6 +80,8 @@ const Register = ({ onClose }) => {
               required
             />
           </div>
+
+          {/* Email */}
           <div className="register-input-group">
             <label className="register-label">Email:</label>
             <input
@@ -91,6 +92,8 @@ const Register = ({ onClose }) => {
               required
             />
           </div>
+
+          {/* Password */}
           <div className="register-input-group">
             <label className="register-label">Password:</label>
             <input
@@ -102,6 +105,7 @@ const Register = ({ onClose }) => {
             />
           </div>
 
+          {/* ปุ่ม Register และ Close */}
           <div className="register-button-group">
             <button type="submit" className="register-button save">
               Register
