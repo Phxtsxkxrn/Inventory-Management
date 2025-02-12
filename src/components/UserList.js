@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { collection, getDocs } from "firebase/firestore";
+import { deleteDoc, doc, collection, getDocs } from "firebase/firestore";
 import { db } from "../services/firebaseConfig";
 import Register from "./Register";
 import "./UserList.css";
+import Swal from "sweetalert2"; // นำเข้า SweetAlert2
 
 const UserList = () => {
   const [users, setUsers] = useState([]);
@@ -99,6 +100,33 @@ const UserList = () => {
       return new Date(timestamp.seconds * 1000).toLocaleString();
     }
     return new Date(timestamp).toLocaleString();
+  };
+
+  // ✅ ฟังก์ชันลบผู้ใช้
+  const handleDeleteUser = async (userId) => {
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await deleteDoc(doc(db, "users", userId)); // ลบผู้ใช้จาก Firestore
+          setUsers((prevUsers) =>
+            prevUsers.filter((user) => user.id !== userId)
+          ); // อัปเดต state
+
+          Swal.fire("Deleted!", "User has been deleted.", "success");
+        } catch (error) {
+          console.error("Error deleting user:", error);
+          Swal.fire("Error!", "Failed to delete user.", "error");
+        }
+      }
+    });
   };
 
   return (
@@ -199,6 +227,7 @@ const UserList = () => {
             <th>Email</th>
             <th>Created At</th>
             <th>Last Update</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -211,11 +240,19 @@ const UserList = () => {
                 <td>{user.email}</td>
                 <td>{formatDate(user.createdAt)}</td>
                 <td>{formatDate(user.lastUpdate)}</td>
+                <td>
+                  <button
+                    className="delete-user"
+                    onClick={() => handleDeleteUser(user.id)}
+                  >
+                    Delete
+                  </button>
+                </td>
               </tr>
             ))
           ) : (
             <tr>
-              <td colSpan="5">No users found.</td>
+              <td colSpan="7">No users found.</td>
             </tr>
           )}
         </tbody>

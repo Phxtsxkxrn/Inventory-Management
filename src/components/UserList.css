@@ -198,3 +198,27 @@
 .custom-submit-button:hover {
   background-color: #0056b3;
 }
+
+/* ปุ่ม Delete */
+.delete-user {
+  background-color: #ef4444; /* สีพื้นหลังปุ่ม Delete */
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.delete-user:hover {
+  background-color: #dc2626; /* สีพื้นหลังเมื่อ hover */
+  transform: translateY(-2px); /* ยกปุ่มขึ้น */
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15); /* เพิ่มเงาเมื่อ hover */
+}
+
+.delete-user:active {
+  transform: translateY(0); /* กลับตำแหน่งเดิมเมื่อคลิก */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* เงาปกติ */
+}
