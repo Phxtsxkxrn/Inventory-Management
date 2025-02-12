@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { getCategories } from "../services/categoriesService"; // Import service
 import "./AddProduct.css"; // Import CSS
+import Swal from "sweetalert2";
 
 const AddProduct = ({ onAdd, onClose }) => {
   const [form, setForm] = useState({
@@ -74,24 +75,45 @@ const AddProduct = ({ onAdd, onClose }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Convert NormalPrice and Discount to numeric values
     const normalPrice = parseCurrency(form.NormalPrice);
     const discount = parseFloat(form.Discount) || 0;
-
-    // คำนวณราคาหลังหักส่วนลด
     const finalPrice = normalPrice - (normalPrice * discount) / 100;
 
-    // เตรียมข้อมูลสำหรับบันทึกใน Firebase
     const formData = {
       ...form,
       NormalPrice: normalPrice,
       Discount: discount,
-      FinalPrice: finalPrice, // เพิ่ม FinalPrice
+      FinalPrice: finalPrice,
     };
 
-    // ส่งข้อมูลไปยังฟังก์ชัน onAdd หรือ Firebase
-    onAdd(formData);
-    onClose();
+    // ✅ แสดง SweetAlert2 ยืนยันก่อนเพิ่มสินค้า
+    Swal.fire({
+      title: "Are you sure?",
+      text: "Do you want to add this product?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, add it!",
+      cancelButtonText: "Cancel",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // ✅ บันทึกข้อมูลสินค้า
+        onAdd(formData);
+
+        // ✅ แจ้งเตือนว่าสำเร็จ
+        Swal.fire({
+          icon: "success",
+          title: "Product Added!",
+          text: "The product has been successfully added.",
+          confirmButtonText: "OK",
+        });
+
+        onClose(); // ✅ ปิด modal หลังจากเพิ่มเสร็จ
+      } else if (result.dismiss === Swal.DismissReason.cancel) {
+        onClose(); // ✅ ปิด modal ถ้ากด Cancel
+      }
+    });
   };
 
   return (
