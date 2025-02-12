@@ -88,8 +88,6 @@
   transition: width 0.3s;
 }
 
-
-
 .button-group {
   display: flex;
   gap: 15px; /* เพิ่มระยะห่างระหว่างปุ่ม */
@@ -113,4 +111,9 @@
 .modal-button.cancel {
   background-color: #f44336;
   color: white;
+}
+
+/* ✅ SweetAlert2 อยู่ด้านหน้า */
+.swal2-container {
+  z-index: 100000 !important; /* ✅ z-index สูงสุด */
 }

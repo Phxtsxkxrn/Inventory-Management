@@ -3,6 +3,7 @@ import Papa from "papaparse"; // สำหรับไฟล์ CSV
 import * as XLSX from "xlsx"; // สำหรับไฟล์ Excel
 import "./ImportProducts.css";
 import { FaCloudUploadAlt } from "react-icons/fa";
+import Swal from "sweetalert2";
 
 const ImportProducts = ({ onImport, onClose }) => {
   const [file, setFile] = useState(null);
@@ -39,23 +40,52 @@ const ImportProducts = ({ onImport, onClose }) => {
   const handleUpload = () => {
     if (!file) {
       setError("Please select a file to upload.");
+      Swal.fire({
+        icon: "warning",
+        title: "No File Selected",
+        text: "Please select a CSV or Excel file before uploading.",
+        confirmButtonText: "OK",
+      });
       return;
     }
 
-    setError("");
-    setUploadStatus("Uploading...");
+    // ✅ แสดงกล่องยืนยันก่อนอัปโหลด
+    Swal.fire({
+      title: "Are you sure?",
+      text: "Do you want to upload this file?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, upload it!",
+      cancelButtonText: "Cancel",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        setError("");
+        setUploadStatus("Uploading...");
 
-    const fileExtension = file.name.split(".").pop().toLowerCase();
+        const fileExtension = file.name.split(".").pop().toLowerCase();
 
-    // แยกการประมวลผลตามประเภทไฟล์
-    if (fileExtension === "csv") {
-      processCSV(file);
-    } else if (fileExtension === "xlsx" || fileExtension === "xls") {
-      processExcel(file);
-    } else {
-      setError("Unsupported file format. Please upload a CSV or Excel file.");
-      setUploadStatus("");
-    }
+        if (fileExtension === "csv") {
+          processCSV(file);
+        } else if (fileExtension === "xlsx" || fileExtension === "xls") {
+          processExcel(file);
+        } else {
+          setError(
+            "Unsupported file format. Please upload a CSV or Excel file."
+          );
+          setUploadStatus("");
+          Swal.fire({
+            icon: "error",
+            title: "Invalid File Format",
+            text: "Please upload a CSV or Excel file.",
+            confirmButtonText: "OK",
+          });
+        }
+      } else if (result.dismiss === Swal.DismissReason.cancel) {
+        onClose(); // ✅ ปิด popup ImportProducts ถ้ากด Cancel
+      }
+    });
   };
 
   const processCSV = (file) => {
@@ -79,11 +109,26 @@ const ImportProducts = ({ onImport, onClose }) => {
               Image: item.Image?.trim() || "",
             };
           });
+
           onImport(parsedData);
           setUploadStatus("Upload Complete");
+
+          // ✅ แจ้งเตือนเมื่ออัปโหลดสำเร็จ
+          Swal.fire({
+            icon: "success",
+            title: "Upload Successful!",
+            text: `${parsedData.length} products imported successfully.`,
+            confirmButtonText: "OK",
+          });
         },
         error: function () {
           setError("Error reading the CSV file.");
+          Swal.fire({
+            icon: "error",
+            title: "Upload Failed",
+            text: "Error reading the CSV file. Please try again.",
+            confirmButtonText: "OK",
+          });
         },
       });
     };
@@ -114,6 +159,14 @@ const ImportProducts = ({ onImport, onClose }) => {
 
       onImport(parsedData);
       setUploadStatus("Upload Complete");
+
+      // ✅ แจ้งเตือนเมื่ออัปโหลดสำเร็จ
+      Swal.fire({
+        icon: "success",
+        title: "Upload Successful!",
+        text: `${parsedData.length} products imported successfully.`,
+        confirmButtonText: "OK",
+      });
     };
     reader.readAsBinaryString(file);
   };
