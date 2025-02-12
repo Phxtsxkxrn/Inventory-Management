@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./EditProduct.css";
+import Swal from "sweetalert2";
 
 const EditProduct = ({ product, onSave, onDelete, onClose, categories }) => {
   const [form, setForm] = useState({
@@ -62,12 +63,65 @@ const EditProduct = ({ product, onSave, onDelete, onClose, categories }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSave(product.id, {
-      ...form,
-      NormalPrice: parseCurrency(form.NormalPrice), // แปลงกลับเป็นตัวเลขก่อนบันทึก
-      Discount: parseFloat(form.Discount) || 0, // เก็บ Discount เป็นตัวเลข
-      FinalPrice: calculateFinalPrice(), // คำนวณ FinalPrice
-      CreatedAt: product.CreatedAt,
+
+    // ✅ แสดง SweetAlert2 ยืนยันก่อนบันทึก
+    Swal.fire({
+      title: "Are you sure?",
+      text: "Do you want to save the changes?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, save it!",
+      cancelButtonText: "Cancel",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        onSave(product.id, {
+          ...form,
+          NormalPrice: parseCurrency(form.NormalPrice),
+          Discount: parseFloat(form.Discount) || 0,
+          FinalPrice: calculateFinalPrice(),
+          CreatedAt: product.CreatedAt,
+        });
+
+        // ✅ แจ้งเตือนว่าสำเร็จ
+        Swal.fire({
+          icon: "success",
+          title: "Changes Saved!",
+          text: "The product details have been updated.",
+          confirmButtonText: "OK",
+        });
+
+        onClose(); // ✅ ปิด modal หลังจากบันทึกเสร็จ
+      }
+    });
+  };
+
+  const handleDelete = () => {
+    // ✅ แสดง SweetAlert2 ยืนยันก่อนลบ
+    Swal.fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "Cancel",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        onDelete(product.id);
+
+        // ✅ แจ้งเตือนว่าสินค้าถูกลบ
+        Swal.fire({
+          icon: "success",
+          title: "Deleted!",
+          text: "The product has been deleted.",
+          confirmButtonText: "OK",
+        });
+
+        onClose(); // ✅ ปิด modal หลังจากลบเสร็จ
+      }
     });
   };
 
@@ -176,16 +230,7 @@ const EditProduct = ({ product, onSave, onDelete, onClose, categories }) => {
             <button
               type="button"
               className="edit-button edit-button-delete"
-              onClick={() => {
-                if (
-                  window.confirm(
-                    "Are you sure you want to delete this product?"
-                  )
-                ) {
-                  onDelete(product.id);
-                  onClose();
-                }
-              }}
+              onClick={handleDelete} // ✅ เรียกใช้ฟังก์ชัน handleDelete()
             >
               Delete
             </button>
