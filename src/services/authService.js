@@ -1,46 +1,47 @@
-import { db } from "./firebaseConfig"; // นำเข้า Firestore
-import { setDoc, doc, serverTimestamp, getDoc } from "firebase/firestore";
+import { db } from "./firebaseConfig";
+import { setDoc, doc, getDoc, serverTimestamp } from "firebase/firestore";
+import { hashPassword, verifyPassword } from "./cryptoUtils"; // ใช้ฟังก์ชันแฮชจาก cryptoUtils.js
 
-// ฟังก์ชันลงทะเบียนผู้ใช้ใหม่
+// ✅ ฟังก์ชันลงทะเบียน
 export const registerUser = async (firstName, lastName, email, password) => {
   try {
-    // สร้างข้อมูลผู้ใช้ใหม่
+    const hashedPassword = await hashPassword(password); // แฮชรหัสผ่าน
+
     const newUser = {
       firstName,
       lastName,
       email,
-      password, // เก็บรหัสผ่านเป็นข้อความธรรมดา (ไม่แฮช)
+      password: hashedPassword, // บันทึกเป็นค่าแฮช
       createdAt: serverTimestamp(),
       lastUpdate: serverTimestamp(),
     };
 
-    // บันทึกข้อมูลใน Firestore
     await setDoc(doc(db, "users", email), newUser); // ใช้ email เป็น document ID
 
-    return { success: true }; // คืนค่าผลลัพธ์สำเร็จ
+    return { success: true };
   } catch (error) {
     console.error("Registration Error:", error);
-    return { success: false, message: error.message }; // ถ้ามีข้อผิดพลาดให้แสดงข้อความ
+    return { success: false, message: error.message };
   }
 };
 
-// ฟังก์ชันเข้าสู่ระบบผู้ใช้
+// ✅ ฟังก์ชันเข้าสู่ระบบ
 export const loginUser = async (email, password) => {
   try {
-    const docRef = doc(db, "users", email); // ใช้ email เป็น document ID
+    const docRef = doc(db, "users", email);
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
       const user = docSnap.data();
-      // ตรวจสอบรหัสผ่านที่กรอกมาตรงกับรหัสผ่านใน Firestore หรือไม่
-      if (password === user.password) {
-        // เปรียบเทียบรหัสผ่าน
-        return { success: true, user }; // คืนข้อมูลผู้ใช้
+
+      const isPasswordValid = await verifyPassword(password, user.password);
+      if (isPasswordValid) {
+        return { success: true, user };
       } else {
-        return { success: false, message: "Invalid password" }; // ถ้ารหัสผ่านไม่ตรง
+        return { success: false, message: "Invalid password" };
       }
     } else {
-      return { success: false, message: "User not found" }; // ถ้าไม่พบผู้ใช้
+      return { success: false, message: "User not found" };
     }
   } catch (error) {
     console.error("Login Error: ", error);
