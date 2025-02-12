@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { addCategories, getCategories } from "../services/categoriesService";
+import { addCategories } from "../services/categoriesService";
 import "./AddCategories.css";
 
 const AddCategories = ({ onClose, onCategoryAdded }) => {
