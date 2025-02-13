@@ -1,0 +1,91 @@
+.promotions-container {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+/* หัวข้อ Promotions */
+.promotions-container h2 {
+  margin-bottom: 20px;
+  color: #333;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 2px solid #ddd;
+  padding-bottom: 10px;
+}
+
+/* ฟอร์มเพิ่มโปรโมชั่น */
+.promotion-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 0; /* ❌ ลบ Padding ภายใน */
+  background: none; /* ❌ ลบพื้นหลัง */
+  box-shadow: none; /* ❌ ลบเงา */
+  border: none; /* ❌ ลบขอบ */
+  max-width: 100%; /* ✅ ให้ฟอร์มกว้างเต็มที่ */
+}
+
+/* ช่องป้อนข้อมูล */
+.promotion-form input {
+  width: 380px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.promotion-form input:focus {
+  border-color: #007bff;
+  outline: none;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* กลุ่มวันและเวลา */
+.datetime-group {
+  display: flex;
+  gap: 10px;
+}
+
+/* ✅ จัดปุ่ม Add Promotion & Cancel ให้อยู่ข้างกัน */
+.modal-buttons {
+  display: flex;
+  justify-content: center; /* จัดให้อยู่ตรงกลาง */
+  gap: 10px; /* เว้นระยะระหว่างปุ่ม */
+  width: 100%;
+  margin-top: 20px;
+}
+
+/* ✅ ปรับดีไซน์ปุ่ม Add Promotion */
+.promotion-modal-btn {
+  flex: 1;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+/* ✅ ปุ่ม Add */
+.promotion-modal-btn.add {
+  background: #007bff;
+  color: white;
+}
+
+.promotion-modal-btn.add:hover {
+  background: #0056b3;
+}
+
+/* ✅ ปุ่ม Cancel */
+.promotion-modal-btn.cancel {
+  background: #6c757d;
+  color: white;
+}
+
+.promotion-modal-btn.cancel:hover {
+  background: #5a6268;
+}

@@ -1,23 +1,12 @@
 import React, { useState, useEffect } from "react";
-import {
-  getPromotions,
-  addPromotion,
-  deletePromotion,
-} from "../services/promotionService";
+import { getPromotions, deletePromotion } from "../services/promotionService";
+import AddPromotion from "./AddPromotion";
 import "./Promotions.css";
-import { FaPlus, FaTrash } from "react-icons/fa";
 import Swal from "sweetalert2";
 
 const Promotions = () => {
   const [promotions, setPromotions] = useState([]);
-  const [newPromotion, setNewPromotion] = useState({
-    name: "",
-    discount: "",
-    startDate: "",
-    startTime: "",
-    endDate: "",
-    endTime: "",
-  });
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchPromotions = async () => {
@@ -30,89 +19,12 @@ const Promotions = () => {
     fetchPromotions();
   }, []);
 
-  const handleAddPromotion = async () => {
-    const start = new Date(
-      `${newPromotion.startDate}T${newPromotion.startTime}`
-    );
-    const end = new Date(`${newPromotion.endDate}T${newPromotion.endTime}`);
-
-    if (
-      !newPromotion.name ||
-      !newPromotion.discount ||
-      !newPromotion.startDate ||
-      !newPromotion.startTime ||
-      !newPromotion.endDate ||
-      !newPromotion.endTime
-    ) {
-      // ✅ แจ้งเตือนเมื่อข้อมูลไม่ครบ
-      Swal.fire({
-        icon: "warning",
-        title: "Incomplete Information!",
-        text: "Please fill in all required fields.",
-        confirmButtonText: "OK",
-      });
-      return;
-    }
-
-    if (end <= start) {
-      // ✅ แจ้งเตือนเมื่อวันสิ้นสุดต้องมากกว่าวันเริ่ม
-      Swal.fire({
-        icon: "error",
-        title: "Invalid Date Range!",
-        text: "The end date and time must be later than the start date and time.",
-        confirmButtonText: "OK",
-      });
-      return;
-    }
-
-    // ✅ แสดง SweetAlert2 ถามยืนยันก่อนเพิ่มโปรโมชั่น
-    const result = await Swal.fire({
-      title: "Are you sure?",
-      text: "Do you want to add this promotion?",
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, add it!",
-      cancelButtonText: "Cancel",
-    });
-
-    if (result.isConfirmed) {
-      try {
-        const addedPromo = await addPromotion(newPromotion);
-        setPromotions([...promotions, addedPromo]);
-        setNewPromotion({
-          name: "",
-          discount: "",
-          startDate: "",
-          startTime: "",
-          endDate: "",
-          endTime: "",
-        });
-
-        // ✅ แจ้งเตือนเมื่อเพิ่มโปรโมชั่นสำเร็จ
-        Swal.fire({
-          icon: "success",
-          title: "Promotion Added!",
-          text: "The promotion has been successfully added.",
-          confirmButtonText: "OK",
-        });
-      } catch (error) {
-        console.error("🚨 Error adding promotion:", error);
-
-        // ✅ แจ้งเตือนเมื่อเกิดข้อผิดพลาด
-        Swal.fire({
-          icon: "error",
-          title: "Error!",
-          text: "An error occurred while adding the promotion.",
-          confirmButtonText: "OK",
-        });
-      }
-    }
+  const handlePromotionAdded = (newPromo) => {
+    setPromotions([...promotions, newPromo]);
+    setIsModalOpen(false); // Close the modal after adding
   };
 
   const handleDeletePromotion = async (id) => {
-    // ✅ แสดง SweetAlert2 ถามยืนยันก่อนลบ
     const result = await Swal.fire({
       title: "Are you sure?",
       text: "Once deleted, you will not be able to recover this promotion!",
@@ -129,7 +41,6 @@ const Promotions = () => {
         await deletePromotion(id);
         setPromotions(promotions.filter((promo) => promo.id !== id));
 
-        // ✅ แจ้งเตือนเมื่อโปรโมชั่นถูกลบสำเร็จ
         Swal.fire({
           icon: "success",
           title: "Promotion Deleted!",
@@ -138,8 +49,6 @@ const Promotions = () => {
         });
       } catch (error) {
         console.error("🚨 Error deleting promotion:", error);
-
-        // ✅ แจ้งเตือนเมื่อเกิดข้อผิดพลาด
         Swal.fire({
           icon: "error",
           title: "Error!",
@@ -151,63 +60,30 @@ const Promotions = () => {
   };
 
   return (
-    <div className="promotions-container">
-      <h2>Promotions</h2>
-      <div className="promotion-form">
-        <input
-          type="text"
-          placeholder="Promotion Name"
-          value={newPromotion.name}
-          onChange={(e) =>
-            setNewPromotion({ ...newPromotion, name: e.target.value })
-          }
-        />
-        <input
-          type="number"
-          placeholder="Discount (%)"
-          value={newPromotion.discount}
-          onChange={(e) =>
-            setNewPromotion({ ...newPromotion, discount: e.target.value })
-          }
-        />
-        <label>Start Date & Time:</label>
-        <div className="datetime-group">
-          <input
-            type="date"
-            value={newPromotion.startDate}
-            onChange={(e) =>
-              setNewPromotion({ ...newPromotion, startDate: e.target.value })
-            }
-          />
-          <input
-            type="time"
-            value={newPromotion.startTime}
-            onChange={(e) =>
-              setNewPromotion({ ...newPromotion, startTime: e.target.value })
-            }
-          />
-        </div>
-        <label>End Date & Time:</label>
-        <div className="datetime-group">
-          <input
-            type="date"
-            value={newPromotion.endDate}
-            onChange={(e) =>
-              setNewPromotion({ ...newPromotion, endDate: e.target.value })
-            }
-          />
-          <input
-            type="time"
-            value={newPromotion.endTime}
-            onChange={(e) =>
-              setNewPromotion({ ...newPromotion, endTime: e.target.value })
-            }
-          />
-        </div>
-        <button onClick={handleAddPromotion} className="add-promotion-btn">
-          <FaPlus /> Add Promotion
-        </button>
+    <div className="promotions-container-p">
+      <div className="promotion-header">
+        <h2>Promotions</h2>
       </div>
+
+      <button
+        onClick={() => setIsModalOpen(true)}
+        className="add-promotion-btn"
+      >
+        Add Promotion
+      </button>
+
+      {/* Modal for Adding Promotion */}
+      {isModalOpen && (
+        <div className="modal-promotion">
+          <div className="modal-content-promotion">
+            <h3>Add Promotion</h3>
+            <AddPromotion
+              onPromotionAdded={handlePromotionAdded}
+              onCancel={() => setIsModalOpen(false)}
+            />
+          </div>
+        </div>
+      )}
 
       <table className="promotion-table">
         <thead>
@@ -235,7 +111,7 @@ const Promotions = () => {
                   onClick={() => handleDeletePromotion(promo.id)}
                   className="delete-promotion-btn"
                 >
-                  <FaTrash /> Delete
+                  Delete
                 </button>
               </td>
             </tr>
