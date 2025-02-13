@@ -255,6 +255,7 @@ const UserList = () => {
             <th>First Name</th>
             <th>Last Name</th>
             <th>Email</th>
+            <th>Role</th>
             <th>Created At</th>
             <th>Last Update</th>
             <th>Actions</th>
@@ -268,6 +269,7 @@ const UserList = () => {
                 <td>{user.firstName}</td>
                 <td>{user.lastName}</td>
                 <td>{user.email}</td>
+                <td>{user.role}</td>
                 <td>{formatDate(user.createdAt)}</td>
                 <td>{formatDate(user.lastUpdate)}</td>
                 <td>

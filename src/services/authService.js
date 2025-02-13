@@ -3,7 +3,13 @@ import { setDoc, doc, getDoc, serverTimestamp } from "firebase/firestore";
 import { hashPassword, verifyPassword } from "./cryptoUtils"; // ใช้ฟังก์ชันแฮชจาก cryptoUtils.js
 
 // ✅ ฟังก์ชันลงทะเบียน
-export const registerUser = async (firstName, lastName, email, password) => {
+export const registerUser = async (
+  firstName,
+  lastName,
+  email,
+  password,
+  role
+) => {
   try {
     const hashedPassword = await hashPassword(password); // แฮชรหัสผ่าน
 
@@ -12,6 +18,7 @@ export const registerUser = async (firstName, lastName, email, password) => {
       lastName,
       email,
       password: hashedPassword, // บันทึกเป็นค่าแฮช
+      role, // ✅ เพิ่ม role เข้าไปที่ Firestore
       createdAt: serverTimestamp(),
       lastUpdate: serverTimestamp(),
     };

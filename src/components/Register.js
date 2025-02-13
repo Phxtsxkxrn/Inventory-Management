@@ -9,6 +9,7 @@ const Register = ({ onUserAdded, onClose }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [role, setRole] = useState("Employee");
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -18,7 +19,8 @@ const Register = ({ onUserAdded, onClose }) => {
       firstName,
       lastName,
       email,
-      password
+      password,
+      role // ✅ ส่ง role ไปด้วย
     );
 
     if (success) {
@@ -29,14 +31,15 @@ const Register = ({ onUserAdded, onClose }) => {
         confirmButtonText: "OK",
       });
 
-      // ✅ ส่งข้อมูลที่เพิ่งลงทะเบียนไปยัง `UserList.js`
+      // ✅ ส่งข้อมูลใหม่ไปยัง `UserList.js`
       if (onUserAdded) {
         onUserAdded({
           id: userId, // ใช้ ID จาก Firestore
           firstName,
           lastName,
           email,
-          createdAt: new Date(), // ตั้งค่าเวลาเพิ่ม
+          role, // ✅ รวม role
+          createdAt: new Date(),
           lastUpdate: new Date(),
         });
       }
@@ -104,6 +107,16 @@ const Register = ({ onUserAdded, onClose }) => {
               required
             />
           </div>
+
+          <select
+            name="role"
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+          >
+            <option value="Employee">Employee</option>
+            <option value="Stock Manager">Stock Manager</option>
+            <option value="Admin">Admin</option>
+          </select>
 
           {/* ปุ่ม Register และ Close */}
           <div className="register-button-group">
