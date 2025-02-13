@@ -9,6 +9,7 @@ import { useLocation } from "react-router-dom";
 import { getProducts } from "../services/productService"; // ✅ โหลดสินค้าใหม่
 import { exportProducts } from "../services/exportService";
 import { updateProductStatus } from "../services/productService";
+import Swal from "sweetalert2";
 
 const ProductList = ({
   products,
@@ -183,30 +184,52 @@ const ProductList = ({
   };
 
   const deleteSelectedProducts = async () => {
-    if (
-      window.confirm("Are you sure you want to delete the selected products?")
-    ) {
-      try {
-        // ลบสินค้าใน Firebase
-        await Promise.all(
-          selectedProducts.map((productId) => deleteProduct(productId))
-        );
+    // ✅ แสดง SweetAlert2 ยืนยันก่อนลบ
+    Swal.fire({
+      title: "Are you sure?",
+      text: "Do you want to delete the selected products?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete them!",
+      cancelButtonText: "Cancel",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          // ✅ ลบสินค้าใน Firebase
+          await Promise.all(
+            selectedProducts.map((productId) => deleteProduct(productId))
+          );
 
-        // อัปเดตรายการสินค้าใน State
-        setProducts((prevProducts) =>
-          prevProducts.filter(
-            (product) => !selectedProducts.includes(product.id)
-          )
-        );
+          // ✅ อัปเดตรายการสินค้าใน State
+          setProducts((prevProducts) =>
+            prevProducts.filter(
+              (product) => !selectedProducts.includes(product.id)
+            )
+          );
 
-        // ล้างรายการสินค้าที่ถูกเลือก
-        setSelectedProducts([]);
+          // ✅ ล้างรายการสินค้าที่ถูกเลือก
+          setSelectedProducts([]);
 
-        alert("Selected products have been deleted.");
-      } catch (error) {
-        alert("An error occurred while deleting selected products.");
+          // ✅ แจ้งเตือนว่าสำเร็จ
+          Swal.fire({
+            icon: "success",
+            title: "Deleted!",
+            text: "Selected products have been deleted.",
+            confirmButtonText: "OK",
+          });
+        } catch (error) {
+          // ✅ แจ้งเตือนเมื่อเกิดข้อผิดพลาด
+          Swal.fire({
+            icon: "error",
+            title: "Error!",
+            text: "An error occurred while deleting selected products.",
+            confirmButtonText: "OK",
+          });
+        }
       }
-    }
+    });
   };
 
   // ✅ ฟังก์ชันไปที่หน้า Manage Pricing
