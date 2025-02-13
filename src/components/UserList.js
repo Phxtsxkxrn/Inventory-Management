@@ -36,18 +36,48 @@ const UserList = () => {
 
   // ✅ ฟังก์ชันอัปเดตรายการผู้ใช้ทันทีเมื่อเพิ่มผู้ใช้ใหม่
   const handleUserAdded = async (newUser) => {
-    try {
-      // ✅ ดึงข้อมูลผู้ใช้ใหม่จาก Firestore หลังจากลงทะเบียนสำเร็จ
-      const querySnapshot = await getDocs(collection(db, "users"));
-      const updatedUsers = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+    // ✅ แสดง SweetAlert2 ถามยืนยันก่อนเพิ่มผู้ใช้
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "Do you want to add this user?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, add user!",
+      cancelButtonText: "Cancel",
+    });
 
-      setUsers(updatedUsers); // ✅ อัปเดต state ให้แสดงข้อมูลใหม่
-      setShowAddUser(false); // ✅ ปิด modal หลังจากเพิ่มผู้ใช้ใหม่
-    } catch (error) {
-      console.error("Error updating user list:", error);
+    if (result.isConfirmed) {
+      try {
+        // ✅ ดึงข้อมูลผู้ใช้ใหม่จาก Firestore หลังจากลงทะเบียนสำเร็จ
+        const querySnapshot = await getDocs(collection(db, "users"));
+        const updatedUsers = querySnapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+
+        setUsers(updatedUsers); // ✅ อัปเดต state ให้แสดงข้อมูลใหม่
+        setShowAddUser(false); // ✅ ปิด modal หลังจากเพิ่มผู้ใช้ใหม่
+
+        // ✅ แจ้งเตือนเมื่อเพิ่มผู้ใช้สำเร็จ
+        Swal.fire({
+          icon: "success",
+          title: "User Added!",
+          text: "The user has been successfully registered.",
+          confirmButtonText: "OK",
+        });
+      } catch (error) {
+        console.error("🚨 Error updating user list:", error);
+
+        // ✅ แจ้งเตือนเมื่อเกิดข้อผิดพลาด
+        Swal.fire({
+          icon: "error",
+          title: "Error!",
+          text: "An error occurred while updating the user list.",
+          confirmButtonText: "OK",
+        });
+      }
     }
   };
 
