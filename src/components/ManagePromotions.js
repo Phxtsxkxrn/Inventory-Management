@@ -3,6 +3,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { getPromotions } from "../services/promotionService";
 import { updateProduct } from "../services/productService";
 import "./ManagePromotions.css";
+import Swal from "sweetalert2";
+import { FaSave } from "react-icons/fa";
 
 const ManagePromotions = () => {
   const location = useLocation();
@@ -68,30 +70,109 @@ const ManagePromotions = () => {
     }));
   };
 
-  const handleSavePromotions = async () => {
+  const handleSaveAllPromotion = async () => {
     try {
       const updatedProducts = selectedProducts.map((product) => ({
         id: product.id,
         promotionId: productPromotions[product.id]?.promotionId || null,
         startDateTime: productPromotions[product.id]?.startDateTime
-          ? new Date(productPromotions[product.id].startDateTime).toISOString() // ✅ แปลงเป็น ISO format
+          ? new Date(productPromotions[product.id].startDateTime).toISOString()
           : null,
         endDateTime: productPromotions[product.id]?.endDateTime
-          ? new Date(productPromotions[product.id].endDateTime).toISOString() // ✅ แปลงเป็น ISO format
+          ? new Date(productPromotions[product.id].endDateTime).toISOString()
           : null,
       }));
 
-      console.log("🛠️ ส่งข้อมูลไป Firestore:", updatedProducts);
+      // ✅ แสดง SweetAlert2 เพื่อยืนยันก่อนบันทึก
+      const result = await Swal.fire({
+        title: "Are you sure?",
+        text: "Do you want to save promotions for all selected products?",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, save all!",
+        cancelButtonText: "Cancel",
+      });
 
-      await Promise.all(
-        updatedProducts.map((product) => updateProduct(product.id, product))
-      );
+      if (result.isConfirmed) {
+        console.log("🛠️ ส่งข้อมูลไป Firestore:", updatedProducts);
 
-      alert("Promotions updated successfully!");
-      navigate("/product-list", { state: { updated: true } });
+        await Promise.all(
+          updatedProducts.map((product) => updateProduct(product.id, product))
+        );
+
+        // ✅ แจ้งเตือนเมื่อบันทึกสำเร็จ
+        Swal.fire({
+          icon: "success",
+          title: "Promotions Updated!",
+          text: "All promotions have been successfully saved.",
+          confirmButtonText: "OK",
+        });
+
+        navigate("/product-list", { state: { updated: true } });
+      }
     } catch (error) {
-      alert("Error updating promotions. Please try again.");
       console.error("🚨 Error updating promotions:", error);
+
+      // ✅ แจ้งเตือนเมื่อเกิดข้อผิดพลาด
+      Swal.fire({
+        icon: "error",
+        title: "Error!",
+        text: "An error occurred while updating promotions. Please try again.",
+        confirmButtonText: "OK",
+      });
+    }
+  };
+
+  const handleSavePromotion = async (productId) => {
+    try {
+      const updatedProduct = {
+        id: productId,
+        promotionId: productPromotions[productId]?.promotionId || null,
+        startDateTime: productPromotions[productId]?.startDateTime
+          ? new Date(productPromotions[productId].startDateTime).toISOString() // ✅ แปลงเป็น ISO format
+          : null,
+        endDateTime: productPromotions[productId]?.endDateTime
+          ? new Date(productPromotions[productId].endDateTime).toISOString() // ✅ แปลงเป็น ISO format
+          : null,
+      };
+
+      // ✅ แสดง SweetAlert2 ยืนยันก่อนบันทึก
+      const result = await Swal.fire({
+        title: "Are you sure?",
+        text: "Do you want to save this promotion for the product?",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, save it!",
+        cancelButtonText: "Cancel",
+      });
+
+      if (result.isConfirmed) {
+        console.log("📌 บันทึกโปรโมชั่น:", updatedProduct);
+
+        await updateProduct(productId, updatedProduct);
+
+        // ✅ แจ้งเตือนเมื่อบันทึกสำเร็จ
+        Swal.fire({
+          icon: "success",
+          title: "Promotion Updated!",
+          text: "The promotion for this product has been successfully saved.",
+          confirmButtonText: "OK",
+        });
+      }
+    } catch (error) {
+      console.error("🚨 Error updating promotion:", error);
+
+      // ✅ แจ้งเตือนเมื่อเกิดข้อผิดพลาด
+      Swal.fire({
+        icon: "error",
+        title: "Error!",
+        text: "An error occurred while updating the promotion.",
+        confirmButtonText: "OK",
+      });
     }
   };
 
@@ -117,8 +198,8 @@ const ManagePromotions = () => {
             </select>
           </div>
 
-          <button className="save-button" onClick={handleSavePromotions}>
-            Save Promotions
+          <button className="save-button" onClick={handleSaveAllPromotion}>
+            <FaSave style={{ marginRight: "5px" }} /> Save All Promotions
           </button>
         </div>
       )}
@@ -185,6 +266,12 @@ const ManagePromotions = () => {
                         }))
                       }
                     />
+                    <button
+                      className="save-button"
+                      onClick={() => handleSavePromotion(product.id)}
+                    >
+                      <FaSave style={{ marginRight: "5px" }} /> Save
+                    </button>
                   </div>
                 </td>
               </tr>
