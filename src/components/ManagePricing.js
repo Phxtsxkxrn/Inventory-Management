@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import { updateProduct } from "../services/productService";
 import "./ManagePricing.css";
 import { FaSave, FaPercentage } from "react-icons/fa";
+import Swal from "sweetalert2";
 
 const ManagePricing = () => {
   const location = useLocation();
@@ -80,28 +81,57 @@ const ManagePricing = () => {
 
   // ✅ ฟังก์ชันบันทึกข้อมูลสินค้าทั้งหมด
   const handleSaveAll = async () => {
-    setIsSaving(true);
-    try {
-      await Promise.all(
-        products.map((product) =>
-          updateProduct(product.id, {
-            Name: product.Name,
-            SKU: product.SKU,
-            Image: product.Image,
-            NormalPrice: product.NormalPrice,
-            Discount: product.Discount,
-            FinalPrice: product.FinalPrice,
-          })
-        )
-      );
+    // ✅ แสดง SweetAlert2 ยืนยันก่อนบันทึก
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "Do you want to save changes for all products?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, save all!",
+      cancelButtonText: "Cancel",
+    });
 
-      setHasUpdated(true);
-      setTimeout(() => setHasUpdated(false), 3000);
-    } catch (error) {
-      console.error("Error updating products:", error);
-      alert("❌ Error updating products.");
-    } finally {
-      setIsSaving(false);
+    if (result.isConfirmed) {
+      setIsSaving(true);
+      try {
+        await Promise.all(
+          products.map((product) =>
+            updateProduct(product.id, {
+              Name: product.Name,
+              SKU: product.SKU,
+              Image: product.Image,
+              NormalPrice: product.NormalPrice,
+              Discount: product.Discount,
+              FinalPrice: product.FinalPrice,
+            })
+          )
+        );
+
+        // ✅ แจ้งเตือนว่าสำเร็จ
+        Swal.fire({
+          icon: "success",
+          title: "All Products Updated!",
+          text: "All product details have been successfully saved.",
+          confirmButtonText: "OK",
+        });
+
+        setHasUpdated(true);
+        setTimeout(() => setHasUpdated(false), 3000);
+      } catch (error) {
+        console.error("Error updating products:", error);
+
+        // ✅ แจ้งเตือนเมื่อเกิดข้อผิดพลาด
+        Swal.fire({
+          icon: "error",
+          title: "Error!",
+          text: "An error occurred while updating products.",
+          confirmButtonText: "OK",
+        });
+      } finally {
+        setIsSaving(false);
+      }
     }
   };
 
@@ -118,21 +148,50 @@ const ManagePricing = () => {
         return;
       }
 
-      // อัปเดตข้อมูลสินค้าไปยัง Firebase
-      await updateProduct(productId, {
-        Name: productToUpdate.Name,
-        SKU: productToUpdate.SKU,
-        Image: productToUpdate.Image,
-        NormalPrice: productToUpdate.NormalPrice,
-        Discount: productToUpdate.Discount,
-        FinalPrice: productToUpdate.FinalPrice,
+      // ✅ แสดง SweetAlert2 ยืนยันก่อนบันทึก
+      const result = await Swal.fire({
+        title: "Are you sure?",
+        text: "Do you want to save the changes for this product?",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, save it!",
+        cancelButtonText: "Cancel",
       });
 
-      setHasUpdated(true);
-      setTimeout(() => setHasUpdated(false), 3000);
+      if (result.isConfirmed) {
+        // ✅ อัปเดตข้อมูลสินค้าไปยัง Firebase
+        await updateProduct(productId, {
+          Name: productToUpdate.Name,
+          SKU: productToUpdate.SKU,
+          Image: productToUpdate.Image,
+          NormalPrice: productToUpdate.NormalPrice,
+          Discount: productToUpdate.Discount,
+          FinalPrice: productToUpdate.FinalPrice,
+        });
+
+        // ✅ แจ้งเตือนว่าสำเร็จ
+        Swal.fire({
+          icon: "success",
+          title: "Product Updated!",
+          text: "The product details have been successfully saved.",
+          confirmButtonText: "OK",
+        });
+
+        setHasUpdated(true);
+        setTimeout(() => setHasUpdated(false), 3000);
+      }
     } catch (error) {
       console.error("Error updating product:", error);
-      alert("❌ Error updating product.");
+
+      // ✅ แจ้งเตือนเมื่อเกิดข้อผิดพลาด
+      Swal.fire({
+        icon: "error",
+        title: "Error!",
+        text: "An error occurred while updating the product.",
+        confirmButtonText: "OK",
+      });
     } finally {
       setIsSaving(false);
     }
