@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import AddCategories from "./AddCategories";
 import { getCategories, deleteCategories } from "../services/categoriesService";
 import "./CategoriesList.css";
+import Swal from "sweetalert2";
 
 const CategoriesList = () => {
   const [categories, setCategories] = useState([]);
@@ -10,10 +11,7 @@ const CategoriesList = () => {
   const [currentPage, setCurrentPage] = useState(1); // State สำหรับหน้าปัจจุบัน
   const [categoriesPerPage, setCategoriesPerPage] = useState(10); // จำนวนข้อมูลต่อหน้า
   const [categoriesPerPageOptions, setCategoriesPerPageOptions] = useState([
-    5,
-    10,
-    20,
-    50,
+    5, 10, 20, 50,
   ]); // ตัวเลือกใน dropdown
   const [customInputValue, setCustomInputValue] = useState(""); // State สำหรับค่าชั่วคราวของ Custom
 
@@ -29,10 +27,42 @@ const CategoriesList = () => {
   const closeAddModal = () => setIsAddModalOpen(false);
 
   const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this category?")) {
-      await deleteCategories(id);
-      const updatedCategories = await getCategories();
-      setCategories(updatedCategories);
+    // ✅ แสดง SweetAlert2 ถามยืนยันก่อนลบ
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "Once deleted, you will not be able to recover this category!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "Cancel",
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await deleteCategories(id);
+        const updatedCategories = await getCategories();
+        setCategories(updatedCategories);
+
+        // ✅ แจ้งเตือนเมื่อหมวดหมู่ถูกลบสำเร็จ
+        Swal.fire({
+          icon: "success",
+          title: "Category Deleted!",
+          text: "The category has been successfully deleted.",
+          confirmButtonText: "OK",
+        });
+      } catch (error) {
+        console.error("🚨 Error deleting category:", error);
+
+        // ✅ แจ้งเตือนเมื่อเกิดข้อผิดพลาด
+        Swal.fire({
+          icon: "error",
+          title: "Error!",
+          text: "An error occurred while deleting the category.",
+          confirmButtonText: "OK",
+        });
+      }
     }
   };
 
