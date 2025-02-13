@@ -6,6 +6,7 @@ import {
 } from "../services/promotionService";
 import "./Promotions.css";
 import { FaPlus, FaTrash } from "react-icons/fa";
+import Swal from "sweetalert2";
 
 const Promotions = () => {
   const [promotions, setPromotions] = useState([]);
@@ -43,30 +44,110 @@ const Promotions = () => {
       !newPromotion.endDate ||
       !newPromotion.endTime
     ) {
-      alert("กรุณากรอกข้อมูลให้ครบถ้วน!");
+      // ✅ แจ้งเตือนเมื่อข้อมูลไม่ครบ
+      Swal.fire({
+        icon: "warning",
+        title: "Incomplete Information!",
+        text: "Please fill in all required fields.",
+        confirmButtonText: "OK",
+      });
       return;
     }
 
     if (end <= start) {
-      alert("วันและเวลาสิ้นสุดต้องมากกว่าวันและเวลาเริ่มต้น!");
+      // ✅ แจ้งเตือนเมื่อวันสิ้นสุดต้องมากกว่าวันเริ่ม
+      Swal.fire({
+        icon: "error",
+        title: "Invalid Date Range!",
+        text: "The end date and time must be later than the start date and time.",
+        confirmButtonText: "OK",
+      });
       return;
     }
 
-    const addedPromo = await addPromotion(newPromotion);
-    setPromotions([...promotions, addedPromo]);
-    setNewPromotion({
-      name: "",
-      discount: "",
-      startDate: "",
-      startTime: "",
-      endDate: "",
-      endTime: "",
+    // ✅ แสดง SweetAlert2 ถามยืนยันก่อนเพิ่มโปรโมชั่น
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "Do you want to add this promotion?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, add it!",
+      cancelButtonText: "Cancel",
     });
+
+    if (result.isConfirmed) {
+      try {
+        const addedPromo = await addPromotion(newPromotion);
+        setPromotions([...promotions, addedPromo]);
+        setNewPromotion({
+          name: "",
+          discount: "",
+          startDate: "",
+          startTime: "",
+          endDate: "",
+          endTime: "",
+        });
+
+        // ✅ แจ้งเตือนเมื่อเพิ่มโปรโมชั่นสำเร็จ
+        Swal.fire({
+          icon: "success",
+          title: "Promotion Added!",
+          text: "The promotion has been successfully added.",
+          confirmButtonText: "OK",
+        });
+      } catch (error) {
+        console.error("🚨 Error adding promotion:", error);
+
+        // ✅ แจ้งเตือนเมื่อเกิดข้อผิดพลาด
+        Swal.fire({
+          icon: "error",
+          title: "Error!",
+          text: "An error occurred while adding the promotion.",
+          confirmButtonText: "OK",
+        });
+      }
+    }
   };
 
   const handleDeletePromotion = async (id) => {
-    await deletePromotion(id);
-    setPromotions(promotions.filter((promo) => promo.id !== id));
+    // ✅ แสดง SweetAlert2 ถามยืนยันก่อนลบ
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "Once deleted, you will not be able to recover this promotion!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "Cancel",
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await deletePromotion(id);
+        setPromotions(promotions.filter((promo) => promo.id !== id));
+
+        // ✅ แจ้งเตือนเมื่อโปรโมชั่นถูกลบสำเร็จ
+        Swal.fire({
+          icon: "success",
+          title: "Promotion Deleted!",
+          text: "The promotion has been successfully deleted.",
+          confirmButtonText: "OK",
+        });
+      } catch (error) {
+        console.error("🚨 Error deleting promotion:", error);
+
+        // ✅ แจ้งเตือนเมื่อเกิดข้อผิดพลาด
+        Swal.fire({
+          icon: "error",
+          title: "Error!",
+          text: "An error occurred while deleting the promotion.",
+          confirmButtonText: "OK",
+        });
+      }
+    }
   };
 
   return (
