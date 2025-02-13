@@ -105,6 +105,39 @@ const ManagePricing = () => {
     }
   };
 
+  const handleSaveProduct = async (productId) => {
+    setIsSaving(true);
+    try {
+      // ค้นหาสินค้าที่ต้องการบันทึก
+      const productToUpdate = products.find(
+        (product) => product.id === productId
+      );
+
+      if (!productToUpdate) {
+        console.error("Product not found");
+        return;
+      }
+
+      // อัปเดตข้อมูลสินค้าไปยัง Firebase
+      await updateProduct(productId, {
+        Name: productToUpdate.Name,
+        SKU: productToUpdate.SKU,
+        Image: productToUpdate.Image,
+        NormalPrice: productToUpdate.NormalPrice,
+        Discount: productToUpdate.Discount,
+        FinalPrice: productToUpdate.FinalPrice,
+      });
+
+      setHasUpdated(true);
+      setTimeout(() => setHasUpdated(false), 3000);
+    } catch (error) {
+      console.error("Error updating product:", error);
+      alert("❌ Error updating product.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
     <div className="manage-pricing-container">
       <h2>Manage Product Pricing</h2>
@@ -213,7 +246,7 @@ const ManagePricing = () => {
                   <td>
                     <button
                       className="manage-pricing-btn"
-                      onClick={() => handleSaveAll()}
+                      onClick={() => handleSaveProduct(product.id)} // ✅ Save เฉพาะสินค้านี้
                       disabled={isSaving}
                     >
                       {isSaving ? (
