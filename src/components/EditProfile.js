@@ -45,20 +45,44 @@ const EditProfile = () => {
 
   const handleUpdate = async (e) => {
     e.preventDefault();
-    try {
-      const userRef = doc(db, "users", userEmail);
-      await updateDoc(userRef, userData);
 
-      Swal.fire({
-        icon: "success",
-        title: "Profile Updated!",
-        text: "Your profile has been updated successfully.",
-        confirmButtonText: "OK",
-      });
+    // ✅ แสดง SweetAlert2 ถามยืนยันก่อนอัปเดตโปรไฟล์
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "Do you want to update your profile?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, update it!",
+      cancelButtonText: "Cancel",
+    });
 
-      navigate("/"); // ✅ กลับไปหน้า Home หลังแก้ไขเสร็จ
-    } catch (error) {
-      console.error("Error updating profile:", error);
+    if (result.isConfirmed) {
+      try {
+        const userRef = doc(db, "users", userEmail);
+        await updateDoc(userRef, userData);
+
+        // ✅ แจ้งเตือนเมื่ออัปเดตสำเร็จ
+        Swal.fire({
+          icon: "success",
+          title: "Profile Updated!",
+          text: "Your profile has been updated successfully.",
+          confirmButtonText: "OK",
+        });
+
+        navigate("/"); // ✅ กลับไปหน้า Home หลังแก้ไขเสร็จ
+      } catch (error) {
+        console.error("Error updating profile:", error);
+
+        // ✅ แจ้งเตือนเมื่อเกิดข้อผิดพลาด
+        Swal.fire({
+          icon: "error",
+          title: "Error!",
+          text: "An error occurred while updating your profile.",
+          confirmButtonText: "OK",
+        });
+      }
     }
   };
 
