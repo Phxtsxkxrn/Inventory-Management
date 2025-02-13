@@ -53,27 +53,34 @@
   text-align: center;
 }
 
-/* ปุ่มลบโปรโมชั่น */
+/* ✅ ปรับสไตล์ปุ่ม Delete ให้คล้ายปุ่มล่าง */
 .delete-promotion-btn {
-  padding: 8px 12px;
-  background-color: #dc3545;
+  background-color: #ef4444; /* สีแดงสด */
   color: white;
   border: none;
+  padding: 8px 12px;
   border-radius: 5px;
   cursor: pointer;
   font-size: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
-  margin: auto; /* ✅ ทำให้ปุ่มอยู่ตรงกลาง */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
+  margin: auto; /* ✅ ทำให้ปุ่มอยู่ตรงกลาง */
 }
 
+/* ✅ เอฟเฟค hover */
 .delete-promotion-btn:hover {
-  background-color: #c82333;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+  background-color: #dc2626; /* สีแดงเข้มขึ้น */
+  transform: translateY(-2px); /* ยกปุ่มขึ้นเล็กน้อย */
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15); /* เงาลึกขึ้น */
+}
+
+/* ✅ เอฟเฟคเมื่อกดปุ่ม */
+.delete-promotion-btn:active {
+  transform: translateY(0); /* กลับตำแหน่งเดิม */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* เงาปกติ */
 }
 
 /* ข้อความแจ้งเตือนเมื่อไม่มีโปรโมชั่น */
@@ -117,20 +124,6 @@
   right: 15px;
   font-size: 24px;
   cursor: pointer;
-}
-
-.delete-promotion-btn {
-  background-color: #d33;
-  color: white;
-  border: none;
-  padding: 5px 10px;
-  font-size: 14px;
-  cursor: pointer;
-  border-radius: 5px;
-}
-
-.delete-promotion-btn:hover {
-  background-color: #b22222;
 }
 
 /* ✅ Ensure header and button alignment */
