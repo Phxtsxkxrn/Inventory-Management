@@ -1,4 +1,5 @@
 .promotions-container-p {
+  font-family: Arial, sans-serif;
   padding: 20px;
 }
 
@@ -167,5 +168,127 @@
 /* ✅ เอฟเฟคเมื่อกดปุ่ม */
 .add-promotion-btn:active {
   transform: translateY(0);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* ขนาดปกติ */
+.promotion-pagination-container {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  max-width: 500px; /* กำหนดขนาดสูงสุด */
+  margin-top: 10px;
+}
+
+/* ขนาดเมื่อเลือก Custom */
+.promotion-pagination-container.custom {
+  max-width: 800px; /* ขยายขนาดสูงสุด */
+}
+
+/* Container สำหรับ Pagination */
+.pagination-container {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-bottom: 5px; /* ลดระยะห่างจากเดิม */
+  gap: 10px;
+}
+
+/* กล่อง Pagination */
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-bottom: 0;
+}
+
+/* ปุ่ม Previous & Next */
+.promotion-page-navigation {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.promotion-page-navigation button {
+  padding: 5px 10px;
+  font-size: 14px;
+  border: 1px solid #007bff;
+  background-color: #007bff;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.promotion-page-navigation button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+  border-color: #ccc;
+}
+
+/* Text สำหรับแสดง Page */
+.promotion-page-navigation span {
+  font-size: 14px;
+}
+
+/* Dropdown เลือกจำนวนรายการต่อหน้า */
+.promotion-pagination-container label {
+  font-size: 14px;
+  margin-right: 5px;
+}
+
+.promotion-pagination-container select {
+  padding: 5px 8px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+/* Custom input สำหรับเลือกจำนวนรายการต่อหน้า */
+.custom-promotions-per-page {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.custom-input-promotions {
+  width: 80px;
+  padding: 5px 8px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  text-align: center;
+}
+
+/* ปุ่ม Submit ใน Custom Input */
+.custom-submit-button-promotions {
+  padding: 5px 10px;
+  font-size: 14px;
+  border: 1px solid #007bff;
+  background-color: #007bff;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.custom-submit-button-promotions:hover {
+  background-color: #0056b3;
+}
+
+/* ✅ กล่องค้นหา */
+.search-input {
+  width: 300px;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.search-input:focus {
+  border-color: #4caf50;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }

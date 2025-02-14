@@ -6,7 +6,15 @@ import Swal from "sweetalert2";
 
 const Promotions = () => {
   const [promotions, setPromotions] = useState([]);
+  const [searchTerm, setSearchTerm] = useState(""); // State สำหรับเก็บคำค้นหา
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [promotionsPerPage, setPromotionsPerPage] = useState(10);
+  const [promotionsPerPageOptions, setPromotionsPerPageOptions] = useState([
+    5, 10, 20, 50,
+  ]);
+  const [customInputValue, setCustomInputValue] = useState("");
+  const userRole = localStorage.getItem("userRole");
 
   useEffect(() => {
     const fetchPromotions = async () => {
@@ -21,7 +29,7 @@ const Promotions = () => {
 
   const handlePromotionAdded = (newPromo) => {
     setPromotions([...promotions, newPromo]);
-    setIsModalOpen(false); // Close the modal after adding
+    setIsModalOpen(false);
   };
 
   const handleDeletePromotion = async (id) => {
@@ -59,18 +67,55 @@ const Promotions = () => {
     }
   };
 
+  // ฟังก์ชัน Submit ค่าจาก Custom Input
+  const handleCustomSubmit = () => {
+    const customValue = parseInt(customInputValue, 10);
+    if (!isNaN(customValue) && customValue > 0) {
+      if (!promotionsPerPageOptions.includes(customValue)) {
+        setPromotionsPerPageOptions(
+          [...promotionsPerPageOptions, customValue].sort((a, b) => a - b)
+        );
+      }
+      setPromotionsPerPage(customValue);
+      setCurrentPage(1);
+      setCustomInputValue("");
+    }
+  };
+
+  // กรองข้อมูลตามคำค้นหา
+  const filteredPromotions = promotions.filter((promo) =>
+    promo.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // คำนวณ Pagination
+  const totalPages = Math.ceil(filteredPromotions.length / promotionsPerPage);
+  const displayedPromotions = filteredPromotions.slice(
+    (currentPage - 1) * promotionsPerPage,
+    currentPage * promotionsPerPage
+  );
+
   return (
     <div className="promotions-container-p">
-      <div className="promotion-header">
-        <h2>Promotions</h2>
-      </div>
+      <h2>Promotions</h2>
 
-      <button
-        onClick={() => setIsModalOpen(true)}
-        className="add-promotion-btn"
-      >
-        Add Promotion
-      </button>
+      {/* Search Bar */}
+      <div className="header-container">
+        <input
+          type="text"
+          placeholder="Search promotions..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="search-input"
+        />
+        {userRole !== "Employee" && (
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="add-promotion-btn"
+          >
+            Add Promotion
+          </button>
+        )}
+      </div>
 
       {/* Modal for Adding Promotion */}
       {isModalOpen && (
@@ -85,6 +130,83 @@ const Promotions = () => {
         </div>
       )}
 
+      {/* Pagination Controls */}
+      <div className="pagination-container">
+        <div className="records-found">
+          {filteredPromotions.length}{" "}
+          {filteredPromotions.length === 1 ? "record" : "records"} found
+        </div>
+        <div
+          className={`pagination-controls ${
+            promotionsPerPage === 0
+              ? "categories-pagination-custom"
+              : "categories-pagination-default"
+          }`}
+        >
+          <label htmlFor="promotions-per-page">Promotions per page:</label>
+          <select
+            id="promotions-per-page"
+            value={promotionsPerPage === 0 ? "custom" : promotionsPerPage}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (value === "custom") {
+                setPromotionsPerPage(0);
+              } else {
+                setPromotionsPerPage(parseInt(value, 10));
+                setCurrentPage(1);
+              }
+            }}
+          >
+            {promotionsPerPageOptions.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+            <option value="custom">Custom</option>
+          </select>
+
+          {promotionsPerPage === 0 && (
+            <div className="custom-promotions-per-page">
+              <input
+                type="number"
+                min="1"
+                className="custom-input-promotions"
+                placeholder="Enter number"
+                value={customInputValue}
+                onChange={(e) => setCustomInputValue(e.target.value)}
+              />
+              <button
+                className="custom-submit-button-promotions"
+                onClick={handleCustomSubmit}
+              >
+                Submit
+              </button>
+            </div>
+          )}
+
+          <div className="promotion-page-navigation">
+            <button
+              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+            >
+              Previous
+            </button>
+            <span>
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              onClick={() =>
+                setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+              }
+              disabled={currentPage === totalPages}
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Promotions Table */}
       <table className="promotion-table">
         <thead>
           <tr>
@@ -92,11 +214,11 @@ const Promotions = () => {
             <th>Discount (%)</th>
             <th>Start Date & Time</th>
             <th>End Date & Time</th>
-            <th>Actions</th>
+            {userRole !== "Employee" && <th>Actions</th>}
           </tr>
         </thead>
         <tbody>
-          {promotions.map((promo) => (
+          {displayedPromotions.map((promo) => (
             <tr key={promo.id}>
               <td>{promo.name}</td>
               <td>{promo.discount}%</td>
@@ -106,14 +228,16 @@ const Promotions = () => {
               <td>
                 {promo.endDate} {promo.endTime}
               </td>
-              <td>
-                <button
-                  onClick={() => handleDeletePromotion(promo.id)}
-                  className="delete-promotion-btn"
-                >
-                  Delete
-                </button>
-              </td>
+              {userRole !== "Employee" && (
+                <td>
+                  <button
+                    onClick={() => handleDeletePromotion(promo.id)}
+                    className="delete-promotion-btn"
+                  >
+                    Delete
+                  </button>
+                </td>
+              )}
             </tr>
           ))}
         </tbody>

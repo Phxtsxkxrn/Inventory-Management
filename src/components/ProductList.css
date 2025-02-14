@@ -19,22 +19,19 @@
   gap: 10px; /* เพิ่มระยะห่าง */
 }
 
-/* ช่อง Input Search */
-.search-input-product {
-  flex: 1; /* ขยาย Input ให้พอดีกับพื้นที่ที่เหลือ */
-  max-width: 300px; /* จำกัดความกว้างสูงสุด */
-  padding: 8px; /* ปรับ Padding ให้สอดคล้องกับปุ่ม */
+/* ✅ กล่องค้นหา */
+.search-input {
+  width: 300px;
+  padding: 10px;
   font-size: 14px;
   border: 1px solid #ddd;
   border-radius: 5px;
   outline: none;
   transition: all 0.3s ease;
-  height: 40px; /* ให้มีความสูงเท่ากับปุ่ม */
-  box-sizing: border-box; /* รวม Padding และ Border ในขนาด */
 }
 
-.search-input-product:focus {
-  border-color: #4caf50; /* เปลี่ยนสีขอบเมื่อโฟกัส */
+.search-input:focus {
+  border-color: #4caf50;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 

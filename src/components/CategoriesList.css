@@ -18,9 +18,9 @@
   margin-bottom: 20px; /* ระยะห่างระหว่าง header กับตาราง */
 }
 
-/* กล่องค้นหา */
+/* ✅ กล่องค้นหา */
 .search-input {
-  width: 300px; /* กำหนดความกว้างของ Input */
+  width: 300px;
   padding: 10px;
   font-size: 14px;
   border: 1px solid #ddd;
@@ -30,7 +30,7 @@
 }
 
 .search-input:focus {
-  border-color: #4caf50; /* เปลี่ยนสีขอบเมื่อโฟกัส */
+  border-color: #4caf50;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
@@ -60,7 +60,6 @@
   transform: translateY(0); /* ลดเด้งเมื่อคลิก */
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
-
 
 /* ตาราง Categories */
 .categories-table {
@@ -178,7 +177,6 @@
   margin-bottom: 0; /* ไม่มีระยะห่างเพิ่มเติม */
 }
 
-
 .custom-products-per-page {
   display: flex;
   align-items: center;
@@ -246,7 +244,6 @@
 .page-navigation span {
   font-size: 14px;
 }
-
 
 /* Records Found */
 .records-found {

@@ -14,6 +14,7 @@ const CategoriesList = () => {
     5, 10, 20, 50,
   ]); // ตัวเลือกใน dropdown
   const [customInputValue, setCustomInputValue] = useState(""); // State สำหรับค่าชั่วคราวของ Custom
+  const userRole = localStorage.getItem("userRole");
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -98,6 +99,7 @@ const CategoriesList = () => {
     <div className="categories-list">
       <h2>Categories</h2>
       {/* Container สำหรับ Search และปุ่ม Add */}
+      {/* ✅ ซ่อนปุ่ม Add Categories ถ้าเป็น Employee */}
       <div className="header-container">
         <input
           type="text"
@@ -106,10 +108,13 @@ const CategoriesList = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
           className="search-input"
         />
-        <button onClick={openAddModal} className="categories-add-button">
-          Add Categories
-        </button>
+        {userRole !== "Employee" && (
+          <button onClick={openAddModal} className="categories-add-button">
+            Add Categories
+          </button>
+        )}
       </div>
+
       {/* Pagination Controls และ Records Found */}
       <div className="pagination-container">
         <div className="records-found">
@@ -197,7 +202,8 @@ const CategoriesList = () => {
             <th>Name</th>
             <th>Created At</th>
             <th>Last Update</th>
-            <th>Actions</th>
+            {/* ✅ ซ่อนคอลัมน์ Actions ถ้าเป็น Employee */}
+            {userRole !== "Employee" && <th>Actions</th>}
           </tr>
         </thead>
         <tbody>
@@ -206,14 +212,17 @@ const CategoriesList = () => {
               <td>{category.Name}</td>
               <td>{category.CreatedAt}</td>
               <td>{category.LastUpdate}</td>
-              <td>
-                <button
-                  className="delete"
-                  onClick={() => handleDelete(category.id)}
-                >
-                  Delete
-                </button>
-              </td>
+              {/* ✅ ซ่อนคอลัมน์ Actions ถ้าเป็น Employee */}
+              {userRole !== "Employee" && (
+                <td>
+                  <button
+                    className="delete"
+                    onClick={() => handleDelete(category.id)}
+                  >
+                    Delete
+                  </button>
+                </td>
+              )}
             </tr>
           ))}
         </tbody>

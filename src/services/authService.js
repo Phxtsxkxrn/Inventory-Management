@@ -43,6 +43,9 @@ export const loginUser = async (email, password) => {
 
       const isPasswordValid = await verifyPassword(password, user.password);
       if (isPasswordValid) {
+        localStorage.setItem("userRole", user.role); // ✅ บันทึก Role ลง LocalStorage
+        localStorage.setItem("userEmail", user.email); // ✅ บันทึก Email ด้วย
+
         return { success: true, user };
       } else {
         return { success: false, message: "Invalid password" };

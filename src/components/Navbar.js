@@ -20,6 +20,7 @@ const Navbar = ({ children }) => {
   const [salesOpen, setSalesOpen] = useState(false);
   const [manageOpen, setManageOpen] = useState(false);
   const [usersOpen, setUsersOpen] = useState(false); // สำหรับแสดง/ซ่อน dropdown ของ Users
+  const userRole = localStorage.getItem("userRole");
 
   const navigate = useNavigate();
 
@@ -111,25 +112,27 @@ const Navbar = ({ children }) => {
           </li>
 
           {/* ปุ่ม Users */}
-          <li className="navbar-item">
-            <button className="navbar-link" onClick={toggleUsers}>
-              <FaUserSecret className="icon" />
-              Users
-              <span className={`dropdown-arrow ${usersOpen ? "open" : ""}`}>
-                ▼
-              </span>
-            </button>
-            {usersOpen && (
-              <ul className="dropdown-menu">
-                <li>
-                  <Link to="/users" className="dropdown-link">
-                    <FaUsers className="icon" />
-                    Users List
-                  </Link>
-                </li>
-              </ul>
-            )}
-          </li>
+          {userRole !== "Employee" && (
+            <li className="navbar-item">
+              <button className="navbar-link" onClick={toggleUsers}>
+                <FaUserSecret className="icon" />
+                Users
+                <span className={`dropdown-arrow ${usersOpen ? "open" : ""}`}>
+                  ▼
+                </span>
+              </button>
+              {usersOpen && (
+                <ul className="dropdown-menu">
+                  <li>
+                    <Link to="/users" className="dropdown-link">
+                      <FaUsers className="icon" />
+                      Users List
+                    </Link>
+                  </li>
+                </ul>
+              )}
+            </li>
+          )}
         </ul>
 
         {user && (

@@ -176,7 +176,7 @@ const UserList = () => {
             className="user-add-button"
             onClick={() => setShowAddUser(true)}
           >
-            + Add User
+            Add User
           </button>
         </div>
       </div>

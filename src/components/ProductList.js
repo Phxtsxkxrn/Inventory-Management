@@ -276,7 +276,7 @@ const ProductList = ({
         {/* Input Search */}
         <input
           type="text"
-          className="search-input-product"
+          className="search-input"
           placeholder="Search products..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
