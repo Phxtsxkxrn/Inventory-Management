@@ -10,6 +10,8 @@ import { getProducts } from "../services/productService"; // ✅ โหลดส
 import { exportProducts } from "../services/exportService";
 import { updateProductStatus } from "../services/productService";
 import Swal from "sweetalert2";
+import { db } from "../services/firebaseConfig";
+import { doc, getDoc } from "firebase/firestore";
 
 const ProductList = ({
   products,
@@ -33,6 +35,8 @@ const ProductList = ({
   const navigate = useNavigate(); // ✅ ใช้ navigate เพื่อเปลี่ยนหน้า
   const [isModalOpen, setIsModalOpen] = useState(false); // State ควบคุมการเปิด Modal
   const location = useLocation();
+  const [userRole, setUserRole] = useState(null);
+  console.log("Current User Role:", userRole);
 
   const handleStatusChange = async (productId, newStatus) => {
     try {
@@ -77,6 +81,26 @@ const ProductList = ({
       console.error("Error fetching products:", error);
     }
   }, [setProducts]); // ✅ แก้ warning โดยเพิ่ม setProducts
+
+  useEffect(() => {
+    const fetchUserRole = async () => {
+      let role = localStorage.getItem("userRole"); // ✅ ดึงจาก localStorage ก่อน
+      const email = localStorage.getItem("userEmail");
+
+      if (!role && email) {
+        const docRef = doc(db, "users", email);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          role = docSnap.data().role;
+          localStorage.setItem("userRole", role); // ✅ อัปเดตลง localStorage
+        }
+      }
+      setUserRole(role);
+    };
+
+    fetchUserRole();
+  }, []);
 
   // ✅ โหลดข้อมูลเมื่อเปิดหน้า ProductList
   useEffect(() => {
@@ -252,20 +276,22 @@ const ProductList = ({
         {/* Input Search */}
         <input
           type="text"
-          className="search-input"
+          className="search-input-product"
           placeholder="Search products..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
-        {/* Add and Import Product Buttons */}
-        <div className="button-group">
-          <button className="add-button" onClick={openAddModal}>
-            Add Product
-          </button>
-          <button className="import-button" onClick={openImportModal}>
-            Import Products
-          </button>
-        </div>
+        {/* ซ่อนปุ่ม Add Product และ Import Products ถ้าเป็น Employee */}
+        {userRole !== "Employee" && (
+          <div className="button-group">
+            <button className="add-button" onClick={openAddModal}>
+              Add Product
+            </button>
+            <button className="import-button" onClick={openImportModal}>
+              Import Products
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="pagination-and-records">
@@ -406,7 +432,7 @@ const ProductList = ({
             <th>Status</th>
             <th>Created At</th>
             <th>Last Update</th>
-            <th>Actions</th>
+            {userRole !== "Employee" && <th>Actions</th>}
           </tr>
         </thead>
         <tbody>
@@ -480,23 +506,37 @@ const ProductList = ({
                     : "N/A"}
                 </td>
                 <td className="status">
-                  <select
-                    value={product.Status}
-                    onChange={(e) =>
-                      handleStatusChange(product.id, e.target.value)
-                    }
-                    className={`status-dropdown ${
-                      product.Status === "active"
-                        ? "status-active"
-                        : product.Status === "inactive"
-                        ? "status-inactive"
-                        : "status-other"
-                    }`}
-                  >
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
-                  </select>
+                  {userRole === "Employee" ? ( // ✅ ถ้าเป็น Employee ให้แสดงเฉพาะข้อความ
+                    <span
+                      className={`status-text ${
+                        product.Status === "active"
+                          ? "status-active"
+                          : "status-inactive"
+                      }`}
+                    >
+                      {product.Status === "active" ? "Active" : "Inactive"}
+                    </span>
+                  ) : (
+                    // ✅ ถ้าไม่ใช่ Employee ให้ใช้ dropdown ปกติ
+                    <select
+                      value={product.Status}
+                      onChange={(e) =>
+                        handleStatusChange(product.id, e.target.value)
+                      }
+                      className={`status-dropdown ${
+                        product.Status === "active"
+                          ? "status-active"
+                          : product.Status === "inactive"
+                          ? "status-inactive"
+                          : "status-other"
+                      }`}
+                    >
+                      <option value="active">Active</option>
+                      <option value="inactive">Inactive</option>
+                    </select>
+                  )}
                 </td>
+
                 <td>
                   {product.CreatedAt
                     ? new Date(product.CreatedAt).toLocaleString()
@@ -507,22 +547,30 @@ const ProductList = ({
                     ? new Date(product.LastUpdate).toLocaleString()
                     : "N/A"}
                 </td>
-                <td className="actions">
-                  <button
-                    className="edit"
-                    onClick={() => openEditModal(product)}
-                  >
-                    Edit
-                  </button>
-                </td>
+                {userRole !== "Employee" && (
+                  <td className="actions">
+                    <button
+                      className="edit"
+                      onClick={() => openEditModal(product)}
+                    >
+                      Edit
+                    </button>
+                  </td>
+                )}
               </tr>
             );
           })}
         </tbody>
       </table>
       {/* Action Bar */}
+      {/* ซ่อน Manage Pricing, Manage Promotions, และ Delete Selected ถ้าเป็น Employee */}
+      {/* ✅ ซ่อนปุ่มบางปุ่มเมื่อเป็น Employee */}
       {selectedProducts.length > 0 && (
-        <div className="action-bar">
+        <div
+          className={`action-bar ${
+            userRole === "Employee" ? "action-bar-employee" : ""
+          }`}
+        >
           <span className="selected-info">
             {selectedProducts.length} of {filteredProducts.length} Selected
           </span>
@@ -547,24 +595,31 @@ const ProductList = ({
           >
             Print
           </button>
-          <div className="divider"></div>
-          <button className="action-button" onClick={goToManagePricing}>
-            Manage Pricing
-          </button>
-          <div className="divider"></div>
-          <button
-            className="action-button manage-promotions"
-            onClick={goToManagePromotions}
-          >
-            Manage Promotions
-          </button>
-          <div className="divider"></div>
-          <button
-            className="action-button delete-selected"
-            onClick={deleteSelectedProducts}
-          >
-            Delete Selected
-          </button>
+
+          {/* ✅ ซ่อนปุ่มที่ Employee ไม่สามารถใช้ได้ */}
+          {userRole !== "Employee" && (
+            <>
+              <div className="divider"></div>
+              <button className="action-button" onClick={goToManagePricing}>
+                Manage Pricing
+              </button>
+              <div className="divider"></div>
+              <button
+                className="action-button manage-promotions"
+                onClick={goToManagePromotions}
+              >
+                Manage Promotions
+              </button>
+              <div className="divider"></div>
+              <button
+                className="action-button delete-selected"
+                onClick={deleteSelectedProducts}
+              >
+                Delete Selected
+              </button>
+            </>
+          )}
+
           <div className="divider"></div>
           <button
             className="action-button cancel-selected"

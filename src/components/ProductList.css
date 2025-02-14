@@ -20,7 +20,7 @@
 }
 
 /* ช่อง Input Search */
-.search-input {
+.search-input-product {
   flex: 1; /* ขยาย Input ให้พอดีกับพื้นที่ที่เหลือ */
   max-width: 300px; /* จำกัดความกว้างสูงสุด */
   padding: 8px; /* ปรับ Padding ให้สอดคล้องกับปุ่ม */
@@ -33,7 +33,7 @@
   box-sizing: border-box; /* รวม Padding และ Border ในขนาด */
 }
 
-.search-input:focus {
+.search-input-product:focus {
   border-color: #4caf50; /* เปลี่ยนสีขอบเมื่อโฟกัส */
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
@@ -368,6 +368,12 @@ input[type="checkbox"]:disabled {
   gap: 15px; /* ระยะห่างระหว่างปุ่ม */
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3); /* เงา */
   z-index: 1000; /* ลอยอยู่ด้านบน */
+}
+
+.action-bar-employee {
+  width: 580px; /* ✅ ลดขนาดความกว้าง */
+  max-width: 70%; /* ✅ ป้องกันการล้น */
+  justify-content: center; /* ✅ ปรับให้ปุ่มอยู่ตรงกลาง */
 }
 
 /* ข้อมูลการเลือก */
