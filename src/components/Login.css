@@ -1,19 +1,13 @@
-html,
-body {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-}
-
 /* General layout for the login page */
 .login-container {
+  height: 100vh;
+  overflow: hidden;
+  position: fixed;
+  width: 100vw;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
   background: #ffffff;
-  overflow: hidden; /* ป้องกัน Scroll */
 }
 
 /* Card Style for login form */
