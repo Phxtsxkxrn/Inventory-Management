@@ -48,10 +48,18 @@ export const getProducts = async () => {
     return {
       id: doc.id,
       ...data,
-      FinalPrice: finalPrice, // ✅ ราคาสินค้าหลังลด
-      AppliedPromotion: appliedPromotion, // ✅ เก็บข้อมูลโปรโมชั่นที่ใช้งาน
-      CreatedAt: data.CreatedAt?.toDate(),
-      LastUpdate: data.LastUpdate?.toDate(),
+      FinalPrice: finalPrice,
+      AppliedPromotion: appliedPromotion,
+      CreatedAt: data.CreatedAt?.toDate
+        ? data.CreatedAt.toDate()
+        : data.CreatedAt
+        ? new Date(data.CreatedAt)
+        : null, // ✅ รองรับทั้ง Firestore Timestamp และ string
+      LastUpdate: data.LastUpdate?.toDate
+        ? data.LastUpdate.toDate()
+        : data.LastUpdate
+        ? new Date(data.LastUpdate)
+        : null, // ✅ รองรับทั้ง Firestore Timestamp และ string
     };
   });
 };
@@ -100,12 +108,14 @@ export const deleteProduct = async (id) => {
 };
 
 export const updateProductStatus = async (productId, newStatus) => {
+  const productRef = doc(db, "products", productId);
   try {
-    const productRef = doc(db, "products", productId); // อ้างอิงไปที่เอกสารสินค้า
-    await updateDoc(productRef, { Status: newStatus }); // อัปเดตค่าใน Firestore
-    console.log(`Product ${productId} updated to status: ${newStatus}`);
+    await updateDoc(productRef, {
+      Status: newStatus,
+      LastUpdate: serverTimestamp(), // ✅ ใช้ serverTimestamp() ให้ Firestore อัปเดตเอง
+    });
   } catch (error) {
-    console.error("Failed to update product status:", error);
+    console.error("Error updating product status:", error);
     throw error;
   }
 };

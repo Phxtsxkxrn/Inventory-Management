@@ -40,16 +40,20 @@ const ProductList = ({
 
   const handleStatusChange = async (productId, newStatus) => {
     try {
+      const currentTime = new Date().toISOString(); // เก็บเวลาปัจจุบันในรูปแบบ ISO
+
       // ค้นหาสินค้าที่ต้องการเปลี่ยนแปลง
       const updatedProducts = products.map((product) =>
-        product.id === productId ? { ...product, Status: newStatus } : product
+        product.id === productId
+          ? { ...product, Status: newStatus, LastUpdate: currentTime } // ✅ อัปเดต LastUpdate
+          : product
       );
 
       // อัปเดตค่าใน State
       setProducts(updatedProducts);
 
       // อัปเดตในฐานข้อมูล (Firebase / API)
-      await updateProductStatus(productId, newStatus);
+      await updateProductStatus(productId, newStatus, currentTime); // ✅ ส่งค่า LastUpdate ไปด้วย
     } catch (error) {
       console.error("Error updating status:", error);
       alert("Failed to update status. Please try again.");
