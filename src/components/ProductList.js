@@ -40,19 +40,27 @@ const ProductList = ({
 
   const handleStatusChange = async (productId, newStatus) => {
     try {
-      // ค้นหาสินค้าที่ต้องการเปลี่ยนแปลง
-      const updatedProducts = products.map((product) =>
-        product.id === productId ? { ...product, Status: newStatus } : product
+      const updatedAt = new Date(); // ✅ ดึงเวลาปัจจุบัน
+
+      // ✅ อัปเดตข้อมูลใน Firestore
+      await updateProductStatus(productId, {
+        Status: newStatus,
+        LastUpdate: updatedAt, // ✅ เพิ่มค่า LastUpdate
+      });
+
+      // ✅ อัปเดตค่าใน State เพื่อให้ UI เปลี่ยนทันที
+      setProducts((prevProducts) =>
+        prevProducts.map((product) =>
+          product.id === productId
+            ? { ...product, Status: newStatus, LastUpdate: updatedAt }
+            : product
+        )
       );
 
-      // อัปเดตค่าใน State
-      setProducts(updatedProducts);
-
-      // อัปเดตในฐานข้อมูล (Firebase / API)
-      await updateProductStatus(productId, newStatus);
+      Swal.fire("Success!", "Product status updated successfully.", "success");
     } catch (error) {
       console.error("Error updating status:", error);
-      alert("Failed to update status. Please try again.");
+      Swal.fire("Error!", "Failed to update status.", "error");
     }
   };
 
