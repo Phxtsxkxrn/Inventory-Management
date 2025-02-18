@@ -85,31 +85,33 @@ const Navbar = ({ children }) => {
           </li>
 
           {/* ปุ่ม Manage */}
-          <li className="navbar-item">
-            <button className="navbar-link" onClick={toggleManage}>
-              <FaTools className="icon" />
-              Manage
-              <span className={`dropdown-arrow ${manageOpen ? "open" : ""}`}>
-                ▼
-              </span>
-            </button>
-            {manageOpen && (
-              <ul className="dropdown-menu">
-                <li>
-                  <Link to="/manage-pricing" className="dropdown-link">
-                    <FaDollarSign className="icon" />
-                    Manage Pricing
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/manage-promotions" className="dropdown-link">
-                    <FaGift className="icon" />
-                    Manage Promotions
-                  </Link>
-                </li>
-              </ul>
-            )}
-          </li>
+          {userRole !== "Employee" && (
+            <li className="navbar-item">
+              <button className="navbar-link" onClick={toggleManage}>
+                <FaTools className="icon" />
+                Manage
+                <span className={`dropdown-arrow ${manageOpen ? "open" : ""}`}>
+                  ▼
+                </span>
+              </button>
+              {manageOpen && (
+                <ul className="dropdown-menu">
+                  <li>
+                    <Link to="/manage-pricing" className="dropdown-link">
+                      <FaDollarSign className="icon" />
+                      Manage Pricing
+                    </Link>
+                  </li>
+                  <li>
+                    <Link to="/manage-promotions" className="dropdown-link">
+                      <FaGift className="icon" />
+                      Manage Promotions
+                    </Link>
+                  </li>
+                </ul>
+              )}
+            </li>
+          )}
 
           {/* ปุ่ม Users */}
           {userRole !== "Employee" && (
