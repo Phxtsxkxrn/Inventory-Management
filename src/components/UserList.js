@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { deleteDoc, doc, collection, getDocs } from "firebase/firestore";
+import {
+  deleteDoc,
+  doc,
+  collection,
+  getDocs,
+  updateDoc,
+} from "firebase/firestore";
 import { db } from "../services/firebaseConfig";
 import Register from "./Register";
 import "./UserList.css";
@@ -9,6 +15,7 @@ const UserList = () => {
   const [users, setUsers] = useState([]);
   const [showAddUser, setShowAddUser] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [roles] = useState(["Employee", "Stock Manager", "Admin"]);
 
   // ✅ Pagination State
   const [usersPerPage, setUsersPerPage] = useState(10); // จำนวนผู้ใช้ต่อหน้า
@@ -159,6 +166,21 @@ const UserList = () => {
     });
   };
 
+  const handleRoleChange = async (userId, newRole) => {
+    try {
+      await updateDoc(doc(db, "users", userId), { role: newRole });
+      setUsers((prevUsers) =>
+        prevUsers.map((user) =>
+          user.id === userId ? { ...user, role: newRole } : user
+        )
+      );
+      Swal.fire("Success!", "User role updated successfully.", "success");
+    } catch (error) {
+      console.error("Error updating role:", error);
+      Swal.fire("Error!", "Failed to update role.", "error");
+    }
+  };
+
   return (
     <div className="user-list-container">
       {/* ✅ Header: ค้นหา และปุ่ม Add User */}
@@ -269,7 +291,19 @@ const UserList = () => {
                 <td>{user.firstName}</td>
                 <td>{user.lastName}</td>
                 <td>{user.email}</td>
-                <td>{user.role}</td>
+                <td>
+                  <select
+                    className="role-dropdown"
+                    value={user.role}
+                    onChange={(e) => handleRoleChange(user.id, e.target.value)}
+                  >
+                    {roles.map((role) => (
+                      <option key={role} value={role}>
+                        {role}
+                      </option>
+                    ))}
+                  </select>
+                </td>
                 <td>{formatDate(user.createdAt)}</td>
                 <td>{formatDate(user.lastUpdate)}</td>
                 <td>

@@ -222,3 +222,21 @@
   transform: translateY(0); /* กลับตำแหน่งเดิมเมื่อคลิก */
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* เงาปกติ */
 }
+
+.role-dropdown {
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: white;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.role-dropdown:hover {
+  border-color: #888;
+}
+
+.role-dropdown:focus {
+  outline: none;
+  border-color: #007bff;
+}
