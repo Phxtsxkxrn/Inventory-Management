@@ -9,9 +9,9 @@ const CategoriesList = () => {
   const [searchTerm, setSearchTerm] = useState(""); // State สำหรับเก็บคำค้นหา
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1); // State สำหรับหน้าปัจจุบัน
-  const [categoriesPerPage, setCategoriesPerPage] = useState(10); // จำนวนข้อมูลต่อหน้า
+  const [categoriesPerPage, setCategoriesPerPage] = useState(15); // จำนวนข้อมูลต่อหน้า
   const [categoriesPerPageOptions, setCategoriesPerPageOptions] = useState([
-    5, 10, 20, 50,
+    15, 20, 25, 30,
   ]); // ตัวเลือกใน dropdown
   const [customInputValue, setCustomInputValue] = useState(""); // State สำหรับค่าชั่วคราวของ Custom
   const userRole = localStorage.getItem("userRole");
