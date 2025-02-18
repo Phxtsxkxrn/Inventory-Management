@@ -18,7 +18,7 @@
   padding: 30px;
   border-radius: 10px;
   width: 90%;
-  max-width: 450px; /* ✅ ลดขนาด modal ให้ดูดี */
+  max-width: 450px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
   text-align: center;
   display: flex;
@@ -34,12 +34,13 @@
   text-align: center;
 }
 
-/* ✅ ปรับ Input ให้อยู่ตรงกลางและ Label ชิดซ้าย */
-.register-input-group {
+/* ✅ ปรับให้ Label และ Input อยู่ในโครงสร้างเดียวกัน */
+.register-input-group,
+.register-select-group {
   width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: flex-start; /* ✅ ทำให้ Label ชิดซ้าย */
+  align-items: flex-start;
   margin-bottom: 15px;
 }
 
@@ -53,48 +54,77 @@
   width: 100%;
 }
 
+/* ✅ ใช้ตัวแปรสำหรับขนาด Input และ Dropdown */
 :root {
-  --input-width: 420px; /* ✅ เปลี่ยนค่านี้เพื่อปรับขนาด input */
+  --input-width: 100%; /* ✅ ปรับให้เต็มกล่อง */
+  --max-input-width: 420px; /* ✅ จำกัดขนาดสูงสุด */
 }
 
-/* ปรับขนาด input ตามค่าตัวแปร */
-.register-input {
-  width: var(--input-width);
+/* ✅ ปรับขนาดของ Input และ Dropdown ให้เท่ากัน */
+.register-input,
+.register-select {
+  width: 100%;
+  max-width: 100%; /* ✅ ทำให้ dropdown กว้างเท่า input อัตโนมัติ */
   padding: 12px;
   font-size: 16px;
   border: 1px solid #ced4da;
   border-radius: 6px;
-  transition: border-color 0.3s ease;
+  background-color: white;
+  cursor: pointer;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  box-sizing: border-box; /* ✅ ป้องกัน padding ทำให้ขนาดเล็กลง */
 }
 
-/* ✅ ปรับ Focus Effect */
-.register-input:focus {
+/* ✅ ปรับเมื่อโฟกัส */
+.register-input:focus,
+.register-select:focus {
   border-color: #007bff;
   outline: none;
   box-shadow: 0px 0px 6px rgba(0, 123, 255, 0.3);
 }
 
-/* ✅ ปรับปุ่ม */
-.register-button-group {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  width: var(--input-width);
-  margin: 20px auto 0; /* ✅ เพิ่มระยะห่างข้างบน */
-  padding-top: 10px; /* ✅ เพิ่ม padding ข้างบน */
+/* ✅ ปรับเมื่อ Hover */
+.register-input:hover,
+.register-select:hover {
+  border-color: #007bff;
 }
 
-/* ✅ ปุ่มกด */
+/* ✅ ปรับไอคอนลูกศรของ Dropdown ให้ไม่ผิดเพี้ยน */
+.register-select::-ms-expand {
+  display: none;
+}
+
+/* ✅ ปรับ Label ของ Dropdown */
+.register-select-group label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 5px;
+  text-align: left;
+  width: 100%;
+}
+
+/* ✅ ปรับกลุ่มปุ่มให้จัดเรียงแบบซ้าย-ขวา และมีขนาดเท่ากับ Input */
+.register-button-group {
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+  justify-content: space-between; /* ✅ กระจายปุ่มไปซ้าย-ขวา */
+  gap: 10px;
+  margin-top: 20px;
+}
+
+/* ✅ ปรับขนาดปุ่มให้เท่ากับ Input และ Dropdown */
 .register-button {
-  width: 100%; /* ✅ ทำให้ปุ่มเต็มความกว้าง */
-  max-width: 200px; /* ✅ กำหนดขนาดให้พอดี */
+  flex-grow: 1; /* ✅ ทำให้ปุ่มขยายเต็มที่ */
+  padding: 12px;
   font-size: 16px;
   font-weight: bold;
-  padding: 12px;
   border: none;
   border-radius: 6px;
   cursor: pointer;
   transition: background 0.3s ease;
+  text-align: center;
 }
 
 /* ✅ ปุ่ม Register */

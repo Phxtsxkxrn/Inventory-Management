@@ -108,15 +108,20 @@ const Register = ({ onUserAdded, onClose }) => {
             />
           </div>
 
-          <select
-            name="role"
-            value={role}
-            onChange={(e) => setRole(e.target.value)}
-          >
-            <option value="Employee">Employee</option>
-            <option value="Stock Manager">Stock Manager</option>
-            <option value="Admin">Admin</option>
-          </select>
+          {/* Role Selection */}
+          <div className="register-select-group">
+            <label className="register-label">Role:</label>
+            <select
+              name="role"
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              className="register-select"
+            >
+              <option value="Employee">Employee</option>
+              <option value="Stock Manager">Stock Manager</option>
+              <option value="Admin">Admin</option>
+            </select>
+          </div>
 
           {/* ปุ่ม Register และ Close */}
           <div className="register-button-group">
