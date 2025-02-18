@@ -168,12 +168,21 @@ const UserList = () => {
 
   const handleRoleChange = async (userId, newRole) => {
     try {
-      await updateDoc(doc(db, "users", userId), { role: newRole });
+      const updatedAt = new Date(); // ดึงเวลาปัจจุบัน
+
+      await updateDoc(doc(db, "users", userId), {
+        role: newRole,
+        lastUpdate: updatedAt, // ✅ เพิ่มฟิลด์ lastUpdate
+      });
+
       setUsers((prevUsers) =>
         prevUsers.map((user) =>
-          user.id === userId ? { ...user, role: newRole } : user
+          user.id === userId
+            ? { ...user, role: newRole, lastUpdate: updatedAt }
+            : user
         )
       );
+
       Swal.fire("Success!", "User role updated successfully.", "success");
     } catch (error) {
       console.error("Error updating role:", error);
