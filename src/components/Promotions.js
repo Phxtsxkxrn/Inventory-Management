@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { getPromotions, deletePromotion } from "../services/promotionService";
 import AddPromotion from "./AddPromotion";
+import FilterPromotion from "./FilterPromotion"; // Import FilterPromotion
 import "./Promotions.css";
 import Swal from "sweetalert2";
 
@@ -8,12 +9,19 @@ const Promotions = () => {
   const [promotions, setPromotions] = useState([]);
   const [searchTerm, setSearchTerm] = useState(""); // State สำหรับเก็บคำค้นหา
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false); // State for filter modal
   const [currentPage, setCurrentPage] = useState(1);
   const [promotionsPerPage, setPromotionsPerPage] = useState(10);
   const [promotionsPerPageOptions, setPromotionsPerPageOptions] = useState([
     5, 10, 20, 50,
   ]);
   const [customInputValue, setCustomInputValue] = useState("");
+  const [minDiscount, setMinDiscount] = useState("");
+  const [maxDiscount, setMaxDiscount] = useState("");
+  const [startDateTimeFrom, setStartDateTimeFrom] = useState("");
+  const [startDateTimeTo, setStartDateTimeTo] = useState("");
+  const [endDateTimeFrom, setEndDateTimeFrom] = useState("");
+  const [endDateTimeTo, setEndDateTimeTo] = useState("");
   const userRole = localStorage.getItem("userRole");
 
   useEffect(() => {
@@ -67,6 +75,22 @@ const Promotions = () => {
     }
   };
 
+  const handleFilterChange = ({
+    minDiscount,
+    maxDiscount,
+    startDateTimeFrom,
+    startDateTimeTo,
+    endDateTimeFrom,
+    endDateTimeTo,
+  }) => {
+    setMinDiscount(minDiscount);
+    setMaxDiscount(maxDiscount);
+    setStartDateTimeFrom(startDateTimeFrom);
+    setStartDateTimeTo(startDateTimeTo);
+    setEndDateTimeFrom(endDateTimeFrom);
+    setEndDateTimeTo(endDateTimeTo);
+  };
+
   // ฟังก์ชัน Submit ค่าจาก Custom Input
   const handleCustomSubmit = () => {
     const customValue = parseInt(customInputValue, 10);
@@ -82,10 +106,29 @@ const Promotions = () => {
     }
   };
 
-  // กรองข้อมูลตามคำค้นหา
-  const filteredPromotions = promotions.filter((promo) =>
-    promo.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // กรองข้อมูลตามคำค้นหาและส่วนลด
+  const filteredPromotions = promotions
+    .filter((promo) =>
+      promo.name.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+    .filter((promo) => {
+      const discount = promo.discount || 0;
+      const promoStartDT = new Date(promo.startDateTime);
+      const promoEndDT = promo.endDateTime
+        ? new Date(promo.endDateTime)
+        : new Date(`${promo.endDate}T${promo.endTime}`);
+      const isDiscountOk =
+        (minDiscount === "" || discount >= minDiscount) &&
+        (maxDiscount === "" || discount <= maxDiscount);
+      const isStartDateTimeOk =
+        (startDateTimeFrom === "" ||
+          promoStartDT >= new Date(startDateTimeFrom)) &&
+        (startDateTimeTo === "" || promoStartDT <= new Date(startDateTimeTo));
+      const isEndDateTimeOk =
+        (endDateTimeFrom === "" || promoEndDT >= new Date(endDateTimeFrom)) &&
+        (endDateTimeTo === "" || promoEndDT <= new Date(endDateTimeTo));
+      return isDiscountOk && isStartDateTimeOk && isEndDateTimeOk;
+    });
 
   // คำนวณ Pagination
   const totalPages = Math.ceil(filteredPromotions.length / promotionsPerPage);
@@ -108,12 +151,20 @@ const Promotions = () => {
           className="search-input"
         />
         {userRole !== "Employee" && (
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="add-promotion-btn"
-          >
-            Add Promotion
-          </button>
+          <div className="button-group">
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="add-promotion-btn"
+            >
+              Add Promotion
+            </button>
+            <button
+              onClick={() => setIsFilterModalOpen(true)}
+              className="filter-button"
+            >
+              Filter
+            </button>
+          </div>
         )}
       </div>
 
@@ -128,6 +179,15 @@ const Promotions = () => {
             />
           </div>
         </div>
+      )}
+
+      {/* Modal for Filtering Promotions */}
+      {isFilterModalOpen && (
+        <FilterPromotion
+          onFilterChange={handleFilterChange}
+          isOpen={isFilterModalOpen}
+          closeModal={() => setIsFilterModalOpen(false)}
+        />
       )}
 
       {/* Pagination Controls */}
