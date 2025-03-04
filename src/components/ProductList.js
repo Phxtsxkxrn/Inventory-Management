@@ -12,6 +12,7 @@ import { updateProductStatus } from "../services/productService";
 import Swal from "sweetalert2";
 import { db } from "../services/firebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
+import Filter from "./Filter"; // นำเข้า Filter
 
 const ProductList = ({
   products,
@@ -36,6 +37,14 @@ const ProductList = ({
   const [isModalOpen, setIsModalOpen] = useState(false); // State ควบคุมการเปิด Modal
   const location = useLocation();
   const [userRole, setUserRole] = useState(null);
+  const [minPrice, setMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false); // State for filter modal
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [lastUpdateStart, setLastUpdateStart] = useState("");
+  const [lastUpdateEnd, setLastUpdateEnd] = useState("");
+  const [status, setStatus] = useState("");
   console.log("Current User Role:", userRole);
 
   const handleStatusChange = async (productId, newStatus) => {
@@ -156,12 +165,55 @@ const ProductList = ({
     setIsModalOpen(false); // Enable checkbox
   };
 
-  const filteredProducts = products.filter((product) =>
-    Object.values(product)
-      .join(" ")
-      .toLowerCase()
-      .includes(searchTerm.toLowerCase())
-  );
+  const openFilterModal = () => setIsFilterModalOpen(true);
+  const closeFilterModal = () => setIsFilterModalOpen(false);
+
+  const handleFilterChange = ({
+    minPrice,
+    maxPrice,
+    startDate,
+    endDate,
+    lastUpdateStart,
+    lastUpdateEnd,
+    status,
+  }) => {
+    setMinPrice(minPrice);
+    setMaxPrice(maxPrice);
+    setStartDate(startDate);
+    setEndDate(endDate);
+    setLastUpdateStart(lastUpdateStart);
+    setLastUpdateEnd(lastUpdateEnd);
+    setStatus(status);
+  };
+
+  const filteredProducts = products
+    .filter((product) =>
+      Object.values(product)
+        .join(" ")
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase())
+    )
+    .filter((product) => {
+      const price = product.NormalPrice || 0;
+      const createdAt = new Date(product.CreatedAt);
+      const lastUpdate = new Date(product.LastUpdate);
+      const isPriceInRange =
+        (minPrice === "" || price >= minPrice) &&
+        (maxPrice === "" || price <= maxPrice);
+      const isCreatedAtInRange =
+        (startDate === "" || createdAt >= new Date(startDate)) &&
+        (endDate === "" || createdAt <= new Date(endDate));
+      const isLastUpdateInRange =
+        (lastUpdateStart === "" || lastUpdate >= new Date(lastUpdateStart)) &&
+        (lastUpdateEnd === "" || lastUpdate <= new Date(lastUpdateEnd));
+      const isStatusMatch = status === "" || product.Status === status;
+      return (
+        isPriceInRange &&
+        isCreatedAtInRange &&
+        isLastUpdateInRange &&
+        isStatusMatch
+      );
+    });
 
   const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
 
@@ -294,9 +346,19 @@ const ProductList = ({
             <button className="import-button" onClick={openImportModal}>
               Import Products
             </button>
+            <button className="filter-button" onClick={openFilterModal}>
+              Filter
+            </button>
           </div>
         )}
       </div>
+
+      {/* เพิ่ม Filter Component */}
+      <Filter
+        onFilterChange={handleFilterChange}
+        isOpen={isFilterModalOpen}
+        closeModal={closeFilterModal}
+      />
 
       <div className="pagination-and-records">
         {/* Records Found */}
