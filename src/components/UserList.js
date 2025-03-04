@@ -10,6 +10,7 @@ import { db } from "../services/firebaseConfig";
 import Register from "./Register";
 import "./UserList.css";
 import Swal from "sweetalert2"; // นำเข้า SweetAlert2
+import FilterUser from "./FilterUser"; // เพิ่ม import
 
 const UserList = () => {
   const [users, setUsers] = useState([]);
@@ -22,6 +23,12 @@ const UserList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [customInputValue, setCustomInputValue] = useState(""); // เก็บค่าชั่วคราวจากช่อง input
   const [customOptions, setCustomOptions] = useState([10, 20, 30, 50, 100]); // ตัวเลือก dropdown
+  const [isFilterModalOpen, setIsFilterModalOpen] = useState(false); // เพิ่ม state สำหรับ filter modal
+  const [createdAtFrom, setCreatedAtFrom] = useState(""); // เพิ่ม state สำหรับ filter
+  const [createdAtTo, setCreatedAtTo] = useState(""); // เพิ่ม state สำหรับ filter
+  const [lastUpdateFrom, setLastUpdateFrom] = useState(""); // เพิ่ม state
+  const [lastUpdateTo, setLastUpdateTo] = useState(""); // เพิ่ม state
+  const [selectedRole, setSelectedRole] = useState(""); // เพิ่ม state สำหรับ filter role
 
   // ✅ ดึงข้อมูล Users จาก Firestore
   useEffect(() => {
@@ -89,12 +96,55 @@ const UserList = () => {
   };
 
   // ✅ ฟังก์ชันกรองผู้ใช้ตามคำค้นหา
-  const filteredUsers = users.filter((user) =>
-    Object.values(user)
+  const handleFilterChange = ({
+    createdAtFrom,
+    createdAtTo,
+    lastUpdateFrom,
+    lastUpdateTo,
+    role,
+  }) => {
+    setCreatedAtFrom(createdAtFrom);
+    setCreatedAtTo(createdAtTo);
+    setLastUpdateFrom(lastUpdateFrom);
+    setLastUpdateTo(lastUpdateTo);
+    setSelectedRole(role);
+  };
+
+  // อัปเดต filteredUsers เพื่อรวมการกรองตามวันที่สร้าง
+  const filteredUsers = users.filter((user) => {
+    const matchesSearch = Object.values(user)
       .join(" ")
       .toLowerCase()
-      .includes(searchTerm.toLowerCase())
-  );
+      .includes(searchTerm.toLowerCase());
+
+    const createdDate = user.createdAt
+      ? new Date(user.createdAt.seconds * 1000)
+      : null;
+
+    const lastUpdateDate = user.lastUpdate
+      ? new Date(user.lastUpdate.seconds * 1000)
+      : null;
+
+    const isInCreatedDateRange =
+      (!createdAtFrom ||
+        (createdDate && createdDate >= new Date(createdAtFrom))) &&
+      (!createdAtTo || (createdDate && createdDate <= new Date(createdAtTo)));
+
+    const isInLastUpdateRange =
+      (!lastUpdateFrom ||
+        (lastUpdateDate && lastUpdateDate >= new Date(lastUpdateFrom))) &&
+      (!lastUpdateTo ||
+        (lastUpdateDate && lastUpdateDate <= new Date(lastUpdateTo)));
+
+    const matchesRole = !selectedRole || user.role === selectedRole;
+
+    return (
+      matchesSearch &&
+      isInCreatedDateRange &&
+      isInLastUpdateRange &&
+      matchesRole
+    );
+  });
 
   // ✅ คำนวณ Pagination
   const totalPages = Math.ceil(filteredUsers.length / usersPerPage);
@@ -203,14 +253,31 @@ const UserList = () => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          <button
-            className="user-add-button"
-            onClick={() => setShowAddUser(true)}
-          >
-            Add User
-          </button>
+          <div className="button-group">
+            <button
+              className="user-add-button"
+              onClick={() => setShowAddUser(true)}
+            >
+              Add User
+            </button>
+            <button
+              className="filter-button"
+              onClick={() => setIsFilterModalOpen(true)}
+            >
+              Filter
+            </button>
+          </div>
         </div>
       </div>
+
+      {/* เพิ่ม Filter Modal */}
+      {isFilterModalOpen && (
+        <FilterUser
+          onFilterChange={handleFilterChange}
+          isOpen={isFilterModalOpen}
+          closeModal={() => setIsFilterModalOpen(false)}
+        />
+      )}
 
       {/* ✅ Pagination Controls */}
       <div className="pagination-container">
