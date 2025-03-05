@@ -11,6 +11,7 @@ import Register from "./Register";
 import "./UserList.css";
 import Swal from "sweetalert2"; // นำเข้า SweetAlert2
 import FilterUser from "./FilterUser"; // เพิ่ม import
+import UserColumnSelector from "./UserColumnSelector";
 
 const UserList = () => {
   const [users, setUsers] = useState([]);
@@ -28,6 +29,17 @@ const UserList = () => {
   const [createdAtTo, setCreatedAtTo] = useState(""); // เพิ่ม state สำหรับ filter
   const [lastUpdateFrom, setLastUpdateFrom] = useState(""); // เพิ่ม state
   const [lastUpdateTo, setLastUpdateTo] = useState(""); // เพิ่ม state
+  const [isColumnSelectorOpen, setIsColumnSelectorOpen] = useState(false);
+  const [visibleColumns, setVisibleColumns] = useState([
+    "index",
+    "firstName",
+    "lastName",
+    "email",
+    "role",
+    "createdAt",
+    "lastUpdate",
+    "actions",
+  ]);
 
   // ✅ ดึงข้อมูล Users จาก Firestore
   useEffect(() => {
@@ -230,6 +242,27 @@ const UserList = () => {
     }
   };
 
+  // Add columns configuration
+  const columns = [
+    { key: "index", label: "#" },
+    { key: "firstName", label: "First Name" },
+    { key: "lastName", label: "Last Name" },
+    { key: "email", label: "Email" },
+    { key: "role", label: "Role" },
+    { key: "createdAt", label: "Created At" },
+    { key: "lastUpdate", label: "Last Update" },
+    { key: "actions", label: "Actions" },
+  ];
+
+  // Add column toggle handler
+  const handleColumnToggle = (columnKey) => {
+    setVisibleColumns((prev) =>
+      prev.includes(columnKey)
+        ? prev.filter((key) => key !== columnKey)
+        : [...prev, columnKey]
+    );
+  };
+
   return (
     <div className="user-list-container">
       {/* ✅ Header: ค้นหา และปุ่ม Add User */}
@@ -256,6 +289,12 @@ const UserList = () => {
             >
               Filter
             </button>
+            <button
+              className="columns-button"
+              onClick={() => setIsColumnSelectorOpen(true)}
+            >
+              Columns
+            </button>
           </div>
         </div>
       </div>
@@ -266,6 +305,16 @@ const UserList = () => {
           onFilterChange={handleFilterChange}
           isOpen={isFilterModalOpen}
           closeModal={() => setIsFilterModalOpen(false)}
+        />
+      )}
+
+      {/* Add ColumnSelector component before the table */}
+      {isColumnSelectorOpen && (
+        <UserColumnSelector
+          columns={columns}
+          visibleColumns={visibleColumns}
+          onColumnToggle={handleColumnToggle}
+          onClose={() => setIsColumnSelectorOpen(false)}
         />
       )}
 
@@ -339,52 +388,63 @@ const UserList = () => {
       <table className="user-table">
         <thead>
           <tr>
-            <th>#</th>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Email</th>
-            <th>Role</th>
-            <th>Created At</th>
-            <th>Last Update</th>
-            <th>Actions</th>
+            {columns
+              .filter((col) => visibleColumns.includes(col.key))
+              .map((col) => (
+                <th key={col.key}>{col.label}</th>
+              ))}
           </tr>
         </thead>
         <tbody>
           {displayedUsers.length > 0 ? (
             displayedUsers.map((user, index) => (
               <tr key={user.id}>
-                <td>{index + 1}</td>
-                <td>{user.firstName}</td>
-                <td>{user.lastName}</td>
-                <td>{user.email}</td>
-                <td>
-                  <select
-                    className="role-dropdown"
-                    value={user.role}
-                    onChange={(e) => handleRoleChange(user.id, e.target.value)}
-                  >
-                    {roles.map((role) => (
-                      <option key={role} value={role}>
-                        {role}
-                      </option>
-                    ))}
-                  </select>
-                </td>
-                <td>{formatDate(user.createdAt)}</td>
-                <td>{formatDate(user.lastUpdate)}</td>
-                <td>
-                  <button
-                    className="delete-user"
-                    onClick={() => handleDeleteUser(user.id)}
-                  >
-                    Delete
-                  </button>
-                </td>
+                {visibleColumns.includes("index") && <td>{index + 1}</td>}
+                {visibleColumns.includes("firstName") && (
+                  <td>{user.firstName}</td>
+                )}
+                {visibleColumns.includes("lastName") && (
+                  <td>{user.lastName}</td>
+                )}
+                {visibleColumns.includes("email") && <td>{user.email}</td>}
+                {visibleColumns.includes("role") && (
+                  <td>
+                    <select
+                      className="role-dropdown"
+                      value={user.role}
+                      onChange={(e) =>
+                        handleRoleChange(user.id, e.target.value)
+                      }
+                    >
+                      {roles.map((role) => (
+                        <option key={role} value={role}>
+                          {role}
+                        </option>
+                      ))}
+                    </select>
+                  </td>
+                )}
+                {visibleColumns.includes("createdAt") && (
+                  <td>{formatDate(user.createdAt)}</td>
+                )}
+                {visibleColumns.includes("lastUpdate") && (
+                  <td>{formatDate(user.lastUpdate)}</td>
+                )}
+                {visibleColumns.includes("actions") && (
+                  <td>
+                    <button
+                      className="delete-user"
+                      onClick={() => handleDeleteUser(user.id)}
+                    >
+                      Delete
+                    </button>
+                  </td>
+                )}
               </tr>
             ))
           ) : (
             <tr>
-              <td colSpan="7">No users found.</td>
+              <td colSpan={visibleColumns.length}>No users found.</td>
             </tr>
           )}
         </tbody>

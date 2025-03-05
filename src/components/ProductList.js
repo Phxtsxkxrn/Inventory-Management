@@ -13,6 +13,7 @@ import Swal from "sweetalert2";
 import { db } from "../services/firebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
 import Filter from "./Filter"; // นำเข้า Filter
+import ColumnSelector from "./ColumnSelector";
 
 const ProductList = ({
   products,
@@ -49,7 +50,41 @@ const ProductList = ({
     key: null,
     direction: "asc",
   });
+  const [isColumnSelectorOpen, setIsColumnSelectorOpen] = useState(false);
+  const [visibleColumns, setVisibleColumns] = useState([
+    "checkbox",
+    "Image",
+    "SKU",
+    "Brand",
+    "Name",
+    "Categories",
+    "Seller",
+    "NormalPrice",
+    "Discount",
+    "finalPrice",
+    "Status",
+    "CreatedAt",
+    "LastUpdate",
+    "actions",
+  ]);
   console.log("Current User Role:", userRole);
+
+  const columns = [
+    { key: "checkbox", label: "Select" },
+    { key: "Image", label: "Image" },
+    { key: "SKU", label: "SKU" },
+    { key: "Brand", label: "Brand" },
+    { key: "Name", label: "Name" },
+    { key: "Categories", label: "Categories" },
+    { key: "Seller", label: "Seller" },
+    { key: "NormalPrice", label: "Normal Price" },
+    { key: "Discount", label: "Discount" },
+    { key: "finalPrice", label: "Final Price" },
+    { key: "Status", label: "Status" },
+    { key: "CreatedAt", label: "Created At" },
+    { key: "LastUpdate", label: "Last Update" },
+    { key: "actions", label: "Actions" },
+  ];
 
   const handleStatusChange = async (productId, newStatus) => {
     try {
@@ -188,6 +223,14 @@ const ProductList = ({
     setLastUpdateStart(lastUpdateStart);
     setLastUpdateEnd(lastUpdateEnd);
     setStatus(status);
+  };
+
+  const handleColumnToggle = (columnKey) => {
+    setVisibleColumns((prev) =>
+      prev.includes(columnKey)
+        ? prev.filter((key) => key !== columnKey)
+        : [...prev, columnKey]
+    );
   };
 
   const filteredProducts = products
@@ -412,7 +455,6 @@ const ProductList = ({
     <div className="product-list">
       <h2>Product List</h2>
       <div className="product-header">
-        {/* Input Search */}
         <input
           type="text"
           className="search-input"
@@ -421,11 +463,6 @@ const ProductList = ({
           onChange={(e) => setSearchTerm(e.target.value)}
         />
         <div className="button-group">
-          {/* ปุ่ม Filter แสดงสำหรับทุก role */}
-          <button className="filter-button" onClick={openFilterModal}>
-            Filter
-          </button>
-          {/* ปุ่มอื่นๆ แสดงเฉพาะ non-Employee */}
           {userRole !== "Employee" && (
             <>
               <button className="add-button" onClick={openAddModal}>
@@ -436,6 +473,15 @@ const ProductList = ({
               </button>
             </>
           )}
+          <button className="filter-button" onClick={openFilterModal}>
+            Filter
+          </button>
+          <button
+            className="columns-button"
+            onClick={() => setIsColumnSelectorOpen(true)}
+          >
+            Columns
+          </button>
         </div>
       </div>
 
@@ -445,6 +491,15 @@ const ProductList = ({
         isOpen={isFilterModalOpen}
         closeModal={closeFilterModal}
       />
+
+      {isColumnSelectorOpen && (
+        <ColumnSelector
+          columns={columns}
+          visibleColumns={visibleColumns}
+          onColumnToggle={handleColumnToggle}
+          onClose={() => setIsColumnSelectorOpen(false)}
+        />
+      )}
 
       <div className="pagination-and-records">
         {/* Records Found */}
@@ -557,106 +612,45 @@ const ProductList = ({
       <table className="product-table">
         <thead>
           <tr>
-            <th>
-              <input
-                type="checkbox"
-                onChange={(e) =>
-                  setSelectedProducts(
-                    e.target.checked ? displayedProducts.map((p) => p.id) : []
-                  )
+            {columns
+              .filter((col) => visibleColumns.includes(col.key))
+              .map((col) => {
+                if (col.key === "checkbox") {
+                  return (
+                    <th key={col.key}>
+                      <input
+                        type="checkbox"
+                        onChange={(e) =>
+                          setSelectedProducts(
+                            e.target.checked
+                              ? displayedProducts.map((p) => p.id)
+                              : []
+                          )
+                        }
+                        disabled={isModalOpen}
+                        checked={
+                          displayedProducts.every((p) =>
+                            isProductSelected(p.id)
+                          ) && displayedProducts.length > 0
+                        }
+                      />
+                    </th>
+                  );
                 }
-                disabled={isModalOpen} // Disable checkbox เมื่อ modal เปิดอยู่
-                checked={
-                  displayedProducts.every((p) => isProductSelected(p.id)) &&
-                  displayedProducts.length > 0
+                if (col.key === "actions" && userRole === "Employee") {
+                  return null;
                 }
-              />
-            </th>
-            <th
-              onClick={() => onSort("Image")}
-              className="sortable"
-              data-active={sortConfig.key === "Image"}
-            >
-              Image <SortIcon column="Image" />
-            </th>
-            <th
-              onClick={() => onSort("SKU")}
-              className="sortable"
-              data-active={sortConfig.key === "SKU"}
-            >
-              SKU <SortIcon column="SKU" />
-            </th>
-            <th
-              onClick={() => onSort("Brand")}
-              className="sortable"
-              data-active={sortConfig.key === "Brand"}
-            >
-              Brand <SortIcon column="Brand" />
-            </th>
-            <th
-              onClick={() => onSort("Name")}
-              className="sortable"
-              data-active={sortConfig.key === "Name"}
-            >
-              Name <SortIcon column="Name" />
-            </th>
-            <th
-              onClick={() => onSort("Categories")}
-              className="sortable"
-              data-active={sortConfig.key === "Categories"}
-            >
-              Categories <SortIcon column="Categories" />
-            </th>
-            <th
-              onClick={() => onSort("Seller")}
-              className="sortable"
-              data-active={sortConfig.key === "Seller"}
-            >
-              Seller <SortIcon column="Seller" />
-            </th>
-            <th
-              onClick={() => onSort("NormalPrice")}
-              className="sortable"
-              data-active={sortConfig.key === "NormalPrice"}
-            >
-              Normal Price <SortIcon column="NormalPrice" />
-            </th>
-            <th
-              onClick={() => onSort("Discount")}
-              className="sortable"
-              data-active={sortConfig.key === "Discount"}
-            >
-              Discount (%) <SortIcon column="Discount" />
-            </th>
-            <th
-              onClick={() => onSort("finalPrice")}
-              className="sortable"
-              data-active={sortConfig.key === "finalPrice"}
-            >
-              Final Price <SortIcon column="finalPrice" />
-            </th>
-            <th
-              onClick={() => onSort("Status")}
-              className="sortable"
-              data-active={sortConfig.key === "Status"}
-            >
-              Status <SortIcon column="Status" />
-            </th>
-            <th
-              onClick={() => onSort("CreatedAt")}
-              className="sortable"
-              data-active={sortConfig.key === "CreatedAt"}
-            >
-              Created At <SortIcon column="CreatedAt" />
-            </th>
-            <th
-              onClick={() => onSort("LastUpdate")}
-              className="sortable"
-              data-active={sortConfig.key === "LastUpdate"}
-            >
-              Last Update <SortIcon column="LastUpdate" />
-            </th>
-            {userRole !== "Employee" && <th>Actions</th>}
+                return (
+                  <th
+                    key={col.key}
+                    onClick={() => onSort(col.key)}
+                    className="sortable"
+                    data-active={sortConfig.key === col.key}
+                  >
+                    {col.label} <SortIcon column={col.key} />
+                  </th>
+                );
+              })}
           </tr>
         </thead>
         <tbody>
@@ -675,112 +669,138 @@ const ProductList = ({
 
             return (
               <tr key={product.id}>
-                <td>
-                  <input
-                    type="checkbox"
-                    className="custom-checkbox"
-                    disabled={isModalOpen}
-                    checked={isProductSelected(product.id)}
-                    onChange={() => handleCheckboxChange(product.id)}
-                  />
-                </td>
-                <td>
-                  {product.Image ? (
-                    <img
-                      src={product.Image}
-                      alt={product.Name || "Product Image"}
-                      style={{
-                        width: "50px",
-                        height: "50px",
-                        objectFit: "cover",
-                      }}
+                {visibleColumns.includes("checkbox") && (
+                  <td>
+                    <input
+                      type="checkbox"
+                      className="custom-checkbox"
+                      disabled={isModalOpen}
+                      checked={isProductSelected(product.id)}
+                      onChange={() => handleCheckboxChange(product.id)}
                     />
-                  ) : (
-                    "No Image"
-                  )}
-                </td>
-                <td>{product.SKU || "N/A"}</td>
-                <td>{product.Brand || "N/A"}</td>
-                <td>{product.Name || "N/A"}</td>
-                <td>{product.Categories || "N/A"}</td>
-                <td>{product.Seller || "N/A"}</td>
-                <td>
-                  {product.NormalPrice
-                    ? `฿${new Intl.NumberFormat("th-TH", {
-                        style: "decimal",
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      }).format(product.NormalPrice)}`
-                    : "N/A"}
-                </td>
-                <td>
-                  {product.AppliedPromotion
-                    ? `${product.AppliedPromotion.discount}% (Promo)`
-                    : product.Discount
-                    ? `${product.Discount}%`
-                    : "N/A"}
-                </td>
-                <td>
-                  {finalPrice
-                    ? `฿${new Intl.NumberFormat("th-TH", {
-                        style: "decimal",
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      }).format(finalPrice)}`
-                    : "N/A"}
-                </td>
-                <td className="status">
-                  {userRole === "Employee" ? ( // ✅ ถ้าเป็น Employee ให้แสดงเฉพาะข้อความ
-                    <span
-                      className={`status-text ${
-                        product.Status === "active"
-                          ? "status-active"
-                          : "status-inactive"
-                      }`}
-                    >
-                      {product.Status === "active" ? "Active" : "Inactive"}
-                    </span>
-                  ) : (
-                    // ✅ ถ้าไม่ใช่ Employee ให้ใช้ dropdown ปกติ
-                    <select
-                      value={product.Status}
-                      onChange={(e) =>
-                        handleStatusChange(product.id, e.target.value)
-                      }
-                      className={`status-dropdown ${
-                        product.Status === "active"
-                          ? "status-active"
-                          : product.Status === "inactive"
-                          ? "status-inactive"
-                          : "status-other"
-                      }`}
-                    >
-                      <option value="active">Active</option>
-                      <option value="inactive">Inactive</option>
-                    </select>
-                  )}
-                </td>
-
-                <td>
-                  {product.CreatedAt
-                    ? new Date(product.CreatedAt).toLocaleString()
-                    : "N/A"}
-                </td>
-                <td>
-                  {product.LastUpdate
-                    ? new Date(product.LastUpdate).toLocaleString()
-                    : "N/A"}
-                </td>
-                {userRole !== "Employee" && (
-                  <td className="actions">
-                    <button
-                      className="edit"
-                      onClick={() => openEditModal(product)}
-                    >
-                      Edit
-                    </button>
                   </td>
                 )}
+                {visibleColumns.includes("Image") && (
+                  <td>
+                    {product.Image ? (
+                      <img
+                        src={product.Image}
+                        alt={product.Name || "Product Image"}
+                        style={{
+                          width: "50px",
+                          height: "50px",
+                          objectFit: "cover",
+                        }}
+                      />
+                    ) : (
+                      "No Image"
+                    )}
+                  </td>
+                )}
+                {visibleColumns.includes("SKU") && (
+                  <td>{product.SKU || "N/A"}</td>
+                )}
+                {visibleColumns.includes("Brand") && (
+                  <td>{product.Brand || "N/A"}</td>
+                )}
+                {visibleColumns.includes("Name") && (
+                  <td>{product.Name || "N/A"}</td>
+                )}
+                {visibleColumns.includes("Categories") && (
+                  <td>{product.Categories || "N/A"}</td>
+                )}
+                {visibleColumns.includes("Seller") && (
+                  <td>{product.Seller || "N/A"}</td>
+                )}
+                {visibleColumns.includes("NormalPrice") && (
+                  <td>
+                    {product.NormalPrice
+                      ? `฿${new Intl.NumberFormat("th-TH", {
+                          style: "decimal",
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        }).format(product.NormalPrice)}`
+                      : "N/A"}
+                  </td>
+                )}
+                {visibleColumns.includes("Discount") && (
+                  <td>
+                    {product.AppliedPromotion
+                      ? `${product.AppliedPromotion.discount}% (Promo)`
+                      : product.Discount
+                      ? `${product.Discount}%`
+                      : "N/A"}
+                  </td>
+                )}
+                {visibleColumns.includes("finalPrice") && (
+                  <td>
+                    {finalPrice
+                      ? `฿${new Intl.NumberFormat("th-TH", {
+                          style: "decimal",
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        }).format(finalPrice)}`
+                      : "N/A"}
+                  </td>
+                )}
+                {visibleColumns.includes("Status") && (
+                  <td className="status">
+                    {userRole === "Employee" ? ( // ✅ ถ้าเป็น Employee ให้แสดงเฉพาะข้อความ
+                      <span
+                        className={`status-text ${
+                          product.Status === "active"
+                            ? "status-active"
+                            : "status-inactive"
+                        }`}
+                      >
+                        {product.Status === "active" ? "Active" : "Inactive"}
+                      </span>
+                    ) : (
+                      // ✅ ถ้าไม่ใช่ Employee ให้ใช้ dropdown ปกติ
+                      <select
+                        value={product.Status}
+                        onChange={(e) =>
+                          handleStatusChange(product.id, e.target.value)
+                        }
+                        className={`status-dropdown ${
+                          product.Status === "active"
+                            ? "status-active"
+                            : product.Status === "inactive"
+                            ? "status-inactive"
+                            : "status-other"
+                        }`}
+                      >
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                      </select>
+                    )}
+                  </td>
+                )}
+                {visibleColumns.includes("CreatedAt") && (
+                  <td>
+                    {product.CreatedAt
+                      ? new Date(product.CreatedAt).toLocaleString()
+                      : "N/A"}
+                  </td>
+                )}
+                {visibleColumns.includes("LastUpdate") && (
+                  <td>
+                    {product.LastUpdate
+                      ? new Date(product.LastUpdate).toLocaleString()
+                      : "N/A"}
+                  </td>
+                )}
+                {visibleColumns.includes("actions") &&
+                  userRole !== "Employee" && (
+                    <td className="actions">
+                      <button
+                        className="edit"
+                        onClick={() => openEditModal(product)}
+                      >
+                        Edit
+                      </button>
+                    </td>
+                  )}
               </tr>
             );
           })}

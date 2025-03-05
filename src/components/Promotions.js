@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { getPromotions, deletePromotion } from "../services/promotionService";
 import AddPromotion from "./AddPromotion";
 import FilterPromotion from "./FilterPromotion"; // Import FilterPromotion
+import PromotionColumnSelector from "./PromotionColumnSelector";
 import "./Promotions.css";
 import Swal from "sweetalert2";
 
@@ -10,6 +11,14 @@ const Promotions = () => {
   const [searchTerm, setSearchTerm] = useState(""); // State สำหรับเก็บคำค้นหา
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false); // State for filter modal
+  const [isColumnSelectorOpen, setIsColumnSelectorOpen] = useState(false);
+  const [visibleColumns, setVisibleColumns] = useState([
+    "name",
+    "discount",
+    "startDateTime",
+    "endDateTime",
+    "actions",
+  ]);
   const [currentPage, setCurrentPage] = useState(1);
   const [promotionsPerPage, setPromotionsPerPage] = useState(10);
   const [promotionsPerPageOptions, setPromotionsPerPageOptions] = useState([
@@ -91,6 +100,14 @@ const Promotions = () => {
     setEndDateTimeTo(endDateTimeTo);
   };
 
+  const handleColumnToggle = (columnKey) => {
+    setVisibleColumns((prev) =>
+      prev.includes(columnKey)
+        ? prev.filter((key) => key !== columnKey)
+        : [...prev, columnKey]
+    );
+  };
+
   // ฟังก์ชัน Submit ค่าจาก Custom Input
   const handleCustomSubmit = () => {
     const customValue = parseInt(customInputValue, 10);
@@ -137,6 +154,14 @@ const Promotions = () => {
     currentPage * promotionsPerPage
   );
 
+  const columns = [
+    { key: "name", label: "Name" },
+    { key: "discount", label: "Discount (%)" },
+    { key: "startDateTime", label: "Start Date & Time" },
+    { key: "endDateTime", label: "End Date & Time" },
+    { key: "actions", label: "Actions" },
+  ];
+
   return (
     <div className="promotions-container-p">
       <h2>Promotions</h2>
@@ -151,14 +176,7 @@ const Promotions = () => {
           className="search-input"
         />
         <div className="button-group">
-          {/* ปุ่ม Filter แสดงสำหรับทุก role */}
-          <button
-            onClick={() => setIsFilterModalOpen(true)}
-            className="filter-button"
-          >
-            Filter
-          </button>
-          {/* ปุ่ม Add Promotion แสดงเฉพาะ non-Employee */}
+          {/* ปรับลำดับปุ่ม */}
           {userRole !== "Employee" && (
             <button
               onClick={() => setIsModalOpen(true)}
@@ -167,6 +185,18 @@ const Promotions = () => {
               Add Promotion
             </button>
           )}
+          <button
+            onClick={() => setIsFilterModalOpen(true)}
+            className="filter-button"
+          >
+            Filter
+          </button>
+          <button
+            onClick={() => setIsColumnSelectorOpen(true)}
+            className="columns-button"
+          >
+            Columns
+          </button>
         </div>
       </div>
 
@@ -189,6 +219,15 @@ const Promotions = () => {
           onFilterChange={handleFilterChange}
           isOpen={isFilterModalOpen}
           closeModal={() => setIsFilterModalOpen(false)}
+        />
+      )}
+
+      {isColumnSelectorOpen && (
+        <PromotionColumnSelector
+          columns={columns}
+          visibleColumns={visibleColumns}
+          onColumnToggle={handleColumnToggle}
+          onClose={() => setIsColumnSelectorOpen(false)}
         />
       )}
 
@@ -272,34 +311,43 @@ const Promotions = () => {
       <table className="promotion-table">
         <thead>
           <tr>
-            <th>Name</th>
-            <th>Discount (%)</th>
-            <th>Start Date & Time</th>
-            <th>End Date & Time</th>
-            {userRole !== "Employee" && <th>Actions</th>}
+            {columns
+              .filter((col) => visibleColumns.includes(col.key))
+              .map((col) =>
+                col.key === "actions" && userRole === "Employee" ? null : (
+                  <th key={col.key}>{col.label}</th>
+                )
+              )}
           </tr>
         </thead>
         <tbody>
           {displayedPromotions.map((promo) => (
             <tr key={promo.id}>
-              <td>{promo.name}</td>
-              <td>{promo.discount}%</td>
-              <td>
-                {promo.startDate} {promo.startTime}
-              </td>
-              <td>
-                {promo.endDate} {promo.endTime}
-              </td>
-              {userRole !== "Employee" && (
+              {visibleColumns.includes("name") && <td>{promo.name}</td>}
+              {visibleColumns.includes("discount") && (
+                <td>{promo.discount}%</td>
+              )}
+              {visibleColumns.includes("startDateTime") && (
                 <td>
-                  <button
-                    onClick={() => handleDeletePromotion(promo.id)}
-                    className="delete-promotion-btn"
-                  >
-                    Delete
-                  </button>
+                  {promo.startDate} {promo.startTime}
                 </td>
               )}
+              {visibleColumns.includes("endDateTime") && (
+                <td>
+                  {promo.endDate} {promo.endTime}
+                </td>
+              )}
+              {visibleColumns.includes("actions") &&
+                userRole !== "Employee" && (
+                  <td>
+                    <button
+                      onClick={() => handleDeletePromotion(promo.id)}
+                      className="delete-promotion-btn"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                )}
             </tr>
           ))}
         </tbody>
