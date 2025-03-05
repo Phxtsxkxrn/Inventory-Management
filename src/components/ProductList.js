@@ -420,20 +420,23 @@ const ProductList = ({
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
-        {/* ซ่อนปุ่ม Add Product และ Import Products ถ้าเป็น Employee */}
-        {userRole !== "Employee" && (
-          <div className="button-group">
-            <button className="add-button" onClick={openAddModal}>
-              Add Product
-            </button>
-            <button className="import-button" onClick={openImportModal}>
-              Import Products
-            </button>
-            <button className="filter-button" onClick={openFilterModal}>
-              Filter
-            </button>
-          </div>
-        )}
+        <div className="button-group">
+          {/* ปุ่ม Filter แสดงสำหรับทุก role */}
+          <button className="filter-button" onClick={openFilterModal}>
+            Filter
+          </button>
+          {/* ปุ่มอื่นๆ แสดงเฉพาะ non-Employee */}
+          {userRole !== "Employee" && (
+            <>
+              <button className="add-button" onClick={openAddModal}>
+                Add Product
+              </button>
+              <button className="import-button" onClick={openImportModal}>
+                Import Products
+              </button>
+            </>
+          )}
+        </div>
       </div>
 
       {/* เพิ่ม Filter Component */}

@@ -150,22 +150,24 @@ const Promotions = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
           className="search-input"
         />
-        {userRole !== "Employee" && (
-          <div className="button-group">
+        <div className="button-group">
+          {/* ปุ่ม Filter แสดงสำหรับทุก role */}
+          <button
+            onClick={() => setIsFilterModalOpen(true)}
+            className="filter-button"
+          >
+            Filter
+          </button>
+          {/* ปุ่ม Add Promotion แสดงเฉพาะ non-Employee */}
+          {userRole !== "Employee" && (
             <button
               onClick={() => setIsModalOpen(true)}
               className="add-promotion-btn"
             >
               Add Promotion
             </button>
-            <button
-              onClick={() => setIsFilterModalOpen(true)}
-              className="filter-button"
-            >
-              Filter
-            </button>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       {/* Modal for Adding Promotion */}
