@@ -121,28 +121,70 @@ const AddProduct = ({ onAdd, onClose }) => {
       <div className="modal-content">
         <h3 className="modal-title">Add Product</h3>
         <form onSubmit={handleSubmit}>
-          {/* ✅ ใช้ Grid Layout แบ่งฟอร์มซ้าย-ขวา */}
           <div className="form-grid">
-            {[
-              { name: "Image", type: "text", label: "Image URL" },
-              { name: "SKU", type: "text", label: "SKU" },
-              { name: "Brand", type: "text", label: "Brand" },
-              { name: "Name", type: "text", label: "Name" },
-              { name: "Seller", type: "text", label: "Seller" },
-            ].map((input) => (
-              <div className="product-input-group" key={input.name}>
-                <label className="product-label">{input.label}:</label>
-                <input
-                  className="product-input"
-                  type={input.type}
-                  name={input.name}
-                  value={form[input.name]}
-                  onChange={handleChange}
-                  placeholder="Enter details..."
-                  required={input.name !== "Image"}
-                />
-              </div>
-            ))}
+            {/* ส่วนแรก: Image URL เต็มแถว */}
+            <div className="product-input-group full-width">
+              <label className="product-label">Image URL:</label>
+              <input
+                className="product-input"
+                type="text"
+                name="Image"
+                value={form.Image}
+                onChange={handleChange}
+                placeholder="Enter image URL..."
+              />
+            </div>
+
+            {/* ส่วนที่สอง: ข้อมูลพื้นฐาน */}
+            <div className="product-input-group">
+              <label className="product-label">SKU:</label>
+              <input
+                className="product-input"
+                type="text"
+                name="SKU"
+                value={form.SKU}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <div className="product-input-group">
+              <label className="product-label">Brand:</label>
+              <input
+                className="product-input"
+                type="text"
+                name="Brand"
+                value={form.Brand}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <div className="product-input-group">
+              <label className="product-label">Name:</label>
+              <input
+                className="product-input"
+                type="text"
+                name="Name"
+                value={form.Name}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <div className="product-input-group">
+              <label className="product-label">Seller:</label>
+              <input
+                className="product-input"
+                type="text"
+                name="Seller"
+                value={form.Seller}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            {/* ส่วนที่สาม: ราคาและหมวดหมู่ */}
             <div className="product-input-group">
               <label className="product-label">Normal Price:</label>
               <input
@@ -155,6 +197,7 @@ const AddProduct = ({ onAdd, onClose }) => {
                 required
               />
             </div>
+
             <div className="product-input-group">
               <label className="product-label">Categories:</label>
               <select
@@ -174,6 +217,7 @@ const AddProduct = ({ onAdd, onClose }) => {
                 ))}
               </select>
             </div>
+
             <div className="product-input-group">
               <label className="product-label">Discount (%):</label>
               <input
@@ -185,6 +229,7 @@ const AddProduct = ({ onAdd, onClose }) => {
                 placeholder="0%"
               />
             </div>
+
             <div className="product-input-group">
               <label className="product-label">Status:</label>
               <select
@@ -197,6 +242,8 @@ const AddProduct = ({ onAdd, onClose }) => {
                 <option value="inactive">Inactive</option>
               </select>
             </div>
+
+            {/* ส่วนที่สี่: Final Price */}
             <div className="product-input-group">
               <label className="product-label">Final Price:</label>
               <p className="final-price">
@@ -204,7 +251,8 @@ const AddProduct = ({ onAdd, onClose }) => {
               </p>
             </div>
           </div>
-          {/* ✅ ปุ่ม Add Product และ Cancel */}
+
+          {/* ปุ่มด้านล่าง */}
           <div className="button-group">
             <button type="submit" className="modal-button add">
               Add Product

@@ -130,30 +130,70 @@ const EditProduct = ({ product, onSave, onDelete, onClose, categories }) => {
       <div className="modal-content">
         <h3 className="modal-title">Edit Product</h3>
         <form onSubmit={handleSubmit}>
-          {/* ✅ ใช้ Grid Layout */}
           <div className="edit-form-grid">
-            {[
-              { name: "Image", type: "text", label: "Image URL" },
-              { name: "SKU", type: "text", label: "SKU" },
-              { name: "Brand", type: "text", label: "Brand" },
-              { name: "Name", type: "text", label: "Name" },
-              { name: "Seller", type: "text", label: "Seller" },
-            ].map((input) => (
-              <div className="edit-input-group" key={input.name}>
-                <label className="edit-label">{input.label}:</label>
-                <input
-                  className="edit-input"
-                  type={input.type}
-                  name={input.name}
-                  value={form[input.name]}
-                  onChange={handleChange}
-                  placeholder="Enter details..."
-                  required={input.name !== "Image"}
-                />
-              </div>
-            ))}
+            {/* ส่วนแรก: Image URL เต็มแถว */}
+            <div className="edit-input-group full-width">
+              <label className="edit-label">Image URL:</label>
+              <input
+                className="edit-input"
+                type="text"
+                name="Image"
+                value={form.Image}
+                onChange={handleChange}
+                placeholder="Enter image URL..."
+              />
+            </div>
 
-            {/* Normal Price */}
+            {/* ส่วนที่สอง: ข้อมูลพื้นฐาน */}
+            <div className="edit-input-group">
+              <label className="edit-label">SKU:</label>
+              <input
+                className="edit-input"
+                type="text"
+                name="SKU"
+                value={form.SKU}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <div className="edit-input-group">
+              <label className="edit-label">Brand:</label>
+              <input
+                className="edit-input"
+                type="text"
+                name="Brand"
+                value={form.Brand}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <div className="edit-input-group">
+              <label className="edit-label">Name:</label>
+              <input
+                className="edit-input"
+                type="text"
+                name="Name"
+                value={form.Name}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <div className="edit-input-group">
+              <label className="edit-label">Seller:</label>
+              <input
+                className="edit-input"
+                type="text"
+                name="Seller"
+                value={form.Seller}
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            {/* ส่วนที่สาม: ราคาและหมวดหมู่ */}
             <div className="edit-input-group">
               <label className="edit-label">Normal Price:</label>
               <input
@@ -167,7 +207,6 @@ const EditProduct = ({ product, onSave, onDelete, onClose, categories }) => {
               />
             </div>
 
-            {/* Dropdown Categories */}
             <div className="edit-input-group">
               <label className="edit-label">Categories:</label>
               <select
@@ -178,7 +217,7 @@ const EditProduct = ({ product, onSave, onDelete, onClose, categories }) => {
                 required
               >
                 <option value="" disabled>
-                  Select Categories
+                  Select Category
                 </option>
                 {categories.map((category) => (
                   <option key={category.id} value={category.Name}>
@@ -188,7 +227,6 @@ const EditProduct = ({ product, onSave, onDelete, onClose, categories }) => {
               </select>
             </div>
 
-            {/* Discount */}
             <div className="edit-input-group">
               <label className="edit-label">Discount (%):</label>
               <input
@@ -201,7 +239,6 @@ const EditProduct = ({ product, onSave, onDelete, onClose, categories }) => {
               />
             </div>
 
-            {/* Status */}
             <div className="edit-input-group">
               <label className="edit-label">Status:</label>
               <select
@@ -215,22 +252,22 @@ const EditProduct = ({ product, onSave, onDelete, onClose, categories }) => {
               </select>
             </div>
 
-            {/* Final Price */}
+            {/* ส่วนที่สี่: Final Price */}
             <div className="edit-input-group">
               <label className="edit-label">Final Price:</label>
               <p className="final-price">฿{calculateFinalPrice().toFixed(2)}</p>
             </div>
           </div>
 
-          {/* ✅ ปุ่ม Save, Delete, Cancel */}
+          {/* ปุ่มด้านล่าง */}
           <div className="edit-button-group">
             <button type="submit" className="edit-button edit-button-save">
-              Save Changes
+              Save
             </button>
             <button
               type="button"
               className="edit-button edit-button-delete"
-              onClick={handleDelete} // ✅ เรียกใช้ฟังก์ชัน handleDelete()
+              onClick={handleDelete}
             >
               Delete
             </button>
