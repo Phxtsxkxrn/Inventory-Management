@@ -28,7 +28,6 @@ const UserList = () => {
   const [createdAtTo, setCreatedAtTo] = useState(""); // เพิ่ม state สำหรับ filter
   const [lastUpdateFrom, setLastUpdateFrom] = useState(""); // เพิ่ม state
   const [lastUpdateTo, setLastUpdateTo] = useState(""); // เพิ่ม state
-  const [selectedRole, setSelectedRole] = useState(""); // เพิ่ม state สำหรับ filter role
 
   // ✅ ดึงข้อมูล Users จาก Firestore
   useEffect(() => {
@@ -101,13 +100,11 @@ const UserList = () => {
     createdAtTo,
     lastUpdateFrom,
     lastUpdateTo,
-    role,
   }) => {
     setCreatedAtFrom(createdAtFrom);
     setCreatedAtTo(createdAtTo);
     setLastUpdateFrom(lastUpdateFrom);
     setLastUpdateTo(lastUpdateTo);
-    setSelectedRole(role);
   };
 
   // อัปเดต filteredUsers เพื่อรวมการกรองตามวันที่สร้าง
@@ -136,14 +133,7 @@ const UserList = () => {
       (!lastUpdateTo ||
         (lastUpdateDate && lastUpdateDate <= new Date(lastUpdateTo)));
 
-    const matchesRole = !selectedRole || user.role === selectedRole;
-
-    return (
-      matchesSearch &&
-      isInCreatedDateRange &&
-      isInLastUpdateRange &&
-      matchesRole
-    );
+    return matchesSearch && isInCreatedDateRange && isInLastUpdateRange;
   });
 
   // ✅ คำนวณ Pagination
@@ -400,22 +390,12 @@ const UserList = () => {
         </tbody>
       </table>
 
-      {/* ✅ แสดง Register Form เป็น Modal */}
+      {/* ✅ แสดง Register Form */}
       {showAddUser && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <button
-              className="close-modal"
-              onClick={() => setShowAddUser(false)}
-            >
-              ×
-            </button>
-            <Register
-              onUserAdded={handleUserAdded}
-              onClose={() => setShowAddUser(false)}
-            />
-          </div>
-        </div>
+        <Register
+          onUserAdded={handleUserAdded}
+          onClose={() => setShowAddUser(false)}
+        />
       )}
     </div>
   );

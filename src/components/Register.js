@@ -51,16 +51,11 @@ const Register = ({ onUserAdded, onClose }) => {
   };
 
   return (
-    <div className="register-modal" onClick={onClose}>
-      <div
-        className="register-modal-content"
-        onClick={(e) => e.stopPropagation()} // ป้องกัน Modal ปิดเมื่อคลิกข้างใน
-      >
+    <div className="register-modal">
+      <div className="register-modal-content">
         <h3 className="register-title">Register</h3>
-        {error && <p className="register-error">{error}</p>}{" "}
-        {/* แสดงข้อผิดพลาด */}
+        {error && <p className="register-error">{error}</p>}
         <form className="register-form" onSubmit={handleRegister}>
-          {/* First Name */}
           <div className="register-input-group">
             <label className="register-label">First Name:</label>
             <input
@@ -72,7 +67,6 @@ const Register = ({ onUserAdded, onClose }) => {
             />
           </div>
 
-          {/* Last Name */}
           <div className="register-input-group">
             <label className="register-label">Last Name:</label>
             <input
@@ -84,7 +78,6 @@ const Register = ({ onUserAdded, onClose }) => {
             />
           </div>
 
-          {/* Email */}
           <div className="register-input-group">
             <label className="register-label">Email:</label>
             <input
@@ -96,7 +89,6 @@ const Register = ({ onUserAdded, onClose }) => {
             />
           </div>
 
-          {/* Password */}
           <div className="register-input-group">
             <label className="register-label">Password:</label>
             <input
@@ -108,11 +100,9 @@ const Register = ({ onUserAdded, onClose }) => {
             />
           </div>
 
-          {/* Role Selection */}
           <div className="register-select-group">
             <label className="register-label">Role:</label>
             <select
-              name="role"
               value={role}
               onChange={(e) => setRole(e.target.value)}
               className="register-select"
@@ -123,17 +113,16 @@ const Register = ({ onUserAdded, onClose }) => {
             </select>
           </div>
 
-          {/* ปุ่ม Register และ Close */}
           <div className="register-button-group">
-            <button type="submit" className="register-button save">
+            <button type="submit" className="register-button register-submit">
               Register
             </button>
             <button
               type="button"
-              className="register-button cancel"
+              className="register-button register-close"
               onClick={onClose}
             >
-              Close
+              Cancel
             </button>
           </div>
         </form>
