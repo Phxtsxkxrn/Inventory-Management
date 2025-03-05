@@ -53,6 +53,7 @@
   width: 100%;
   max-width: 225px; /* ✅ ปรับขนาดเฉพาะ dropdown */
   cursor: pointer;
+  background-color: white; /* เพิ่มสีพื้นหลังให้เหมือนกัน */
 }
 
 .product-label {
@@ -64,14 +65,15 @@
   display: block; /* ✅ ให้ Label แยกบรรทัดจาก Input */
 }
 
-.product-input {
-  width: 100%; /* ✅ ขยายเต็ม container */
+.product-input,
+.product-input-group select {
+  width: 100%;
+  height: 38px; /* กำหนดความสูงให้เท่ากัน */
   padding: 8px;
   font-size: 14px;
   border: 1px solid #ccc;
   border-radius: 4px;
   box-sizing: border-box;
-  transition: border-color 0.3s ease;
 }
 
 .product-input:focus {
