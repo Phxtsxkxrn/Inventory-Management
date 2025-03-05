@@ -73,20 +73,3 @@
   background-color: #dc3545;
   color: white;
 }
-
-.role-select {
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 14px;
-  width: 100%;
-  box-sizing: border-box;
-  margin-top: 5px;
-  background-color: white;
-}
-
-.role-select:focus {
-  border-color: #007bff;
-  outline: none;
-  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
-}

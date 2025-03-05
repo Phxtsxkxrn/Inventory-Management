@@ -1,119 +1,130 @@
-.modal-content {
-  background-color: white;
-  padding: 20px;
-  border-radius: 10px;
-  width: 420px; /* กำหนดขนาด popup */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  text-align: center;
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
-  flex-direction: column;
+  justify-content: center;
   align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  width: 320px;
+  text-align: center;
 }
 
 .upload-area {
-  border: 2px dashed #cccccc;
-  border-radius: 8px;
-  padding: 30px;
-  width: 90%; /* กำหนดขนาด upload-area ไม่เกินขอบ popup */
-  max-width: 380px; /* เพิ่ม max-width เพื่อความสมดุล */
-  text-align: center;
-  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 20px;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 15px 0;
+  background-color: white;
   cursor: pointer;
-  margin-bottom: 20px;
-  position: relative;
-  box-sizing: border-box; /* รวม padding ในขนาดองค์ประกอบ */
+  transition: all 0.3s ease;
 }
 
 .upload-area.dragging {
-  background-color: #e8f4ff;
   border-color: #007bff;
+  background-color: rgba(0, 123, 255, 0.1);
 }
 
 .upload-area:hover {
-  background-color: #f0f0f0;
+  border-color: #007bff;
 }
 
 .upload-area i {
-  font-size: 30px; /* ขนาดไอคอน */
   color: #007bff;
   margin-bottom: 10px;
 }
 
 .upload-area p {
-  margin: 0;
-  font-size: 16px; /* ขนาดข้อความ */
-  color: #333333;
+  margin: 10px 0;
+  font-size: 14px;
+  color: #333;
 }
 
-.upload-area p .file-link {
+.upload-area .file-link {
   color: #007bff;
-  text-decoration: underline;
-  cursor: pointer;
-}
-
-.upload-area p .file-link:hover {
   text-decoration: none;
 }
 
 .upload-area small {
-  display: block;
-  color: #666666;
-  margin-top: 5px;
+  color: #666;
   font-size: 12px;
 }
 
 .upload-status {
-  margin-top: 20px;
+  margin-top: 15px;
   text-align: left;
-  width: 100%;
-}
-
-.upload-status p {
   font-size: 14px;
-  margin: 5px 0;
 }
 
 .progress-bar {
   background-color: #f3f3f3;
-  border-radius: 5px;
+  border-radius: 4px;
   overflow: hidden;
-  width: 100%;
-  height: 10px;
-  margin-top: 10px;
+  height: 8px;
+  margin: 10px 0;
 }
 
 .progress {
-  background-color: #4caf50;
+  background-color: #007bff;
   height: 100%;
-  transition: width 0.3s;
+  transition: width 0.3s ease;
 }
 
 .button-group {
   display: flex;
-  gap: 15px; /* เพิ่มระยะห่างระหว่างปุ่ม */
   justify-content: center;
+  gap: 10px;
   margin-top: 20px;
 }
 
 .modal-button {
-  padding: 10px 25px; /* เพิ่มขนาดปุ่มให้เด่นขึ้น */
+  padding: 10px 20px;
   border: none;
-  border-radius: 5px;
+  border-radius: 4px;
   cursor: pointer;
+  flex: 1;
   font-size: 14px;
+  transition: none; /* ลบ transition effect */
 }
 
 .modal-button.upload {
-  background-color: #4caf50;
+  background-color: #007bff;
   color: white;
 }
 
 .modal-button.cancel {
-  background-color: #f44336;
+  background-color: #dc3545;
   color: white;
 }
 
-/* ✅ SweetAlert2 อยู่ด้านหน้า */
+.modal-button.import-cancel {
+  background-color: #dc3545;
+  color: white;
+}
+
+/* ลบ hover effect ถ้ามี */
+.modal-button:hover {
+  transform: none;
+}
+
+.error {
+  color: #dc3545;
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+/* SweetAlert2 z-index */
 .swal2-container {
-  z-index: 100000 !important; /* ✅ z-index สูงสุด */
+  z-index: 1100;
 }

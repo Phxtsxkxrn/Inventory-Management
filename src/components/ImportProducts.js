@@ -252,7 +252,7 @@ const ImportProducts = ({ onImport, onClose }) => {
           <button onClick={handleUpload} className="modal-button upload">
             Upload
           </button>
-          <button onClick={onClose} className="modal-button cancel">
+          <button onClick={onClose} className="modal-button import-cancel">
             Cancel
           </button>
         </div>
