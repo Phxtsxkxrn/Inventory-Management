@@ -19,34 +19,44 @@
 .promotion-form {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 0; /* ❌ ลบ Padding ภายใน */
-  background: none; /* ❌ ลบพื้นหลัง */
-  box-shadow: none; /* ❌ ลบเงา */
-  border: none; /* ❌ ลบขอบ */
-  max-width: 100%; /* ✅ ให้ฟอร์มกว้างเต็มที่ */
+  gap: 15px;
+  width: 100%;
 }
 
 /* ช่องป้อนข้อมูล */
-.promotion-form input {
-  width: 380px;
-  padding: 10px;
+.promotion-form input,
+.datetime-group input {
+  width: 100%;
+  height: 38px;
+  padding: 8px;
   border: 1px solid #ccc;
-  border-radius: 5px;
+  border-radius: 4px;
   font-size: 14px;
-  transition: all 0.3s ease;
+  box-sizing: border-box;
 }
 
-.promotion-form input:focus {
+.promotion-form input:focus,
+.datetime-group input:focus {
   border-color: #007bff;
   outline: none;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+.promotion-form label {
+  font-size: 14px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 5px;
+  text-align: left;
+  display: block;
 }
 
 /* กลุ่มวันและเวลา */
 .datetime-group {
-  display: flex;
-  gap: 10px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  width: 100%;
 }
 
 /* ✅ จัดปุ่ม Add Promotion & Cancel ให้อยู่ข้างกัน */
@@ -61,31 +71,36 @@
 /* ✅ ปรับดีไซน์ปุ่ม Add Promotion */
 .promotion-modal-btn {
   flex: 1;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: bold;
-  padding: 12px;
+  padding: 10px 20px;
   border: none;
-  border-radius: 6px;
+  border-radius: 4px;
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: none;
 }
 
 /* ✅ ปุ่ม Add */
 .promotion-modal-btn.add {
-  background: #007bff;
+  background-color: #007bff;
   color: white;
 }
 
 .promotion-modal-btn.add:hover {
-  background: #0056b3;
+  background-color: #007bff;
 }
 
 /* ✅ ปุ่ม Cancel */
 .promotion-modal-btn.cancel {
-  background: #6c757d;
+  background-color: #dc3545;
   color: white;
 }
 
 .promotion-modal-btn.cancel:hover {
-  background: #5a6268;
+  background-color: #dc3545;
+}
+
+/* ลบ hover effects */
+.promotion-modal-btn:hover {
+  transform: none;
 }
