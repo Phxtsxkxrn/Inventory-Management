@@ -30,6 +30,7 @@
   flex-direction: column;
   align-items: flex-start;
   font-size: 14px;
+  font-weight: bold; /* เพิ่ม font-weight */
   color: #333;
 }
 
@@ -62,6 +63,8 @@
   border-radius: 4px;
   cursor: pointer;
   flex: 1;
+  font-size: 14px;
+  font-weight: bold; /* เพิ่ม font-weight */
 }
 
 .filter-modal-button.filter {
