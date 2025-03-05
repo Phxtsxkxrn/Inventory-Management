@@ -124,15 +124,63 @@
   overflow: hidden;
 }
 
+/* Table Header Style Enhancement */
+.product-table thead {
+  background-color: #f8f9fa;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
 .product-table th {
-  background-color: #f9f9f9;
+  white-space: nowrap;
+  font-weight: 600;
+  font-size: 13px;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  letter-spacing: 0.3px;
+  color: #1a365d;
+  padding: 16px 12px;
   text-align: center;
-  padding: 12px;
-  font-size: 14px;
-  font-weight: bold;
-  color: #333;
-  text-transform: uppercase;
   border-bottom: 2px solid #e5e7eb;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  text-transform: none;
+  background: linear-gradient(to bottom, #ffffff, #f8f9fa);
+}
+
+.product-table th.sortable {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  padding-right: 25px;
+}
+
+.product-table th.sortable:hover {
+  background: linear-gradient(to bottom, #f8f9fa, #e9ecef);
+  color: #2563eb;
+}
+
+/* Sort Icons Enhancement */
+.sort-icon {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-block;
+  font-size: 14px;
+  color: #6b7280;
+  opacity: 0.6;
+  transition: all 0.2s ease;
+}
+
+.sortable:hover .sort-icon {
+  opacity: 1;
+  color: #2563eb;
+}
+
+/* Active Sort Header */
+.product-table th.sortable[data-active="true"] {
+  color: #2563eb;
+  background: linear-gradient(to bottom, #eff6ff, #dbeafe);
 }
 
 .product-table td {

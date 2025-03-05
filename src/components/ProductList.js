@@ -45,6 +45,10 @@ const ProductList = ({
   const [lastUpdateStart, setLastUpdateStart] = useState("");
   const [lastUpdateEnd, setLastUpdateEnd] = useState("");
   const [status, setStatus] = useState("");
+  const [sortConfig, setSortConfig] = useState({
+    key: null,
+    direction: "asc",
+  });
   console.log("Current User Role:", userRole);
 
   const handleStatusChange = async (productId, newStatus) => {
@@ -215,9 +219,88 @@ const ProductList = ({
       );
     });
 
-  const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
+  const onSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
+    setSortConfig({ key, direction });
+  };
 
-  const displayedProducts = filteredProducts.slice(
+  const SortIcon = ({ column }) => {
+    if (sortConfig.key !== column) {
+      return <span className="sort-icon">⇅</span>;
+    }
+    return sortConfig.direction === "asc" ? (
+      <span className="sort-icon">↑</span>
+    ) : (
+      <span className="sort-icon">↓</span>
+    );
+  };
+
+  const sortedProducts = React.useMemo(() => {
+    let sortableProducts = filteredProducts.map((product) => {
+      // Calculate finalPrice for each product
+      const discountPercentage = product.AppliedPromotion
+        ? product.AppliedPromotion.discount
+        : product.Discount || 0;
+
+      const finalPrice =
+        product.NormalPrice && discountPercentage
+          ? product.NormalPrice -
+            (product.NormalPrice * discountPercentage) / 100
+          : product.NormalPrice || 0;
+
+      return {
+        ...product,
+        finalPrice: finalPrice,
+        // Convert price strings to numbers for sorting
+        NormalPrice: parseFloat(product.NormalPrice) || 0,
+        Discount: parseFloat(product.Discount) || 0,
+      };
+    });
+
+    if (sortConfig.key) {
+      sortableProducts.sort((a, b) => {
+        let aValue = a[sortConfig.key];
+        let bValue = b[sortConfig.key];
+
+        // Handle numeric sorting
+        if (
+          ["NormalPrice", "Discount", "finalPrice"].includes(sortConfig.key)
+        ) {
+          aValue = parseFloat(aValue) || 0;
+          bValue = parseFloat(bValue) || 0;
+        }
+        // Handle date sorting
+        else if (
+          sortConfig.key === "CreatedAt" ||
+          sortConfig.key === "LastUpdate"
+        ) {
+          aValue = new Date(aValue || 0).getTime();
+          bValue = new Date(bValue || 0).getTime();
+        }
+        // Handle string sorting
+        else {
+          aValue = String(aValue || "").toLowerCase();
+          bValue = String(bValue || "").toLowerCase();
+        }
+
+        if (aValue < bValue) {
+          return sortConfig.direction === "asc" ? -1 : 1;
+        }
+        if (aValue > bValue) {
+          return sortConfig.direction === "asc" ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+    return sortableProducts;
+  }, [filteredProducts, sortConfig]);
+
+  const totalPages = Math.ceil(sortedProducts.length / productsPerPage);
+
+  const displayedProducts = sortedProducts.slice(
     (currentPage - 1) * productsPerPage,
     currentPage * productsPerPage
   );
@@ -363,8 +446,8 @@ const ProductList = ({
       <div className="pagination-and-records">
         {/* Records Found */}
         <div className="records-found">
-          {filteredProducts.length}{" "}
-          {filteredProducts.length === 1 ? "record" : "records"} found
+          {sortedProducts.length}{" "}
+          {sortedProducts.length === 1 ? "record" : "records"} found
           {selectedProducts.length > 0 && (
             <span>
               {" "}
@@ -486,18 +569,90 @@ const ProductList = ({
                 }
               />
             </th>
-            <th>Image</th>
-            <th>SKU</th>
-            <th>Brand</th>
-            <th>Name</th>
-            <th>Categories</th>
-            <th>Seller</th>
-            <th>Normal Price</th>
-            <th>Discount (%)</th> {/* เพิ่มคอลัมน์ Discount */}
-            <th>Final Price</th> {/* เพิ่มคอลัมน์ Final Price */}
-            <th>Status</th>
-            <th>Created At</th>
-            <th>Last Update</th>
+            <th
+              onClick={() => onSort("Image")}
+              className="sortable"
+              data-active={sortConfig.key === "Image"}
+            >
+              Image <SortIcon column="Image" />
+            </th>
+            <th
+              onClick={() => onSort("SKU")}
+              className="sortable"
+              data-active={sortConfig.key === "SKU"}
+            >
+              SKU <SortIcon column="SKU" />
+            </th>
+            <th
+              onClick={() => onSort("Brand")}
+              className="sortable"
+              data-active={sortConfig.key === "Brand"}
+            >
+              Brand <SortIcon column="Brand" />
+            </th>
+            <th
+              onClick={() => onSort("Name")}
+              className="sortable"
+              data-active={sortConfig.key === "Name"}
+            >
+              Name <SortIcon column="Name" />
+            </th>
+            <th
+              onClick={() => onSort("Categories")}
+              className="sortable"
+              data-active={sortConfig.key === "Categories"}
+            >
+              Categories <SortIcon column="Categories" />
+            </th>
+            <th
+              onClick={() => onSort("Seller")}
+              className="sortable"
+              data-active={sortConfig.key === "Seller"}
+            >
+              Seller <SortIcon column="Seller" />
+            </th>
+            <th
+              onClick={() => onSort("NormalPrice")}
+              className="sortable"
+              data-active={sortConfig.key === "NormalPrice"}
+            >
+              Normal Price <SortIcon column="NormalPrice" />
+            </th>
+            <th
+              onClick={() => onSort("Discount")}
+              className="sortable"
+              data-active={sortConfig.key === "Discount"}
+            >
+              Discount (%) <SortIcon column="Discount" />
+            </th>
+            <th
+              onClick={() => onSort("finalPrice")}
+              className="sortable"
+              data-active={sortConfig.key === "finalPrice"}
+            >
+              Final Price <SortIcon column="finalPrice" />
+            </th>
+            <th
+              onClick={() => onSort("Status")}
+              className="sortable"
+              data-active={sortConfig.key === "Status"}
+            >
+              Status <SortIcon column="Status" />
+            </th>
+            <th
+              onClick={() => onSort("CreatedAt")}
+              className="sortable"
+              data-active={sortConfig.key === "CreatedAt"}
+            >
+              Created At <SortIcon column="CreatedAt" />
+            </th>
+            <th
+              onClick={() => onSort("LastUpdate")}
+              className="sortable"
+              data-active={sortConfig.key === "LastUpdate"}
+            >
+              Last Update <SortIcon column="LastUpdate" />
+            </th>
             {userRole !== "Employee" && <th>Actions</th>}
           </tr>
         </thead>
@@ -638,7 +793,7 @@ const ProductList = ({
           }`}
         >
           <span className="selected-info">
-            {selectedProducts.length} of {filteredProducts.length} Selected
+            {selectedProducts.length} of {sortedProducts.length} Selected
           </span>
           <div className="divider"></div>
           <button
