@@ -282,13 +282,3 @@
     grid-template-columns: 1fr;
   }
 }
-
-@media (max-width: 480px) {
-  .summary-cards {
-    grid-template-columns: 1fr;
-  }
-
-  .dashboard h2 {
-    font-size: 1.5rem;
-  }
-}

@@ -134,15 +134,3 @@
     opacity: 1;
   }
 }
-
-/* Responsive Design */
-@media (max-width: 640px) {
-  .column-selector-content {
-    min-width: 90%;
-    margin: 20px;
-  }
-
-  .column-list {
-    grid-template-columns: 1fr;
-  }
-}
