@@ -67,6 +67,7 @@ const ProductList = ({
     "LastUpdate",
     "actions",
   ]);
+  const [isLoading, setIsLoading] = useState(false);
   console.log("Current User Role:", userRole);
 
   const columns = [
@@ -602,13 +603,26 @@ const ProductList = ({
       )}
       {isImportModalOpen && (
         <ImportProducts
-          onImport={(parsedData) => {
-            onImport(parsedData);
-            closeImportModal();
+          onImport={async (parsedData) => {
+            setIsLoading(true);
+            try {
+              await onImport(parsedData);
+            } finally {
+              setIsLoading(false);
+              closeImportModal();
+            }
           }}
           onClose={closeImportModal}
         />
       )}
+
+      {isLoading && (
+        <div className="loading-overlay">
+          <div className="loading-spinner"></div>
+          <p>Loading products...</p>
+        </div>
+      )}
+
       <table className="product-table">
         <thead>
           <tr>

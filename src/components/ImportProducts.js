@@ -89,37 +89,48 @@ const ImportProducts = ({ onImport, onClose }) => {
   };
 
   const processCSV = (file) => {
+    setUploadStatus("Processing file...");
     const reader = new FileReader();
-    reader.onload = (event) => {
+    reader.onload = async (event) => {
       const csvData = event.target.result;
       Papa.parse(csvData, {
         header: true,
         skipEmptyLines: true,
-        complete: function (results) {
-          const parsedData = results.data.map((item) => {
-            const normalPrice = parseCurrency(item.NormalPrice);
-            const discount = parseFloat(item.Discount) || 0;
-            const finalPrice = normalPrice - (normalPrice * discount) / 100;
+        complete: async function (results) {
+          try {
+            setUploadStatus("Importing products...");
+            const parsedData = results.data.map((item) => {
+              const normalPrice = parseCurrency(item.NormalPrice);
+              const discount = parseFloat(item.Discount) || 0;
+              const finalPrice = normalPrice - (normalPrice * discount) / 100;
 
-            return {
-              ...item,
-              NormalPrice: normalPrice,
-              Discount: discount,
-              FinalPrice: finalPrice,
-              Image: item.Image?.trim() || "",
-            };
-          });
+              return {
+                ...item,
+                NormalPrice: normalPrice,
+                Discount: discount,
+                FinalPrice: finalPrice,
+                Image: item.Image?.trim() || "",
+              };
+            });
 
-          onImport(parsedData);
-          setUploadStatus("Upload Complete");
+            await onImport(parsedData);
+            setUploadStatus("Import complete!");
 
-          // ✅ แจ้งเตือนเมื่ออัปโหลดสำเร็จ
-          Swal.fire({
-            icon: "success",
-            title: "Upload Successful!",
-            text: `${parsedData.length} products imported successfully.`,
-            confirmButtonText: "OK",
-          });
+            Swal.fire({
+              icon: "success",
+              title: "Upload Successful!",
+              text: `${parsedData.length} products imported successfully.`,
+              confirmButtonText: "OK",
+            });
+          } catch (error) {
+            setError("Error importing products.");
+            Swal.fire({
+              icon: "error",
+              title: "Import Failed",
+              text: "Error importing products. Please try again.",
+              confirmButtonText: "OK",
+            });
+          }
         },
         error: function () {
           setError("Error reading the CSV file.");
@@ -136,37 +147,48 @@ const ImportProducts = ({ onImport, onClose }) => {
   };
 
   const processExcel = (file) => {
+    setUploadStatus("Processing file...");
     const reader = new FileReader();
-    reader.onload = (event) => {
-      const binaryData = event.target.result;
-      const workbook = XLSX.read(binaryData, { type: "binary" });
+    reader.onload = async (event) => {
+      try {
+        const binaryData = event.target.result;
+        const workbook = XLSX.read(binaryData, { type: "binary" });
 
-      const sheetName = workbook.SheetNames[0];
-      const worksheet = workbook.Sheets[sheetName];
-      const parsedData = XLSX.utils.sheet_to_json(worksheet).map((item) => {
-        const normalPrice = parseCurrency(item.NormalPrice);
-        const discount = parseFloat(item.Discount) || 0;
-        const finalPrice = normalPrice - (normalPrice * discount) / 100;
+        setUploadStatus("Importing products...");
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        const parsedData = XLSX.utils.sheet_to_json(worksheet).map((item) => {
+          const normalPrice = parseCurrency(item.NormalPrice);
+          const discount = parseFloat(item.Discount) || 0;
+          const finalPrice = normalPrice - (normalPrice * discount) / 100;
 
-        return {
-          ...item,
-          NormalPrice: normalPrice,
-          Discount: discount,
-          FinalPrice: finalPrice,
-          Image: item.Image?.trim() || "",
-        };
-      });
+          return {
+            ...item,
+            NormalPrice: normalPrice,
+            Discount: discount,
+            FinalPrice: finalPrice,
+            Image: item.Image?.trim() || "",
+          };
+        });
 
-      onImport(parsedData);
-      setUploadStatus("Upload Complete");
+        await onImport(parsedData);
+        setUploadStatus("Import complete!");
 
-      // ✅ แจ้งเตือนเมื่ออัปโหลดสำเร็จ
-      Swal.fire({
-        icon: "success",
-        title: "Upload Successful!",
-        text: `${parsedData.length} products imported successfully.`,
-        confirmButtonText: "OK",
-      });
+        Swal.fire({
+          icon: "success",
+          title: "Upload Successful!",
+          text: `${parsedData.length} products imported successfully.`,
+          confirmButtonText: "OK",
+        });
+      } catch (error) {
+        setError("Error importing products.");
+        Swal.fire({
+          icon: "error",
+          title: "Import Failed",
+          text: "Error importing products. Please try again.",
+          confirmButtonText: "OK",
+        });
+      }
     };
     reader.readAsBinaryString(file);
   };
