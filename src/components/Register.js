@@ -1,52 +1,84 @@
-import React, { useState } from "react";
-import { registerUser } from "../services/authService"; // นำเข้า registerUser
-import Swal from "sweetalert2"; // ใช้ในการแจ้งเตือน
-import "./Register.css"; // นำเข้าไฟล์ CSS
+import React from "react";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+import { registerUser } from "../services/authService";
+import Swal from "sweetalert2";
+import "./Register.css";
+
+const schema = yup.object().shape({
+  firstName: yup.string().required("First name is required"),
+  lastName: yup.string().required("Last name is required"),
+  email: yup
+    .string()
+    .email("Invalid email format")
+    .required("Email is required"),
+  password: yup
+    .string()
+    .min(6, "Password must be at least 6 characters")
+    .required("Password is required"),
+  role: yup.string().required("Role is required"),
+});
 
 const Register = ({ onUserAdded, onClose }) => {
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [role, setRole] = useState("Employee");
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      email: "",
+      password: "",
+      role: "Employee",
+    },
+  });
 
-  const handleRegister = async (e) => {
-    e.preventDefault();
-    setError(""); // รีเซ็ตข้อผิดพลาดก่อน
+  const onSubmit = async (data) => {
+    try {
+      const { success, message, userId } = await registerUser(
+        data.firstName,
+        data.lastName,
+        data.email,
+        data.password,
+        data.role
+      );
 
-    const { success, message, userId } = await registerUser(
-      firstName,
-      lastName,
-      email,
-      password,
-      role // ✅ ส่ง role ไปด้วย
-    );
+      if (success) {
+        Swal.fire({
+          icon: "success",
+          title: "User Registered!",
+          text: "The user has been successfully added.",
+          confirmButtonText: "OK",
+        });
 
-    if (success) {
-      Swal.fire({
-        icon: "success",
-        title: "User Registered!",
-        text: "The user has been successfully added.",
-        confirmButtonText: "OK",
-      });
-
-      // ✅ ส่งข้อมูลใหม่ไปยัง `UserList.js`
-      if (onUserAdded) {
-        onUserAdded({
-          id: userId, // ใช้ ID จาก Firestore
-          firstName,
-          lastName,
-          email,
-          role, // ✅ รวม role
-          createdAt: new Date(),
-          lastUpdate: new Date(),
+        if (onUserAdded) {
+          onUserAdded({
+            id: userId,
+            ...data,
+            createdAt: new Date(),
+            lastUpdate: new Date(),
+          });
+        }
+        onClose();
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Registration Failed",
+          text: message,
+          confirmButtonText: "OK",
         });
       }
-
-      onClose(); // ✅ ปิด modal หลังจากลงทะเบียนเสร็จ
-    } else {
-      setError(message); // ✅ แสดงข้อความผิดพลาด
+    } catch (error) {
+      console.error("Registration error:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "An error occurred during registration",
+        confirmButtonText: "OK",
+      });
     }
   };
 
@@ -54,63 +86,65 @@ const Register = ({ onUserAdded, onClose }) => {
     <div className="register-modal">
       <div className="register-modal-content">
         <h3 className="register-title">Register</h3>
-        {error && <p className="register-error">{error}</p>}
-        <form className="register-form" onSubmit={handleRegister}>
+        <form className="register-form" onSubmit={handleSubmit(onSubmit)}>
           <div className="register-input-group">
             <label className="register-label">First Name:</label>
             <input
               type="text"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
               className="register-input"
-              required
+              {...register("firstName")}
             />
+            {errors.firstName && (
+              <span className="error-message">{errors.firstName.message}</span>
+            )}
           </div>
 
           <div className="register-input-group">
             <label className="register-label">Last Name:</label>
             <input
               type="text"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
               className="register-input"
-              required
+              {...register("lastName")}
             />
+            {errors.lastName && (
+              <span className="error-message">{errors.lastName.message}</span>
+            )}
           </div>
 
           <div className="register-input-group">
             <label className="register-label">Email:</label>
             <input
               type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
               className="register-input"
-              required
+              {...register("email")}
             />
+            {errors.email && (
+              <span className="error-message">{errors.email.message}</span>
+            )}
           </div>
 
           <div className="register-input-group">
             <label className="register-label">Password:</label>
             <input
               type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
               className="register-input"
-              required
+              {...register("password")}
             />
+            {errors.password && (
+              <span className="error-message">{errors.password.message}</span>
+            )}
           </div>
 
           <div className="register-select-group">
             <label className="register-label">Role:</label>
-            <select
-              value={role}
-              onChange={(e) => setRole(e.target.value)}
-              className="register-select"
-            >
+            <select className="register-select" {...register("role")}>
               <option value="Employee">Employee</option>
               <option value="Stock Manager">Stock Manager</option>
               <option value="Admin">Admin</option>
             </select>
+            {errors.role && (
+              <span className="error-message">{errors.role.message}</span>
+            )}
           </div>
 
           <div className="register-button-group">

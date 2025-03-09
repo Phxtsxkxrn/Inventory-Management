@@ -1,18 +1,57 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import { useForm, useFieldArray } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
 import { updateProduct } from "../services/productService";
 import "./ManagePricing.css";
 import { FaSave, FaPercentage } from "react-icons/fa";
 import Swal from "sweetalert2";
 
+// Validation schema
+const schema = yup.object().shape({
+  products: yup.array().of(
+    yup.object().shape({
+      NormalPrice: yup
+        .number()
+        .transform((value) => (isNaN(value) ? 0 : value))
+        .moreThan(0, "Price must be greater than 0")
+        .required("Price is required"),
+      Discount: yup
+        .number()
+        .transform((value) => (isNaN(value) ? 0 : value))
+        .min(0, "Discount cannot be negative")
+        .max(100, "Discount cannot exceed 100%")
+        .nullable(),
+    })
+  ),
+});
+
 const ManagePricing = () => {
   const location = useLocation();
-  const [products, setProducts] = useState(
-    location.state?.selectedProducts || []
-  );
   const [isSaving, setIsSaving] = useState(false);
   const [hasUpdated, setHasUpdated] = useState(false);
   const [globalDiscount, setGlobalDiscount] = useState("");
+
+  const {
+    control,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+    defaultValues: {
+      products: location.state?.selectedProducts || [],
+    },
+  });
+
+  const { fields } = useFieldArray({
+    control,
+    name: "products",
+  });
+
+  const products = watch("products");
 
   // ✅ แปลงค่าเงินให้อยู่ในรูปแบบไทย
   const formatCurrency = (value) => {
@@ -36,32 +75,21 @@ const ManagePricing = () => {
     return isNaN(numberValue) ? "" : numberValue;
   };
 
-  // ✅ ฟังก์ชันอัปเดตราคาใน State
-  const handlePriceChange = (id, field, value) => {
-    setProducts((prevProducts) =>
-      prevProducts.map((product) => {
-        if (product.id !== id) return product;
+  // Modified handlePriceChange to work with React Hook Form
+  const handlePriceChange = (index, field, value) => {
+    const parsedValue = parseCurrency(value);
+    setValue(`products.${index}.${field}`, parsedValue);
 
-        let updatedProduct = { ...product };
-
-        if (field === "NormalPrice") {
-          updatedProduct.NormalPrice = parseCurrency(value);
-          updatedProduct.FinalPrice =
-            updatedProduct.NormalPrice -
-            (updatedProduct.NormalPrice * (updatedProduct.Discount || 0)) / 100;
-        } else if (field === "Discount") {
-          updatedProduct.Discount = parseCurrency(value);
-          updatedProduct.FinalPrice =
-            updatedProduct.NormalPrice -
-            (updatedProduct.NormalPrice * updatedProduct.Discount) / 100;
-        }
-
-        return updatedProduct;
-      })
-    );
+    // Update FinalPrice
+    const product = products[index];
+    const normalPrice =
+      field === "NormalPrice" ? parsedValue : product.NormalPrice;
+    const discount = field === "Discount" ? parsedValue : product.Discount || 0;
+    const finalPrice = normalPrice - (normalPrice * discount) / 100;
+    setValue(`products.${index}.FinalPrice`, finalPrice);
   };
 
-  // ✅ ฟังก์ชันอัปเดตส่วนลดทุกรายการ
+  // Modified applyGlobalDiscount
   const applyGlobalDiscount = () => {
     const discountValue = parseFloat(globalDiscount);
     if (isNaN(discountValue) || discountValue < 0) {
@@ -69,19 +97,35 @@ const ManagePricing = () => {
       return;
     }
 
-    setProducts((prevProducts) =>
-      prevProducts.map((product) => ({
-        ...product,
-        Discount: discountValue,
-        FinalPrice:
-          product.NormalPrice - (product.NormalPrice * discountValue) / 100,
-      }))
-    );
+    products.forEach((_, index) => {
+      const normalPrice = products[index].NormalPrice;
+      setValue(`products.${index}.Discount`, discountValue);
+      setValue(
+        `products.${index}.FinalPrice`,
+        normalPrice - (normalPrice * discountValue) / 100
+      );
+    });
   };
 
-  // ✅ ฟังก์ชันบันทึกข้อมูลสินค้าทั้งหมด
-  const handleSaveAll = async () => {
-    // ✅ แสดง SweetAlert2 ยืนยันก่อนบันทึก
+  // Modified handleSaveAll
+  const onSubmit = async (data) => {
+    // Check for zero or invalid prices
+    const invalidProducts = data.products.filter(
+      (product) => !product.NormalPrice || product.NormalPrice <= 0
+    );
+
+    if (invalidProducts.length > 0) {
+      Swal.fire({
+        icon: "error",
+        title: "Invalid Prices",
+        html: `The following products have invalid prices (0 or empty):<br><br>${invalidProducts
+          .map((p) => `- ${p.Name}`)
+          .join("<br>")}`,
+        confirmButtonText: "OK",
+      });
+      return;
+    }
+
     const result = await Swal.fire({
       title: "Are you sure?",
       text: "Do you want to save changes for all products?",
@@ -97,32 +141,18 @@ const ManagePricing = () => {
       setIsSaving(true);
       try {
         await Promise.all(
-          products.map((product) =>
-            updateProduct(product.id, {
-              Name: product.Name,
-              SKU: product.SKU,
-              Image: product.Image,
-              NormalPrice: product.NormalPrice,
-              Discount: product.Discount,
-              FinalPrice: product.FinalPrice,
-            })
-          )
+          data.products.map((product) => updateProduct(product.id, product))
         );
-
-        // ✅ แจ้งเตือนว่าสำเร็จ
         Swal.fire({
           icon: "success",
           title: "All Products Updated!",
           text: "All product details have been successfully saved.",
           confirmButtonText: "OK",
         });
-
         setHasUpdated(true);
         setTimeout(() => setHasUpdated(false), 3000);
       } catch (error) {
         console.error("Error updating products:", error);
-
-        // ✅ แจ้งเตือนเมื่อเกิดข้อผิดพลาด
         Swal.fire({
           icon: "error",
           title: "Error!",
@@ -136,6 +166,24 @@ const ManagePricing = () => {
   };
 
   const handleSaveProduct = async (productId) => {
+    const productToUpdate = products.find(
+      (product) => product.id === productId
+    );
+
+    if (
+      !productToUpdate ||
+      !productToUpdate.NormalPrice ||
+      productToUpdate.NormalPrice <= 0
+    ) {
+      Swal.fire({
+        icon: "error",
+        title: "Invalid Price",
+        text: "Product price must be greater than 0",
+        confirmButtonText: "OK",
+      });
+      return;
+    }
+
     setIsSaving(true);
     try {
       // ค้นหาสินค้าที่ต้องการบันทึก
@@ -201,10 +249,10 @@ const ManagePricing = () => {
     <div className="manage-pricing-container">
       <h2>Manage Product Pricing</h2>
 
-      {products.length === 0 ? (
+      {fields.length === 0 ? (
         <p className="no-products-message">No products selected for pricing.</p>
       ) : (
-        <>
+        <form onSubmit={handleSubmit(onSubmit)}>
           {hasUpdated && (
             <p className="success-message">✅ Prices updated successfully!</p>
           )}
@@ -224,11 +272,7 @@ const ManagePricing = () => {
             >
               <FaPercentage /> Apply Discount
             </button>
-            <button
-              className="save-all-btn"
-              onClick={handleSaveAll}
-              disabled={isSaving}
-            >
+            <button className="save-all-btn" disabled={isSaving}>
               {isSaving ? (
                 "Saving..."
               ) : (
@@ -250,62 +294,67 @@ const ManagePricing = () => {
               </tr>
             </thead>
             <tbody>
-              {products.map((product) => (
-                <tr key={product.id}>
+              {fields.map((field, index) => (
+                <tr key={field.id}>
                   <td>
                     <div className="manage-pricing-product">
                       <img
                         className="manage-pricing-img"
-                        src={product.Image || "no-image.jpg"}
-                        alt={product.Name}
+                        src={field.Image || "no-image.jpg"}
+                        alt={field.Name}
                       />
-                      <span>{product.Name}</span>
+                      <span>{field.Name}</span>
                     </div>
                   </td>
                   <td>
                     <input
-                      className="manage-pricing-input"
+                      className={`manage-pricing-input ${
+                        errors.products?.[index]?.NormalPrice ? "error" : ""
+                      }`}
                       type="text"
-                      value={formatCurrency(product.NormalPrice)}
+                      value={formatCurrency(products[index]?.NormalPrice)}
                       onChange={(e) =>
-                        handlePriceChange(
-                          product.id,
-                          "NormalPrice",
-                          e.target.value
-                        )
+                        handlePriceChange(index, "NormalPrice", e.target.value)
                       }
                       placeholder="฿0.00"
-                      required
                     />
+                    {errors.products?.[index]?.NormalPrice && (
+                      <span className="error-message">
+                        {errors.products[index].NormalPrice.message}
+                      </span>
+                    )}
                   </td>
                   <td>
                     <input
-                      className="manage-pricing-input"
+                      className={`manage-pricing-input ${
+                        errors.products?.[index]?.Discount ? "error" : ""
+                      }`}
                       type="text"
                       value={
-                        product.Discount !== undefined
-                          ? product.Discount.toFixed(2)
+                        products[index]?.Discount !== undefined
+                          ? products[index].Discount.toFixed(2)
                           : ""
                       }
                       onChange={(e) =>
-                        handlePriceChange(
-                          product.id,
-                          "Discount",
-                          e.target.value
-                        )
+                        handlePriceChange(index, "Discount", e.target.value)
                       }
                       placeholder="0%"
                     />
+                    {errors.products?.[index]?.Discount && (
+                      <span className="error-message">
+                        {errors.products[index].Discount.message}
+                      </span>
+                    )}
                   </td>
                   <td>
                     <span className="final-price-display">
-                      {formatCurrency(product.FinalPrice) || "฿0.00"}
+                      {formatCurrency(products[index]?.FinalPrice) || "฿0.00"}
                     </span>
                   </td>
                   <td>
                     <button
                       className="manage-pricing-btn"
-                      onClick={() => handleSaveProduct(product.id)} // ✅ Save เฉพาะสินค้านี้
+                      onClick={() => handleSaveProduct(field.id)} // ✅ Save เฉพาะสินค้านี้
                       disabled={isSaving}
                     >
                       {isSaving ? (
@@ -321,7 +370,7 @@ const ManagePricing = () => {
               ))}
             </tbody>
           </table>
-        </>
+        </form>
       )}
     </div>
   );

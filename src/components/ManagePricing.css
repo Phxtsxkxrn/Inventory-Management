@@ -108,11 +108,34 @@
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+.manage-pricing-input.error {
+  border-color: #ff4444;
+  background-color: #fff8f8;
+}
+
+.manage-pricing-input[value="฿0.00"],
+.manage-pricing-input[value="฿0"] {
+  border-color: #ff4444;
+  background-color: #fff8f8;
+}
+
+.error-message {
+  color: #ff4444;
+  font-size: 0.8rem;
+  margin-top: 4px;
+  display: block;
+}
+
 /* ✅ สไตล์ Final Price */
 .final-price-display {
   font-weight: bold;
   color: #007bff;
   font-size: 16px;
+}
+
+.final-price-display.zero-price {
+  color: #ff4444;
+  font-weight: bold;
 }
 
 /* ✅ ปุ่ม Save */

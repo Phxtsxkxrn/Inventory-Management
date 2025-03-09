@@ -1,70 +1,63 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
 import "./EditProduct.css";
 import Swal from "sweetalert2";
 
+const schema = yup.object().shape({
+  SKU: yup.string().required("SKU is required"),
+  Image: yup.string().url("Must be a valid URL"),
+  Brand: yup.string().required("Brand is required"),
+  Name: yup.string().required("Name is required"),
+  Categories: yup.string().required("Category is required"),
+  Seller: yup.string().required("Seller is required"),
+  NormalPrice: yup
+    .number()
+    .typeError("Price must be a number")
+    .positive("Price must be positive")
+    .required("Price is required"),
+  Discount: yup
+    .number()
+    .typeError("Discount must be a number")
+    .min(0, "Discount cannot be negative")
+    .max(100, "Discount cannot exceed 100%"),
+  Status: yup.string().required("Status is required"),
+});
+
 const EditProduct = ({ product, onSave, onDelete, onClose, categories }) => {
-  const [form, setForm] = useState({
-    SKU: "",
-    Brand: "",
-    Name: "",
-    Categories: "",
-    Seller: "",
-    NormalPrice: "",
-    Discount: "",
-    Status: "active",
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+    defaultValues: {
+      ...product,
+      NormalPrice: product?.NormalPrice || "",
+      Discount: product?.Discount || "0",
+    },
   });
 
-  useEffect(() => {
-    if (product) {
-      setForm({
-        ...product,
-        NormalPrice: formatCurrency(product.NormalPrice), // ฟอร์แมตราคาเริ่มต้น
-        Discount: product.Discount || "", // ค่าเริ่มต้น Discount
-      });
-    }
-  }, [product]);
+  const normalPrice = watch("NormalPrice");
+  const discount = watch("Discount");
 
-  const formatCurrency = (value) => {
-    if (!value) return "";
+  const calculateFinalPrice = () => {
+    const price = parseFloat(normalPrice) || 0;
+    const discountValue = parseFloat(discount) || 0;
+    const finalPrice = price - (price * discountValue) / 100;
     return new Intl.NumberFormat("th-TH", {
       style: "currency",
       currency: "THB",
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(value);
+    }).format(finalPrice);
   };
 
-  const parseCurrency = (value) => {
-    const numberValue = parseFloat(
-      value.replace(/[฿,]/g, "").replace(/[^0-9.]/g, "")
-    );
-    return isNaN(numberValue) ? "" : numberValue;
-  };
+  const onSubmit = (data) => {
+    const finalPrice =
+      parseFloat(data.NormalPrice) -
+      (parseFloat(data.NormalPrice) * parseFloat(data.Discount || 0)) / 100;
 
-  const calculateFinalPrice = () => {
-    const normalPrice = parseCurrency(form.NormalPrice);
-    const discount = parseFloat(form.Discount) || 0;
-    return normalPrice - (normalPrice * discount) / 100 || 0;
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-
-    if (name === "NormalPrice") {
-      const numericValue = parseCurrency(value); // แปลงค่ากลับเป็นตัวเลข
-      setForm((prev) => ({
-        ...prev,
-        [name]: numericValue ? formatCurrency(numericValue) : "",
-      }));
-    } else {
-      setForm((prev) => ({ ...prev, [name]: value }));
-    }
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-
-    // ✅ แสดง SweetAlert2 ยืนยันก่อนบันทึก
     Swal.fire({
       title: "Are you sure?",
       text: "Do you want to save the changes?",
@@ -73,32 +66,25 @@ const EditProduct = ({ product, onSave, onDelete, onClose, categories }) => {
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
       confirmButtonText: "Yes, save it!",
-      cancelButtonText: "Cancel",
     }).then((result) => {
       if (result.isConfirmed) {
         onSave(product.id, {
-          ...form,
-          NormalPrice: parseCurrency(form.NormalPrice),
-          Discount: parseFloat(form.Discount) || 0,
-          FinalPrice: calculateFinalPrice(),
+          ...data,
+          FinalPrice: finalPrice,
           CreatedAt: product.CreatedAt,
         });
 
-        // ✅ แจ้งเตือนว่าสำเร็จ
         Swal.fire({
           icon: "success",
           title: "Changes Saved!",
           text: "The product details have been updated.",
-          confirmButtonText: "OK",
         });
-
-        onClose(); // ✅ ปิด modal หลังจากบันทึกเสร็จ
+        onClose();
       }
     });
   };
 
   const handleDelete = () => {
-    // ✅ แสดง SweetAlert2 ยืนยันก่อนลบ
     Swal.fire({
       title: "Are you sure?",
       text: "You won't be able to revert this!",
@@ -112,7 +98,6 @@ const EditProduct = ({ product, onSave, onDelete, onClose, categories }) => {
       if (result.isConfirmed) {
         onDelete(product.id);
 
-        // ✅ แจ้งเตือนว่าสินค้าถูกลบ
         Swal.fire({
           icon: "success",
           title: "Deleted!",
@@ -120,7 +105,7 @@ const EditProduct = ({ product, onSave, onDelete, onClose, categories }) => {
           confirmButtonText: "OK",
         });
 
-        onClose(); // ✅ ปิด modal หลังจากลบเสร็จ
+        onClose();
       }
     });
   };
@@ -129,91 +114,72 @@ const EditProduct = ({ product, onSave, onDelete, onClose, categories }) => {
     <div className="modal">
       <div className="modal-content">
         <h3 className="modal-title">Edit Product</h3>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <div className="edit-form-grid">
-            {/* ส่วนแรก: Image URL เต็มแถว */}
             <div className="edit-input-group full-width">
               <label className="edit-label">Image URL:</label>
               <input
                 className="edit-input"
-                type="text"
-                name="Image"
-                value={form.Image}
-                onChange={handleChange}
+                {...register("Image")}
                 placeholder="Enter image URL..."
               />
+              {errors.Image && (
+                <span className="error-message">{errors.Image.message}</span>
+              )}
             </div>
 
-            {/* ส่วนที่สอง: ข้อมูลพื้นฐาน */}
             <div className="edit-input-group">
               <label className="edit-label">SKU:</label>
-              <input
-                className="edit-input"
-                type="text"
-                name="SKU"
-                value={form.SKU}
-                onChange={handleChange}
-                required
-              />
+              <input className="edit-input" {...register("SKU")} required />
+              {errors.SKU && (
+                <span className="error-message">{errors.SKU.message}</span>
+              )}
             </div>
 
             <div className="edit-input-group">
               <label className="edit-label">Brand:</label>
-              <input
-                className="edit-input"
-                type="text"
-                name="Brand"
-                value={form.Brand}
-                onChange={handleChange}
-                required
-              />
+              <input className="edit-input" {...register("Brand")} required />
+              {errors.Brand && (
+                <span className="error-message">{errors.Brand.message}</span>
+              )}
             </div>
 
             <div className="edit-input-group">
               <label className="edit-label">Name:</label>
-              <input
-                className="edit-input"
-                type="text"
-                name="Name"
-                value={form.Name}
-                onChange={handleChange}
-                required
-              />
+              <input className="edit-input" {...register("Name")} required />
+              {errors.Name && (
+                <span className="error-message">{errors.Name.message}</span>
+              )}
             </div>
 
             <div className="edit-input-group">
               <label className="edit-label">Seller:</label>
-              <input
-                className="edit-input"
-                type="text"
-                name="Seller"
-                value={form.Seller}
-                onChange={handleChange}
-                required
-              />
+              <input className="edit-input" {...register("Seller")} required />
+              {errors.Seller && (
+                <span className="error-message">{errors.Seller.message}</span>
+              )}
             </div>
 
-            {/* ส่วนที่สาม: ราคาและหมวดหมู่ */}
             <div className="edit-input-group">
               <label className="edit-label">Normal Price:</label>
               <input
                 className="edit-input"
-                type="text"
-                name="NormalPrice"
-                value={form.NormalPrice}
-                onChange={handleChange}
+                {...register("NormalPrice")}
                 placeholder="฿0.00"
                 required
               />
+              {errors.NormalPrice && (
+                <span className="error-message">
+                  {errors.NormalPrice.message}
+                </span>
+              )}
             </div>
 
             <div className="edit-input-group">
               <label className="edit-label">Categories:</label>
               <select
-                name="Categories"
+                {...register("Categories")}
                 className="edit-input"
-                value={form.Categories}
-                onChange={handleChange}
                 required
               >
                 <option value="" disabled>
@@ -225,6 +191,11 @@ const EditProduct = ({ product, onSave, onDelete, onClose, categories }) => {
                   </option>
                 ))}
               </select>
+              {errors.Categories && (
+                <span className="error-message">
+                  {errors.Categories.message}
+                </span>
+              )}
             </div>
 
             <div className="edit-input-group">
@@ -232,34 +203,31 @@ const EditProduct = ({ product, onSave, onDelete, onClose, categories }) => {
               <input
                 className="edit-input"
                 type="number"
-                name="Discount"
-                value={form.Discount}
-                onChange={handleChange}
+                {...register("Discount")}
                 placeholder="0"
               />
+              {errors.Discount && (
+                <span className="error-message">{errors.Discount.message}</span>
+              )}
             </div>
 
             <div className="edit-input-group">
               <label className="edit-label">Status:</label>
-              <select
-                name="Status"
-                className="edit-input"
-                value={form.Status}
-                onChange={handleChange}
-              >
+              <select {...register("Status")} className="edit-input">
                 <option value="active">Active</option>
                 <option value="inactive">Inactive</option>
               </select>
+              {errors.Status && (
+                <span className="error-message">{errors.Status.message}</span>
+              )}
             </div>
 
-            {/* ส่วนที่สี่: Final Price */}
             <div className="edit-input-group">
               <label className="edit-label">Final Price:</label>
-              <p className="final-price">฿{calculateFinalPrice().toFixed(2)}</p>
+              <p className="final-price">{calculateFinalPrice()}</p>
             </div>
           </div>
 
-          {/* ปุ่มด้านล่าง */}
           <div className="edit-button-group">
             <button type="submit" className="edit-button edit-button-save">
               Save

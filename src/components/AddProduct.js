@@ -1,92 +1,88 @@
-import React, { useState, useEffect } from "react";
-import { getCategories } from "../services/categoriesService"; // Import service
-import "./AddProduct.css"; // Import CSS
+import React, { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+import { getCategories } from "../services/categoriesService";
+import "./AddProduct.css";
 import Swal from "sweetalert2";
 
+const schema = yup.object().shape({
+  SKU: yup.string().required("SKU is required"),
+  Image: yup.string().url("Must be a valid URL"),
+  Brand: yup.string().required("Brand is required"),
+  Name: yup.string().required("Name is required"),
+  Categories: yup.string().required("Category is required"),
+  Seller: yup.string().required("Seller is required"),
+  NormalPrice: yup
+    .number()
+    .typeError("Price must be a number")
+    .positive("Price must be positive")
+    .required("Price is required"),
+  Discount: yup
+    .number()
+    .typeError("Discount must be a number")
+    .min(0, "Discount cannot be negative")
+    .max(100, "Discount cannot exceed 100%"),
+  Status: yup.string().required("Status is required"),
+});
+
 const AddProduct = ({ onAdd, onClose }) => {
-  const [form, setForm] = useState({
-    SKU: "",
-    Image: "",
-    Brand: "",
-    Name: "",
-    Categories: "", // ใช้สำหรับเก็บค่าจาก dropdown
-    Seller: "",
-    NormalPrice: "",
-    Discount: "", // เพิ่ม Discount
-    Status: "active",
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+    defaultValues: {
+      SKU: "",
+      Image: "",
+      Brand: "",
+      Name: "",
+      Categories: "",
+      Seller: "",
+      NormalPrice: "",
+      Discount: "0",
+      Status: "active",
+    },
   });
 
-  const [categories, setCategories] = useState([]); // เก็บ Categories
+  const [categories, setCategories] = React.useState([]);
+  const normalPrice = watch("NormalPrice");
+  const discount = watch("Discount");
 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const data = await getCategories(); // ดึงข้อมูล Categories จาก Firebase
+        const data = await getCategories();
         setCategories(data);
       } catch (error) {
         console.error("Error fetching categories:", error);
       }
     };
-
     fetchCategories();
   }, []);
 
-  const formatCurrency = (value) => {
-    if (!value) return "";
+  const calculateDiscountedPrice = () => {
+    const price = parseFloat(normalPrice) || 0;
+    const discountValue = parseFloat(discount) || 0;
+    const discountedPrice = price - (price * discountValue) / 100;
     return new Intl.NumberFormat("th-TH", {
       style: "currency",
       currency: "THB",
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(value);
+    }).format(discountedPrice);
   };
 
-  const parseCurrency = (value) => {
-    if (typeof value !== "string") {
-      return isNaN(value) ? "" : value; // ถ้าไม่ใช่ string ให้ตรวจสอบว่าเป็นตัวเลขหรือไม่
-    }
-    const numberValue = parseFloat(
-      value.replace(/[฿,]/g, "").replace(/[^0-9.]/g, "")
-    );
-    return isNaN(numberValue) ? "" : numberValue;
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-
-    if (name === "NormalPrice" || name === "Discount") {
-      const numericValue = parseCurrency(value); // Convert to numeric value
-      setForm((prev) => ({
-        ...prev,
-        [name]: numericValue ? numericValue : "",
-      }));
-    } else {
-      setForm((prev) => ({ ...prev, [name]: value }));
-    }
-  };
-
-  const calculateDiscountedPrice = () => {
-    const price = parseCurrency(form.NormalPrice);
-    const discount = parseFloat(form.Discount);
-    if (!price || !discount) return "";
-    const discountedPrice = price - (price * discount) / 100;
-    return formatCurrency(discountedPrice);
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const normalPrice = parseCurrency(form.NormalPrice);
-    const discount = parseFloat(form.Discount) || 0;
-    const finalPrice = normalPrice - (normalPrice * discount) / 100;
+  const onSubmit = (data) => {
+    const finalPrice =
+      parseFloat(data.NormalPrice) -
+      (parseFloat(data.NormalPrice) * parseFloat(data.Discount || 0)) / 100;
 
     const formData = {
-      ...form,
-      NormalPrice: normalPrice,
-      Discount: discount,
+      ...data,
       FinalPrice: finalPrice,
     };
 
-    // ✅ แสดง SweetAlert2 ยืนยันก่อนเพิ่มสินค้า
     Swal.fire({
       title: "Are you sure?",
       text: "Do you want to add this product?",
@@ -95,23 +91,15 @@ const AddProduct = ({ onAdd, onClose }) => {
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
       confirmButtonText: "Yes, add it!",
-      cancelButtonText: "Cancel",
     }).then((result) => {
       if (result.isConfirmed) {
-        // ✅ บันทึกข้อมูลสินค้า
         onAdd(formData);
-
-        // ✅ แจ้งเตือนว่าสำเร็จ
         Swal.fire({
           icon: "success",
           title: "Product Added!",
           text: "The product has been successfully added.",
-          confirmButtonText: "OK",
         });
-
-        onClose(); // ✅ ปิด modal หลังจากเพิ่มเสร็จ
-      } else if (result.dismiss === Swal.DismissReason.cancel) {
-        onClose(); // ✅ ปิด modal ถ้ากด Cancel
+        onClose();
       }
     });
   };
@@ -120,91 +108,80 @@ const AddProduct = ({ onAdd, onClose }) => {
     <div className="modal">
       <div className="modal-content">
         <h3 className="modal-title">Add Product</h3>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <div className="form-grid">
-            {/* ส่วนแรก: Image URL เต็มแถว */}
             <div className="product-input-group full-width">
               <label className="product-label">Image URL:</label>
               <input
                 className="product-input"
-                type="text"
-                name="Image"
-                value={form.Image}
-                onChange={handleChange}
+                {...register("Image")}
                 placeholder="Enter image URL..."
               />
+              {errors.Image && (
+                <span className="error-message">{errors.Image.message}</span>
+              )}
             </div>
 
-            {/* ส่วนที่สอง: ข้อมูลพื้นฐาน */}
             <div className="product-input-group">
               <label className="product-label">SKU:</label>
-              <input
-                className="product-input"
-                type="text"
-                name="SKU"
-                value={form.SKU}
-                onChange={handleChange}
-                required
-              />
+              <input className="product-input" {...register("SKU")} required />
+              {errors.SKU && (
+                <span className="error-message">{errors.SKU.message}</span>
+              )}
             </div>
 
             <div className="product-input-group">
               <label className="product-label">Brand:</label>
               <input
                 className="product-input"
-                type="text"
-                name="Brand"
-                value={form.Brand}
-                onChange={handleChange}
+                {...register("Brand")}
                 required
               />
+              {errors.Brand && (
+                <span className="error-message">{errors.Brand.message}</span>
+              )}
             </div>
 
             <div className="product-input-group">
               <label className="product-label">Name:</label>
-              <input
-                className="product-input"
-                type="text"
-                name="Name"
-                value={form.Name}
-                onChange={handleChange}
-                required
-              />
+              <input className="product-input" {...register("Name")} required />
+              {errors.Name && (
+                <span className="error-message">{errors.Name.message}</span>
+              )}
             </div>
 
             <div className="product-input-group">
               <label className="product-label">Seller:</label>
               <input
                 className="product-input"
-                type="text"
-                name="Seller"
-                value={form.Seller}
-                onChange={handleChange}
+                {...register("Seller")}
                 required
               />
+              {errors.Seller && (
+                <span className="error-message">{errors.Seller.message}</span>
+              )}
             </div>
 
-            {/* ส่วนที่สาม: ราคาและหมวดหมู่ */}
             <div className="product-input-group">
               <label className="product-label">Normal Price:</label>
               <input
                 className="product-input"
-                type="text"
-                name="NormalPrice"
-                value={form.NormalPrice}
-                onChange={handleChange}
+                {...register("NormalPrice")}
                 placeholder="฿0.00"
                 required
               />
+              {errors.NormalPrice && (
+                <span className="error-message">
+                  {errors.NormalPrice.message}
+                </span>
+              )}
             </div>
 
             <div className="product-input-group">
               <label className="product-label">Categories:</label>
               <select
-                name="Categories"
+                {...register("Categories")}
                 className="product-input"
-                value={form.Categories}
-                onChange={handleChange}
                 required
               >
                 <option value="" disabled>
@@ -216,43 +193,42 @@ const AddProduct = ({ onAdd, onClose }) => {
                   </option>
                 ))}
               </select>
+              {errors.Categories && (
+                <span className="error-message">
+                  {errors.Categories.message}
+                </span>
+              )}
             </div>
 
             <div className="product-input-group">
               <label className="product-label">Discount (%):</label>
               <input
                 className="product-input"
-                type="text"
-                name="Discount"
-                value={form.Discount}
-                onChange={handleChange}
+                {...register("Discount")}
                 placeholder="0%"
               />
+              {errors.Discount && (
+                <span className="error-message">{errors.Discount.message}</span>
+              )}
             </div>
 
             <div className="product-input-group">
               <label className="product-label">Status:</label>
-              <select
-                name="Status"
-                className="product-input"
-                value={form.Status}
-                onChange={handleChange}
-              >
+              <select {...register("Status")} className="product-input">
                 <option value="active">Active</option>
                 <option value="inactive">Inactive</option>
               </select>
+              {errors.Status && (
+                <span className="error-message">{errors.Status.message}</span>
+              )}
             </div>
 
-            {/* ส่วนที่สี่: Final Price */}
             <div className="product-input-group">
               <label className="product-label">Final Price:</label>
-              <p className="final-price">
-                {calculateDiscountedPrice() || "฿0.00"}
-              </p>
+              <p className="final-price">{calculateDiscountedPrice()}</p>
             </div>
           </div>
 
-          {/* ปุ่มด้านล่าง */}
           <div className="button-group">
             <button type="submit" className="modal-button add">
               Add Product

@@ -1,32 +1,35 @@
-import React, { useState } from "react";
+import React from "react";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
 import { addCategories } from "../services/categoriesService";
 import "./AddCategories.css";
 import Swal from "sweetalert2";
 
+const schema = yup.object().shape({
+  Name: yup
+    .string()
+    .required("Category name is required")
+    .min(2, "Category name must be at least 2 characters")
+    .matches(
+      /^[a-zA-Z0-9\s]+$/,
+      "Only letters, numbers and spaces are allowed"
+    ),
+});
+
 const AddCategories = ({ onClose, onCategoryAdded }) => {
-  const [form, setForm] = useState({
-    Name: "",
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+    defaultValues: {
+      Name: "",
+    },
   });
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!form.Name.trim()) {
-      Swal.fire({
-        icon: "warning",
-        title: "Incomplete Information!",
-        text: "Please enter a category name.",
-        confirmButtonText: "OK",
-      });
-      return;
-    }
-
-    // ✅ แสดง SweetAlert2 ถามยืนยันก่อนเพิ่มหมวดหมู่
+  const onSubmit = async (data) => {
     const result = await Swal.fire({
       title: "Are you sure?",
       text: "Do you want to add this category?",
@@ -40,9 +43,7 @@ const AddCategories = ({ onClose, onCategoryAdded }) => {
 
     if (result.isConfirmed) {
       try {
-        const newCategory = await addCategories(form);
-
-        // แปลงค่าของ CreatedAt และ LastUpdate
+        const newCategory = await addCategories(data);
         const formattedCategory = {
           ...newCategory,
           CreatedAt: newCategory.CreatedAt
@@ -53,10 +54,9 @@ const AddCategories = ({ onClose, onCategoryAdded }) => {
             : "N/A",
         };
 
-        onCategoryAdded(formattedCategory); // ส่งค่าที่ถูกแปลงกลับไป
+        onCategoryAdded(formattedCategory);
         onClose();
 
-        // ✅ แจ้งเตือนเมื่อเพิ่มหมวดหมู่สำเร็จ
         Swal.fire({
           icon: "success",
           title: "Category Added!",
@@ -64,9 +64,7 @@ const AddCategories = ({ onClose, onCategoryAdded }) => {
           confirmButtonText: "OK",
         });
       } catch (error) {
-        console.error("🚨 Error adding category:", error);
-
-        // ✅ แจ้งเตือนเมื่อเกิดข้อผิดพลาด
+        console.error("Error adding category:", error);
         Swal.fire({
           icon: "error",
           title: "Error!",
@@ -81,7 +79,7 @@ const AddCategories = ({ onClose, onCategoryAdded }) => {
     <div className="add-category-modal">
       <div className="add-category-modal-content">
         <h3 className="add-category-title">Add Category</h3>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <div className="add-category-form-grid">
             <div className="add-category-input-group">
               <label htmlFor="name" className="add-category-label">
@@ -90,13 +88,13 @@ const AddCategories = ({ onClose, onCategoryAdded }) => {
               <input
                 type="text"
                 id="name"
-                name="Name"
-                value={form.Name}
-                onChange={handleChange}
-                placeholder="Enter category name..."
                 className="add-category-input"
-                required
+                placeholder="Enter category name..."
+                {...register("Name")}
               />
+              {errors.Name && (
+                <span className="error-message">{errors.Name.message}</span>
+              )}
             </div>
           </div>
           <div className="add-category-button-group">
