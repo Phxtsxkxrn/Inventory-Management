@@ -83,8 +83,6 @@ export const addProduct = async (product) => {
 
 // อัปเดตสินค้า
 export const updateProduct = async (id, updatedProduct) => {
-  console.log("📢 อัปเดตสินค้าใน Firestore:", id, updatedProduct); // ✅ Debug
-
   const productDoc = doc(db, "products", id);
   await updateDoc(productDoc, {
     ...updatedProduct,

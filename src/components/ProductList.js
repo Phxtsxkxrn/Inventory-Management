@@ -71,7 +71,6 @@ const ProductList = ({
     "actions",
   ]);
   const [isLoading, setIsLoading] = useState(false);
-  console.log("Current User Role:", userRole);
 
   const columns = [
     { key: "checkbox", label: "Select" },

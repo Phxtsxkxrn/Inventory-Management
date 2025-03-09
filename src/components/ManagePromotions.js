@@ -55,8 +55,6 @@ const ManagePromotions = () => {
     const selectedPromo = promotions.find((promo) => promo.id === promotionId);
     if (!selectedPromo) return;
 
-    console.log("📌 เลือกโปรโมชั่น:", productId, selectedPromo);
-
     setProductPromotions((prev) => ({
       ...prev,
       [productId]: {
@@ -97,8 +95,6 @@ const ManagePromotions = () => {
       });
 
       if (result.isConfirmed) {
-        console.log("🛠️ ส่งข้อมูลไป Firestore:", updatedProducts);
-
         await Promise.all(
           updatedProducts.map((product) => updateProduct(product.id, product))
         );
@@ -138,8 +134,6 @@ const ManagePromotions = () => {
       });
 
       if (result.isConfirmed) {
-        console.log("📌 บันทึกโปรโมชั่น:", updatedProduct);
-
         await updateProduct(productId, updatedProduct);
 
         showToast.success("Promotion has been successfully saved");
