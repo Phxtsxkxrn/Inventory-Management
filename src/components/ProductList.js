@@ -618,13 +618,6 @@ const ProductList = ({
         />
       )}
 
-      {isLoading && (
-        <div className="loading-overlay">
-          <div className="loading-spinner"></div>
-          <p>Loading products...</p>
-        </div>
-      )}
-
       <table className="product-table">
         <thead>
           <tr>
