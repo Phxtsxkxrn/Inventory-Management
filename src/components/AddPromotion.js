@@ -4,6 +4,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import Swal from "sweetalert2";
 import { addPromotion } from "../services/promotionService";
+import { showToast } from "../utils/toast";
 import "./AddPromotion.css";
 
 const schema = yup.object().shape({
@@ -42,11 +43,9 @@ const AddPromotion = ({ onPromotionAdded, onCancel }) => {
     const end = new Date(`${data.endDate}T${data.endTime}`);
 
     if (end <= start) {
-      Swal.fire({
-        icon: "error",
-        title: "Invalid Date Range!",
-        text: "The end date and time must be later than the start date and time.",
-      });
+      showToast.error(
+        "End date and time must be later than start date and time"
+      );
       return;
     }
 
@@ -64,19 +63,10 @@ const AddPromotion = ({ onPromotionAdded, onCancel }) => {
       try {
         const addedPromo = await addPromotion(data);
         onPromotionAdded(addedPromo);
-
-        Swal.fire({
-          icon: "success",
-          title: "Promotion Added!",
-          text: "The promotion has been successfully added.",
-        });
+        showToast.success("Promotion added successfully");
       } catch (error) {
         console.error("Error adding promotion:", error);
-        Swal.fire({
-          icon: "error",
-          title: "Error!",
-          text: "An error occurred while adding the promotion.",
-        });
+        showToast.error("Failed to add promotion: " + error.message);
       }
     }
   };

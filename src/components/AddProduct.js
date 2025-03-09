@@ -5,6 +5,7 @@ import * as yup from "yup";
 import { getCategories } from "../services/categoriesService";
 import "./AddProduct.css";
 import Swal from "sweetalert2";
+import { showToast } from "../utils/toast";
 
 const schema = yup.object().shape({
   SKU: yup.string().required("SKU is required"),
@@ -93,13 +94,13 @@ const AddProduct = ({ onAdd, onClose }) => {
       confirmButtonText: "Yes, add it!",
     }).then((result) => {
       if (result.isConfirmed) {
-        onAdd(formData);
-        Swal.fire({
-          icon: "success",
-          title: "Product Added!",
-          text: "The product has been successfully added.",
-        });
-        onClose();
+        try {
+          onAdd(formData);
+          showToast.success("Product added successfully!");
+          onClose();
+        } catch (error) {
+          showToast.error("Failed to add product: " + error.message);
+        }
       }
     });
   };

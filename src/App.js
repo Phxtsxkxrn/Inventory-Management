@@ -30,6 +30,8 @@ import {
   addCategories,
   deleteCategories,
 } from "./services/categoriesService";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const App = () => {
   const [user, setUser] = useState(null); // กำหนดสถานะของผู้ใช้
@@ -253,6 +255,13 @@ const App = () => {
               element={<ProductForm onSubmit={handleAddProduct} />}
             />
           </Routes>
+          <ToastContainer
+            position="top-right"
+            autoClose={3000}
+            hideProgressBar={false}
+            closeOnClick
+            pauseOnHover
+          />
         </div>
       </div>
     </Router>

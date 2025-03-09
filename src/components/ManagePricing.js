@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom"; // เพิ่ม useNavigate
 import { useForm, useFieldArray } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -7,6 +7,7 @@ import { updateProduct } from "../services/productService";
 import "./ManagePricing.css";
 import { FaSave, FaPercentage } from "react-icons/fa";
 import Swal from "sweetalert2";
+import { showToast } from "../utils/toast";
 
 // Validation schema
 const schema = yup.object().shape({
@@ -29,8 +30,8 @@ const schema = yup.object().shape({
 
 const ManagePricing = () => {
   const location = useLocation();
+  const navigate = useNavigate(); // เพิ่ม navigate
   const [isSaving, setIsSaving] = useState(false);
-  const [hasUpdated, setHasUpdated] = useState(false);
   const [globalDiscount, setGlobalDiscount] = useState("");
 
   const {
@@ -89,11 +90,12 @@ const ManagePricing = () => {
     setValue(`products.${index}.FinalPrice`, finalPrice);
   };
 
-  // Modified applyGlobalDiscount
-  const applyGlobalDiscount = () => {
+  // เปลี่ยนเป็นฟังก์ชัน click event แทนเพื่อป้องกัน form submission
+  const applyGlobalDiscount = (e) => {
+    e.preventDefault(); // ป้องกันการ submit form
     const discountValue = parseFloat(globalDiscount);
     if (isNaN(discountValue) || discountValue < 0) {
-      alert("กรุณาใส่ส่วนลดที่ถูกต้อง (0 ขึ้นไป)");
+      showToast.error("Please enter a valid discount (0 or greater)");
       return;
     }
 
@@ -105,24 +107,19 @@ const ManagePricing = () => {
         normalPrice - (normalPrice * discountValue) / 100
       );
     });
+
+    showToast.info(`Discount ${discountValue}% applied to all products`);
+    setGlobalDiscount(""); // Clear input after applying
   };
 
   // Modified handleSaveAll
   const onSubmit = async (data) => {
-    // Check for zero or invalid prices
     const invalidProducts = data.products.filter(
       (product) => !product.NormalPrice || product.NormalPrice <= 0
     );
 
     if (invalidProducts.length > 0) {
-      Swal.fire({
-        icon: "error",
-        title: "Invalid Prices",
-        html: `The following products have invalid prices (0 or empty):<br><br>${invalidProducts
-          .map((p) => `- ${p.Name}`)
-          .join("<br>")}`,
-        confirmButtonText: "OK",
-      });
+      showToast.error("Some products have invalid prices (0 or empty)");
       return;
     }
 
@@ -143,105 +140,16 @@ const ManagePricing = () => {
         await Promise.all(
           data.products.map((product) => updateProduct(product.id, product))
         );
-        Swal.fire({
-          icon: "success",
-          title: "All Products Updated!",
-          text: "All product details have been successfully saved.",
-          confirmButtonText: "OK",
-        });
-        setHasUpdated(true);
-        setTimeout(() => setHasUpdated(false), 3000);
+        showToast.success(
+          `Successfully updated ${data.products.length} products`
+        );
+        navigate("/product-list"); // เพิ่มการ navigate กลับ
       } catch (error) {
         console.error("Error updating products:", error);
-        Swal.fire({
-          icon: "error",
-          title: "Error!",
-          text: "An error occurred while updating products.",
-          confirmButtonText: "OK",
-        });
+        showToast.error("Failed to update products");
       } finally {
         setIsSaving(false);
       }
-    }
-  };
-
-  const handleSaveProduct = async (productId) => {
-    const productToUpdate = products.find(
-      (product) => product.id === productId
-    );
-
-    if (
-      !productToUpdate ||
-      !productToUpdate.NormalPrice ||
-      productToUpdate.NormalPrice <= 0
-    ) {
-      Swal.fire({
-        icon: "error",
-        title: "Invalid Price",
-        text: "Product price must be greater than 0",
-        confirmButtonText: "OK",
-      });
-      return;
-    }
-
-    setIsSaving(true);
-    try {
-      // ค้นหาสินค้าที่ต้องการบันทึก
-      const productToUpdate = products.find(
-        (product) => product.id === productId
-      );
-
-      if (!productToUpdate) {
-        console.error("Product not found");
-        return;
-      }
-
-      // ✅ แสดง SweetAlert2 ยืนยันก่อนบันทึก
-      const result = await Swal.fire({
-        title: "Are you sure?",
-        text: "Do you want to save the changes for this product?",
-        icon: "question",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Yes, save it!",
-        cancelButtonText: "Cancel",
-      });
-
-      if (result.isConfirmed) {
-        // ✅ อัปเดตข้อมูลสินค้าไปยัง Firebase
-        await updateProduct(productId, {
-          Name: productToUpdate.Name,
-          SKU: productToUpdate.SKU,
-          Image: productToUpdate.Image,
-          NormalPrice: productToUpdate.NormalPrice,
-          Discount: productToUpdate.Discount,
-          FinalPrice: productToUpdate.FinalPrice,
-        });
-
-        // ✅ แจ้งเตือนว่าสำเร็จ
-        Swal.fire({
-          icon: "success",
-          title: "Product Updated!",
-          text: "The product details have been successfully saved.",
-          confirmButtonText: "OK",
-        });
-
-        setHasUpdated(true);
-        setTimeout(() => setHasUpdated(false), 3000);
-      }
-    } catch (error) {
-      console.error("Error updating product:", error);
-
-      // ✅ แจ้งเตือนเมื่อเกิดข้อผิดพลาด
-      Swal.fire({
-        icon: "error",
-        title: "Error!",
-        text: "An error occurred while updating the product.",
-        confirmButtonText: "OK",
-      });
-    } finally {
-      setIsSaving(false);
     }
   };
 
@@ -253,10 +161,6 @@ const ManagePricing = () => {
         <p className="no-products-message">No products selected for pricing.</p>
       ) : (
         <form onSubmit={handleSubmit(onSubmit)}>
-          {hasUpdated && (
-            <p className="success-message">✅ Prices updated successfully!</p>
-          )}
-
           {/* ✅ กล่องใส่ส่วนลด + ปุ่มชิดขวา */}
           <div className="global-discount-container">
             <input
@@ -267,12 +171,13 @@ const ManagePricing = () => {
               onChange={(e) => setGlobalDiscount(e.target.value)}
             />
             <button
+              type="button" // เปลี่ยนเป็น type="button" เพื่อป้องกันการ submit form
               className="apply-discount-btn"
               onClick={applyGlobalDiscount}
             >
               <FaPercentage /> Apply Discount
             </button>
-            <button className="save-all-btn" disabled={isSaving}>
+            <button type="submit" className="save-all-btn" disabled={isSaving}>
               {isSaving ? (
                 "Saving..."
               ) : (
@@ -290,7 +195,6 @@ const ManagePricing = () => {
                 <th>Normal Price</th>
                 <th>Discount (%)</th>
                 <th>Final Price</th>
-                <th>Update</th>
               </tr>
             </thead>
             <tbody>
@@ -350,21 +254,6 @@ const ManagePricing = () => {
                     <span className="final-price-display">
                       {formatCurrency(products[index]?.FinalPrice) || "฿0.00"}
                     </span>
-                  </td>
-                  <td>
-                    <button
-                      className="manage-pricing-btn"
-                      onClick={() => handleSaveProduct(field.id)} // ✅ Save เฉพาะสินค้านี้
-                      disabled={isSaving}
-                    >
-                      {isSaving ? (
-                        "Saving..."
-                      ) : (
-                        <>
-                          <FaSave /> Save
-                        </>
-                      )}
-                    </button>
                   </td>
                 </tr>
               ))}

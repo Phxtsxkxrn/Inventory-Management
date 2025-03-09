@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import "./FilterPromotion.css"; // Import CSS for styling
+import "./FilterPromotion.css";
+import { showToast } from "../utils/toast";
 
 const FilterPromotion = ({ onFilterChange, isOpen, closeModal }) => {
   const [minDiscount, setMinDiscount] = useState("");
@@ -18,17 +19,22 @@ const FilterPromotion = ({ onFilterChange, isOpen, closeModal }) => {
       endDateTimeFrom ||
       endDateTimeTo
     ) {
-      onFilterChange({
-        minDiscount,
-        maxDiscount,
-        startDateTimeFrom,
-        startDateTimeTo,
-        endDateTimeFrom,
-        endDateTimeTo,
-      });
-      closeModal();
+      try {
+        onFilterChange({
+          minDiscount,
+          maxDiscount,
+          startDateTimeFrom,
+          startDateTimeTo,
+          endDateTimeFrom,
+          endDateTimeTo,
+        });
+        showToast.success("Filter applied successfully");
+        closeModal();
+      } catch (error) {
+        showToast.error("Failed to apply filter");
+      }
     } else {
-      alert("Please enter at least one filter criteria");
+      showToast.warning("Please enter at least one filter criteria");
     }
   };
 

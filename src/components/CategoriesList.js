@@ -3,6 +3,7 @@ import AddCategories from "./AddCategories";
 import { getCategories, deleteCategories } from "../services/categoriesService";
 import "./CategoriesList.css";
 import Swal from "sweetalert2";
+import { showToast } from "../utils/toast";
 
 const CategoriesList = () => {
   const [categories, setCategories] = useState([]);
@@ -28,7 +29,7 @@ const CategoriesList = () => {
   const closeAddModal = () => setIsAddModalOpen(false);
 
   const handleDelete = async (id) => {
-    // ✅ แสดง SweetAlert2 ถามยืนยันก่อนลบ
+    // ยังคงใช้ SweetAlert2 สำหรับการยืนยันการลบ
     const result = await Swal.fire({
       title: "Are you sure?",
       text: "Once deleted, you will not be able to recover this category!",
@@ -45,24 +46,10 @@ const CategoriesList = () => {
         await deleteCategories(id);
         const updatedCategories = await getCategories();
         setCategories(updatedCategories);
-
-        // ✅ แจ้งเตือนเมื่อหมวดหมู่ถูกลบสำเร็จ
-        Swal.fire({
-          icon: "success",
-          title: "Category Deleted!",
-          text: "The category has been successfully deleted.",
-          confirmButtonText: "OK",
-        });
+        showToast.success("Category deleted successfully");
       } catch (error) {
         console.error("🚨 Error deleting category:", error);
-
-        // ✅ แจ้งเตือนเมื่อเกิดข้อผิดพลาด
-        Swal.fire({
-          icon: "error",
-          title: "Error!",
-          text: "An error occurred while deleting the category.",
-          confirmButtonText: "OK",
-        });
+        showToast.error("Failed to delete category");
       }
     }
   };
@@ -80,6 +67,9 @@ const CategoriesList = () => {
       setCategoriesPerPage(customValue);
       setCurrentPage(1); // Reset ไปหน้าที่ 1
       setCustomInputValue(""); // เคลียร์ช่องกรอก
+      showToast.info(`Categories per page set to ${customValue}`);
+    } else {
+      showToast.error("Please enter a valid number");
     }
   };
 
@@ -193,6 +183,8 @@ const CategoriesList = () => {
           onClose={closeAddModal}
           onCategoryAdded={(newCategory) => {
             setCategories((prev) => [...prev, newCategory]);
+            showToast.success("Category added successfully");
+            closeAddModal();
           }}
         />
       )}

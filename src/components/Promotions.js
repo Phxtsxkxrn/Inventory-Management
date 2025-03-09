@@ -5,6 +5,7 @@ import FilterPromotion from "./FilterPromotion"; // Import FilterPromotion
 import PromotionColumnSelector from "./PromotionColumnSelector";
 import "./Promotions.css";
 import Swal from "sweetalert2";
+import { showToast } from "../utils/toast";
 
 const Promotions = () => {
   const [promotions, setPromotions] = useState([]);
@@ -49,37 +50,29 @@ const Promotions = () => {
     setIsModalOpen(false);
   };
 
-  const handleDeletePromotion = async (id) => {
+  const handleDeletePromotion = async (promotionId) => {
+    // ยังคงใช้ SweetAlert2 สำหรับการยืนยันการลบ
     const result = await Swal.fire({
       title: "Are you sure?",
-      text: "Once deleted, you will not be able to recover this promotion!",
+      text: "Do you want to delete this promotion?",
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#d33",
       cancelButtonColor: "#3085d6",
       confirmButtonText: "Yes, delete it!",
-      cancelButtonText: "Cancel",
     });
 
     if (result.isConfirmed) {
       try {
-        await deletePromotion(id);
-        setPromotions(promotions.filter((promo) => promo.id !== id));
-
-        Swal.fire({
-          icon: "success",
-          title: "Promotion Deleted!",
-          text: "The promotion has been successfully deleted.",
-          confirmButtonText: "OK",
-        });
+        await deletePromotion(promotionId);
+        const updatedPromotions = promotions.filter(
+          (promotion) => promotion.id !== promotionId
+        );
+        setPromotions(updatedPromotions);
+        showToast.success("Promotion deleted successfully");
       } catch (error) {
-        console.error("🚨 Error deleting promotion:", error);
-        Swal.fire({
-          icon: "error",
-          title: "Error!",
-          text: "An error occurred while deleting the promotion.",
-          confirmButtonText: "OK",
-        });
+        console.error("Error deleting promotion:", error);
+        showToast.error("Failed to delete promotion");
       }
     }
   };

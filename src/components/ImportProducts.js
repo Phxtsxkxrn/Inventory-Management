@@ -4,6 +4,7 @@ import * as XLSX from "xlsx"; // สำหรับไฟล์ Excel
 import "./ImportProducts.css";
 import { FaCloudUploadAlt } from "react-icons/fa";
 import Swal from "sweetalert2";
+import { showToast } from "../utils/toast";
 
 const ImportProducts = ({ onImport, onClose }) => {
   const [file, setFile] = useState(null);
@@ -115,31 +116,17 @@ const ImportProducts = ({ onImport, onClose }) => {
 
             await onImport(parsedData);
             setUploadStatus("Import complete!");
-
-            Swal.fire({
-              icon: "success",
-              title: "Upload Successful!",
-              text: `${parsedData.length} products imported successfully.`,
-              confirmButtonText: "OK",
-            });
+            showToast.success(
+              `${parsedData.length} products imported successfully`
+            );
           } catch (error) {
             setError("Error importing products.");
-            Swal.fire({
-              icon: "error",
-              title: "Import Failed",
-              text: "Error importing products. Please try again.",
-              confirmButtonText: "OK",
-            });
+            showToast.error("Failed to import products");
           }
         },
         error: function () {
           setError("Error reading the CSV file.");
-          Swal.fire({
-            icon: "error",
-            title: "Upload Failed",
-            text: "Error reading the CSV file. Please try again.",
-            confirmButtonText: "OK",
-          });
+          showToast.error("Error reading the CSV file");
         },
       });
     };
@@ -173,21 +160,12 @@ const ImportProducts = ({ onImport, onClose }) => {
 
         await onImport(parsedData);
         setUploadStatus("Import complete!");
-
-        Swal.fire({
-          icon: "success",
-          title: "Upload Successful!",
-          text: `${parsedData.length} products imported successfully.`,
-          confirmButtonText: "OK",
-        });
+        showToast.success(
+          `${parsedData.length} products imported successfully`
+        );
       } catch (error) {
         setError("Error importing products.");
-        Swal.fire({
-          icon: "error",
-          title: "Import Failed",
-          text: "Error importing products. Please try again.",
-          confirmButtonText: "OK",
-        });
+        showToast.error("Failed to import products");
       }
     };
     reader.readAsBinaryString(file);

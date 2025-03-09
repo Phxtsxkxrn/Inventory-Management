@@ -1,34 +1,28 @@
 import React, { useState } from "react";
 import "./FilterUser.css";
 
-const FilterUser = ({ onFilterChange, isOpen, closeModal }) => {
+const FilterUser = ({
+  onFilterChange,
+  isOpen,
+  closeModal,
+  roles,
+  selectedRole,
+}) => {
   const [createdAtFrom, setCreatedAtFrom] = useState("");
   const [createdAtTo, setCreatedAtTo] = useState("");
   const [lastUpdateFrom, setLastUpdateFrom] = useState("");
   const [lastUpdateTo, setLastUpdateTo] = useState("");
-  const [selectedRole, setSelectedRole] = useState("");
+  const [role, setRole] = useState(selectedRole);
 
-  const roles = ["", "Employee", "Stock Manager", "Admin"]; // เพิ่มค่าว่างสำหรับ "All roles"
-
-  const handleFilterSubmit = () => {
-    if (
-      createdAtFrom ||
-      createdAtTo ||
-      lastUpdateFrom ||
-      lastUpdateTo ||
-      selectedRole
-    ) {
-      onFilterChange({
-        createdAtFrom,
-        createdAtTo,
-        lastUpdateFrom,
-        lastUpdateTo,
-        role: selectedRole,
-      });
-      closeModal();
-    } else {
-      alert("Please enter at least one filter criteria");
-    }
+  const handleApplyFilter = () => {
+    onFilterChange({
+      createdAtFrom,
+      createdAtTo,
+      lastUpdateFrom,
+      lastUpdateTo,
+      role,
+    });
+    closeModal();
   };
 
   if (!isOpen) return null;
@@ -41,12 +35,12 @@ const FilterUser = ({ onFilterChange, isOpen, closeModal }) => {
           <label>
             Role:
             <select
-              value={selectedRole}
-              onChange={(e) => setSelectedRole(e.target.value)}
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
               className="role-select"
             >
               <option value="">All roles</option>
-              {roles.slice(1).map((role) => (
+              {roles.map((role) => (
                 <option key={role} value={role}>
                   {role}
                 </option>
@@ -87,7 +81,7 @@ const FilterUser = ({ onFilterChange, isOpen, closeModal }) => {
           </label>
           <div className="filter-button-group">
             <button
-              onClick={handleFilterSubmit}
+              onClick={handleApplyFilter}
               className="filter-modal-button filter"
             >
               Filter

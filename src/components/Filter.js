@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import "./Filter.css"; // Import CSS for styling
+import { showToast } from "../utils/toast";
 
 const Filter = ({ onFilterChange, isOpen, closeModal }) => {
   const [minPrice, setMinPrice] = useState("");
@@ -20,18 +21,23 @@ const Filter = ({ onFilterChange, isOpen, closeModal }) => {
       lastUpdateEnd ||
       status
     ) {
-      onFilterChange({
-        minPrice,
-        maxPrice,
-        startDate,
-        endDate,
-        lastUpdateStart,
-        lastUpdateEnd,
-        status,
-      });
-      closeModal();
+      try {
+        onFilterChange({
+          minPrice,
+          maxPrice,
+          startDate,
+          endDate,
+          lastUpdateStart,
+          lastUpdateEnd,
+          status,
+        });
+        showToast.success("Filter applied successfully");
+        closeModal();
+      } catch (error) {
+        showToast.error("Failed to apply filter");
+      }
     } else {
-      alert("Please enter at least one filter criteria");
+      showToast.warning("Please enter at least one filter criteria");
     }
   };
 

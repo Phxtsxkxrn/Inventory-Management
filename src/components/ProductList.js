@@ -16,6 +16,7 @@ import Filter from "./Filter"; // นำเข้า Filter
 import ColumnSelector from "./ColumnSelector";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
+import { showToast } from "../utils/toast";
 
 const ProductList = ({
   products,
@@ -105,16 +106,20 @@ const ProductList = ({
 
       // อัปเดตในฐานข้อมูล (Firebase / API)
       await updateProductStatus(productId, newStatus, currentTime); // ✅ ส่งค่า LastUpdate ไปด้วย
+
+      // ทดสอบ success toast
+      showToast.success(`Status updated to ${newStatus} successfully`);
     } catch (error) {
       console.error("Error updating status:", error);
-      alert("Failed to update status. Please try again.");
+      // ทดสอบ error toast
+      showToast.error(`Failed to update status: ${error.message}`);
     }
   };
 
   // ✅ นำสินค้าไปที่ Manage Promotions
   const goToManagePromotions = () => {
     if (selectedProducts.length === 0) {
-      alert("Please select at least one product.");
+      showToast.warning("Please select at least one product");
       return;
     }
 
@@ -385,6 +390,9 @@ const ProductList = ({
       setProductsPerPage(value); // อัปเดตจำนวนสินค้าต่อหน้า
       setCurrentPage(1); // Reset to the first page
       setCustomInputValue(""); // ล้างค่าช่อง input
+      showToast.info(`Products per page set to ${value}`);
+    } else {
+      showToast.error("Please enter a valid number");
     }
   };
 
@@ -422,20 +430,10 @@ const ProductList = ({
           setSelectedProducts([]);
 
           // ✅ แจ้งเตือนว่าสำเร็จ
-          Swal.fire({
-            icon: "success",
-            title: "Deleted!",
-            text: "Selected products have been deleted.",
-            confirmButtonText: "OK",
-          });
+          showToast.success("Products deleted successfully");
         } catch (error) {
           // ✅ แจ้งเตือนเมื่อเกิดข้อผิดพลาด
-          Swal.fire({
-            icon: "error",
-            title: "Error!",
-            text: "An error occurred while deleting selected products.",
-            confirmButtonText: "OK",
-          });
+          showToast.error("Error deleting products");
         }
       }
     });
@@ -444,7 +442,7 @@ const ProductList = ({
   // ✅ ฟังก์ชันไปที่หน้า Manage Pricing
   const goToManagePricing = () => {
     if (selectedProducts.length === 0) {
-      alert("Please select at least one product.");
+      showToast.warning("Please select at least one product before proceeding");
       return;
     }
     // ✅ ส่งเฉพาะสินค้าที่เลือกไปหน้า ManagePricing
@@ -452,6 +450,27 @@ const ProductList = ({
       selectedProducts.includes(product.id)
     );
     navigate("/manage-pricing", { state: { selectedProducts: selectedData } });
+  };
+
+  // เพิ่ม handler สำหรับการแก้ไขสินค้า
+  const handleEditSuccess = (id, updatedProduct) => {
+    try {
+      onEdit(id, updatedProduct);
+      showToast.success("Product updated successfully");
+      closeEditModal();
+    } catch (error) {
+      showToast.error("Failed to update product: " + error.message);
+    }
+  };
+
+  const handleDelete = (id) => {
+    try {
+      onDelete(id);
+      showToast.success("Product deleted successfully");
+      closeEditModal();
+    } catch (error) {
+      showToast.error("Failed to delete product: " + error.message);
+    }
   };
 
   return (
@@ -592,14 +611,8 @@ const ProductList = ({
         <EditProduct
           product={editingProduct}
           categories={categories}
-          onSave={(id, updatedProduct) => {
-            onEdit(id, updatedProduct);
-            closeEditModal();
-          }}
-          onDelete={(id) => {
-            onDelete(id);
-            closeEditModal();
-          }}
+          onSave={handleEditSuccess}
+          onDelete={handleDelete}
           onClose={closeEditModal}
         />
       )}

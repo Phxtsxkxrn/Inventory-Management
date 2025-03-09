@@ -5,6 +5,7 @@ import { updateProduct } from "../services/productService";
 import "./ManagePromotions.css";
 import Swal from "sweetalert2";
 import { FaSave } from "react-icons/fa";
+import { showToast } from "../utils/toast";
 
 const ManagePromotions = () => {
   const location = useLocation();
@@ -102,26 +103,12 @@ const ManagePromotions = () => {
           updatedProducts.map((product) => updateProduct(product.id, product))
         );
 
-        // ✅ แจ้งเตือนเมื่อบันทึกสำเร็จ
-        Swal.fire({
-          icon: "success",
-          title: "Promotions Updated!",
-          text: "All promotions have been successfully saved.",
-          confirmButtonText: "OK",
-        });
-
+        showToast.success("All promotions have been successfully saved");
         navigate("/product-list", { state: { updated: true } });
       }
     } catch (error) {
       console.error("🚨 Error updating promotions:", error);
-
-      // ✅ แจ้งเตือนเมื่อเกิดข้อผิดพลาด
-      Swal.fire({
-        icon: "error",
-        title: "Error!",
-        text: "An error occurred while updating promotions. Please try again.",
-        confirmButtonText: "OK",
-      });
+      showToast.error("Failed to update promotions. Please try again.");
     }
   };
 
@@ -155,24 +142,11 @@ const ManagePromotions = () => {
 
         await updateProduct(productId, updatedProduct);
 
-        // ✅ แจ้งเตือนเมื่อบันทึกสำเร็จ
-        Swal.fire({
-          icon: "success",
-          title: "Promotion Updated!",
-          text: "The promotion for this product has been successfully saved.",
-          confirmButtonText: "OK",
-        });
+        showToast.success("Promotion has been successfully saved");
       }
     } catch (error) {
       console.error("🚨 Error updating promotion:", error);
-
-      // ✅ แจ้งเตือนเมื่อเกิดข้อผิดพลาด
-      Swal.fire({
-        icon: "error",
-        title: "Error!",
-        text: "An error occurred while updating the promotion.",
-        confirmButtonText: "OK",
-      });
+      showToast.error("Failed to update promotion");
     }
   };
 

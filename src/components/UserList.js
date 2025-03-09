@@ -12,6 +12,7 @@ import "./UserList.css";
 import Swal from "sweetalert2"; // นำเข้า SweetAlert2
 import FilterUser from "./FilterUser"; // เพิ่ม import
 import UserColumnSelector from "./UserColumnSelector";
+import { showToast } from "../utils/toast"; // เพิ่ม import
 
 const UserList = () => {
   const [users, setUsers] = useState([]);
@@ -40,6 +41,7 @@ const UserList = () => {
     "lastUpdate",
     "actions",
   ]);
+  const [selectedRole, setSelectedRole] = useState(""); // เพิ่ม state สำหรับ filter role
 
   // ✅ ดึงข้อมูล Users จาก Firestore
   useEffect(() => {
@@ -61,7 +63,6 @@ const UserList = () => {
 
   // ✅ ฟังก์ชันอัปเดตรายการผู้ใช้ทันทีเมื่อเพิ่มผู้ใช้ใหม่
   const handleUserAdded = async (newUser) => {
-    // ✅ แสดง SweetAlert2 ถามยืนยันก่อนเพิ่มผู้ใช้
     const result = await Swal.fire({
       title: "Are you sure?",
       text: "Do you want to add this user?",
@@ -75,33 +76,19 @@ const UserList = () => {
 
     if (result.isConfirmed) {
       try {
-        // ✅ ดึงข้อมูลผู้ใช้ใหม่จาก Firestore หลังจากลงทะเบียนสำเร็จ
         const querySnapshot = await getDocs(collection(db, "users"));
         const updatedUsers = querySnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
 
-        setUsers(updatedUsers); // ✅ อัปเดต state ให้แสดงข้อมูลใหม่
-        setShowAddUser(false); // ✅ ปิด modal หลังจากเพิ่มผู้ใช้ใหม่
+        setUsers(updatedUsers);
+        setShowAddUser(false);
 
-        // ✅ แจ้งเตือนเมื่อเพิ่มผู้ใช้สำเร็จ
-        Swal.fire({
-          icon: "success",
-          title: "User Added!",
-          text: "The user has been successfully registered.",
-          confirmButtonText: "OK",
-        });
+        showToast.success("User has been successfully registered");
       } catch (error) {
         console.error("🚨 Error updating user list:", error);
-
-        // ✅ แจ้งเตือนเมื่อเกิดข้อผิดพลาด
-        Swal.fire({
-          icon: "error",
-          title: "Error!",
-          text: "An error occurred while updating the user list.",
-          confirmButtonText: "OK",
-        });
+        showToast.error("Failed to register user");
       }
     }
   };
@@ -112,11 +99,19 @@ const UserList = () => {
     createdAtTo,
     lastUpdateFrom,
     lastUpdateTo,
+    role, // เพิ่ม parameter role
   }) => {
-    setCreatedAtFrom(createdAtFrom);
-    setCreatedAtTo(createdAtTo);
-    setLastUpdateFrom(lastUpdateFrom);
-    setLastUpdateTo(lastUpdateTo);
+    try {
+      setCreatedAtFrom(createdAtFrom);
+      setCreatedAtTo(createdAtTo);
+      setLastUpdateFrom(lastUpdateFrom);
+      setLastUpdateTo(lastUpdateTo);
+      setSelectedRole(role); // เก็บค่า role ที่เลือก
+      showToast.success("Filter applied successfully");
+    } catch (error) {
+      console.error("Error applying filter:", error);
+      showToast.error("Failed to apply filter");
+    }
   };
 
   // อัปเดต filteredUsers เพื่อรวมการกรองตามวันที่สร้าง
@@ -145,7 +140,14 @@ const UserList = () => {
       (!lastUpdateTo ||
         (lastUpdateDate && lastUpdateDate <= new Date(lastUpdateTo)));
 
-    return matchesSearch && isInCreatedDateRange && isInLastUpdateRange;
+    const matchesRole = !selectedRole || user.role === selectedRole;
+
+    return (
+      matchesSearch &&
+      isInCreatedDateRange &&
+      isInLastUpdateRange &&
+      matchesRole
+    );
   });
 
   // ✅ คำนวณ Pagination
@@ -179,6 +181,9 @@ const UserList = () => {
       setUsersPerPage(value);
       setCurrentPage(1);
       setCustomInputValue(""); // รีเซ็ตค่าช่อง input
+      showToast.success(`Successfully set ${value} users per page`);
+    } else {
+      showToast.error("Please enter a valid number greater than 0");
     }
   };
 
@@ -204,15 +209,14 @@ const UserList = () => {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await deleteDoc(doc(db, "users", userId)); // ลบผู้ใช้จาก Firestore
+          await deleteDoc(doc(db, "users", userId));
           setUsers((prevUsers) =>
             prevUsers.filter((user) => user.id !== userId)
-          ); // อัปเดต state
-
-          Swal.fire("Deleted!", "User has been deleted.", "success");
+          );
+          showToast.success("User has been deleted successfully");
         } catch (error) {
           console.error("Error deleting user:", error);
-          Swal.fire("Error!", "Failed to delete user.", "error");
+          showToast.error("Failed to delete user");
         }
       }
     });
@@ -220,11 +224,11 @@ const UserList = () => {
 
   const handleRoleChange = async (userId, newRole) => {
     try {
-      const updatedAt = new Date(); // ดึงเวลาปัจจุบัน
+      const updatedAt = new Date();
 
       await updateDoc(doc(db, "users", userId), {
         role: newRole,
-        lastUpdate: updatedAt, // ✅ เพิ่มฟิลด์ lastUpdate
+        lastUpdate: updatedAt,
       });
 
       setUsers((prevUsers) =>
@@ -235,10 +239,10 @@ const UserList = () => {
         )
       );
 
-      Swal.fire("Success!", "User role updated successfully.", "success");
+      showToast.success("User role updated successfully");
     } catch (error) {
       console.error("Error updating role:", error);
-      Swal.fire("Error!", "Failed to update role.", "error");
+      showToast.error("Failed to update role");
     }
   };
 
@@ -305,6 +309,8 @@ const UserList = () => {
           onFilterChange={handleFilterChange}
           isOpen={isFilterModalOpen}
           closeModal={() => setIsFilterModalOpen(false)}
+          roles={roles} // ส่ง roles ไปให้ FilterUser
+          selectedRole={selectedRole} // ส่งค่า role ที่เลือกไปด้วย
         />
       )}
 
