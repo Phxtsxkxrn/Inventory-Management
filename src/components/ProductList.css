@@ -549,3 +549,23 @@ input[type="checkbox"]:disabled {
   font-size: 18px;
   color: #333;
 }
+
+/* Skeleton loading styles */
+.react-loading-skeleton {
+  background-color: #f0f0f0;
+  border-radius: 4px;
+}
+
+.product-table td .react-loading-skeleton {
+  margin: 5px 0;
+}
+
+/* Custom skeleton heights for different columns */
+td .react-loading-skeleton {
+  height: 20px;
+}
+
+td:first-child .react-loading-skeleton {
+  width: 20px;
+  height: 20px;
+}

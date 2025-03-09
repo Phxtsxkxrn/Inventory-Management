@@ -14,6 +14,8 @@ import { db } from "../services/firebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
 import Filter from "./Filter"; // นำเข้า Filter
 import ColumnSelector from "./ColumnSelector";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
 
 const ProductList = ({
   products,
@@ -668,156 +670,180 @@ const ProductList = ({
           </tr>
         </thead>
         <tbody>
-          {displayedProducts.map((product) => {
-            // ตรวจสอบว่ามีโปรโมชั่นที่กำลังใช้งานอยู่หรือไม่
-            const discountPercentage = product.AppliedPromotion
-              ? product.AppliedPromotion.discount
-              : product.Discount || 0; // ใช้ Discount ปกติถ้าไม่มีโปรโมชั่น
+          {isLoading
+            ? // Skeleton loading rows
+              Array(productsPerPage)
+                .fill()
+                .map((_, idx) => (
+                  <tr key={`skeleton-${idx}`}>
+                    {visibleColumns.map((column) => (
+                      <td key={`${column}-${idx}`}>
+                        {column === "Image" ? (
+                          <Skeleton circle width={50} height={50} />
+                        ) : column === "checkbox" ? (
+                          <Skeleton circle width={20} height={20} />
+                        ) : column === "actions" ? (
+                          <Skeleton width={60} height={30} />
+                        ) : (
+                          <Skeleton width={column === "Name" ? 200 : 100} />
+                        )}
+                      </td>
+                    ))}
+                  </tr>
+                ))
+            : // Regular product rows
+              displayedProducts.map((product) => {
+                // ตรวจสอบว่ามีโปรโมชั่นที่กำลังใช้งานอยู่หรือไม่
+                const discountPercentage = product.AppliedPromotion
+                  ? product.AppliedPromotion.discount
+                  : product.Discount || 0; // ใช้ Discount ปกติถ้าไม่มีโปรโมชั่น
 
-            // คำนวณ Final Price ตามโปรโมชั่น (ถ้ามี)
-            const finalPrice =
-              product.NormalPrice && discountPercentage
-                ? product.NormalPrice -
-                  (product.NormalPrice * discountPercentage) / 100
-                : product.NormalPrice;
+                // คำนวณ Final Price ตามโปรโมชั่น (ถ้ามี)
+                const finalPrice =
+                  product.NormalPrice && discountPercentage
+                    ? product.NormalPrice -
+                      (product.NormalPrice * discountPercentage) / 100
+                    : product.NormalPrice;
 
-            return (
-              <tr key={product.id}>
-                {visibleColumns.includes("checkbox") && (
-                  <td>
-                    <input
-                      type="checkbox"
-                      className="custom-checkbox"
-                      disabled={isModalOpen}
-                      checked={isProductSelected(product.id)}
-                      onChange={() => handleCheckboxChange(product.id)}
-                    />
-                  </td>
-                )}
-                {visibleColumns.includes("Image") && (
-                  <td>
-                    {product.Image ? (
-                      <img
-                        src={product.Image}
-                        alt={product.Name || "Product Image"}
-                        style={{
-                          width: "50px",
-                          height: "50px",
-                          objectFit: "cover",
-                        }}
-                      />
-                    ) : (
-                      "No Image"
+                return (
+                  <tr key={product.id}>
+                    {visibleColumns.includes("checkbox") && (
+                      <td>
+                        <input
+                          type="checkbox"
+                          className="custom-checkbox"
+                          disabled={isModalOpen}
+                          checked={isProductSelected(product.id)}
+                          onChange={() => handleCheckboxChange(product.id)}
+                        />
+                      </td>
                     )}
-                  </td>
-                )}
-                {visibleColumns.includes("SKU") && (
-                  <td>{product.SKU || "N/A"}</td>
-                )}
-                {visibleColumns.includes("Brand") && (
-                  <td>{product.Brand || "N/A"}</td>
-                )}
-                {visibleColumns.includes("Name") && (
-                  <td>{product.Name || "N/A"}</td>
-                )}
-                {visibleColumns.includes("Categories") && (
-                  <td>{product.Categories || "N/A"}</td>
-                )}
-                {visibleColumns.includes("Seller") && (
-                  <td>{product.Seller || "N/A"}</td>
-                )}
-                {visibleColumns.includes("NormalPrice") && (
-                  <td>
-                    {product.NormalPrice
-                      ? `฿${new Intl.NumberFormat("th-TH", {
-                          style: "decimal",
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        }).format(product.NormalPrice)}`
-                      : "N/A"}
-                  </td>
-                )}
-                {visibleColumns.includes("Discount") && (
-                  <td>
-                    {product.AppliedPromotion
-                      ? `${product.AppliedPromotion.discount}% (Promo)`
-                      : product.Discount
-                      ? `${product.Discount}%`
-                      : "N/A"}
-                  </td>
-                )}
-                {visibleColumns.includes("finalPrice") && (
-                  <td>
-                    {finalPrice
-                      ? `฿${new Intl.NumberFormat("th-TH", {
-                          style: "decimal",
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        }).format(finalPrice)}`
-                      : "N/A"}
-                  </td>
-                )}
-                {visibleColumns.includes("Status") && (
-                  <td className="status">
-                    {userRole === "Employee" ? ( // ✅ ถ้าเป็น Employee ให้แสดงเฉพาะข้อความ
-                      <span
-                        className={`status-text ${
-                          product.Status === "active"
-                            ? "status-active"
-                            : "status-inactive"
-                        }`}
-                      >
-                        {product.Status === "active" ? "Active" : "Inactive"}
-                      </span>
-                    ) : (
-                      // ✅ ถ้าไม่ใช่ Employee ให้ใช้ dropdown ปกติ
-                      <select
-                        value={product.Status}
-                        onChange={(e) =>
-                          handleStatusChange(product.id, e.target.value)
-                        }
-                        className={`status-dropdown ${
-                          product.Status === "active"
-                            ? "status-active"
-                            : product.Status === "inactive"
-                            ? "status-inactive"
-                            : "status-other"
-                        }`}
-                      >
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
-                      </select>
+                    {visibleColumns.includes("Image") && (
+                      <td>
+                        {product.Image ? (
+                          <img
+                            src={product.Image}
+                            alt={product.Name || "Product Image"}
+                            style={{
+                              width: "50px",
+                              height: "50px",
+                              objectFit: "cover",
+                            }}
+                          />
+                        ) : (
+                          "No Image"
+                        )}
+                      </td>
                     )}
-                  </td>
-                )}
-                {visibleColumns.includes("CreatedAt") && (
-                  <td>
-                    {product.CreatedAt
-                      ? new Date(product.CreatedAt).toLocaleString()
-                      : "N/A"}
-                  </td>
-                )}
-                {visibleColumns.includes("LastUpdate") && (
-                  <td>
-                    {product.LastUpdate
-                      ? new Date(product.LastUpdate).toLocaleString()
-                      : "N/A"}
-                  </td>
-                )}
-                {visibleColumns.includes("actions") &&
-                  userRole !== "Employee" && (
-                    <td className="actions">
-                      <button
-                        className="edit"
-                        onClick={() => openEditModal(product)}
-                      >
-                        Edit
-                      </button>
-                    </td>
-                  )}
-              </tr>
-            );
-          })}
+                    {visibleColumns.includes("SKU") && (
+                      <td>{product.SKU || "N/A"}</td>
+                    )}
+                    {visibleColumns.includes("Brand") && (
+                      <td>{product.Brand || "N/A"}</td>
+                    )}
+                    {visibleColumns.includes("Name") && (
+                      <td>{product.Name || "N/A"}</td>
+                    )}
+                    {visibleColumns.includes("Categories") && (
+                      <td>{product.Categories || "N/A"}</td>
+                    )}
+                    {visibleColumns.includes("Seller") && (
+                      <td>{product.Seller || "N/A"}</td>
+                    )}
+                    {visibleColumns.includes("NormalPrice") && (
+                      <td>
+                        {product.NormalPrice
+                          ? `฿${new Intl.NumberFormat("th-TH", {
+                              style: "decimal",
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            }).format(product.NormalPrice)}`
+                          : "N/A"}
+                      </td>
+                    )}
+                    {visibleColumns.includes("Discount") && (
+                      <td>
+                        {product.AppliedPromotion
+                          ? `${product.AppliedPromotion.discount}% (Promo)`
+                          : product.Discount
+                          ? `${product.Discount}%`
+                          : "N/A"}
+                      </td>
+                    )}
+                    {visibleColumns.includes("finalPrice") && (
+                      <td>
+                        {finalPrice
+                          ? `฿${new Intl.NumberFormat("th-TH", {
+                              style: "decimal",
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            }).format(finalPrice)}`
+                          : "N/A"}
+                      </td>
+                    )}
+                    {visibleColumns.includes("Status") && (
+                      <td className="status">
+                        {userRole === "Employee" ? ( // ✅ ถ้าเป็น Employee ให้แสดงเฉพาะข้อความ
+                          <span
+                            className={`status-text ${
+                              product.Status === "active"
+                                ? "status-active"
+                                : "status-inactive"
+                            }`}
+                          >
+                            {product.Status === "active"
+                              ? "Active"
+                              : "Inactive"}
+                          </span>
+                        ) : (
+                          // ✅ ถ้าไม่ใช่ Employee ให้ใช้ dropdown ปกติ
+                          <select
+                            value={product.Status}
+                            onChange={(e) =>
+                              handleStatusChange(product.id, e.target.value)
+                            }
+                            className={`status-dropdown ${
+                              product.Status === "active"
+                                ? "status-active"
+                                : product.Status === "inactive"
+                                ? "status-inactive"
+                                : "status-other"
+                            }`}
+                          >
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                          </select>
+                        )}
+                      </td>
+                    )}
+                    {visibleColumns.includes("CreatedAt") && (
+                      <td>
+                        {product.CreatedAt
+                          ? new Date(product.CreatedAt).toLocaleString()
+                          : "N/A"}
+                      </td>
+                    )}
+                    {visibleColumns.includes("LastUpdate") && (
+                      <td>
+                        {product.LastUpdate
+                          ? new Date(product.LastUpdate).toLocaleString()
+                          : "N/A"}
+                      </td>
+                    )}
+                    {visibleColumns.includes("actions") &&
+                      userRole !== "Employee" && (
+                        <td className="actions">
+                          <button
+                            className="edit"
+                            onClick={() => openEditModal(product)}
+                          >
+                            Edit
+                          </button>
+                        </td>
+                      )}
+                  </tr>
+                );
+              })}
         </tbody>
       </table>
       {/* Action Bar */}
