@@ -1,12 +1,14 @@
 import React, { useState } from "react";
-import { loginUser } from "../services/authService"; // นำเข้า loginUser
-import Swal from "sweetalert2"; // ใช้ในการแจ้งเตือน
+import { useNavigate } from "react-router-dom";
+import { loginUser } from "../services/authService";
+import Swal from "sweetalert2";
 import "./Login.css";
 
 const Login = ({ onLoginSuccess }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -32,7 +34,7 @@ const Login = ({ onLoginSuccess }) => {
     <div className="login-container">
       <div className="login-card">
         <h3 className="login-title">Sign in</h3>
-        {error && <p className="login-error">{error}</p>} {/* แสดงข้อผิดพลาด */}
+        {error && <p className="login-error">{error}</p>}
         <form className="login-form" onSubmit={handleLogin}>
           <div className="login-input-group">
             <label className="login-label">Email</label>
@@ -53,6 +55,12 @@ const Login = ({ onLoginSuccess }) => {
               className="login-input"
               required
             />
+          </div>
+
+          <div className="forgot-password-link">
+            <span onClick={() => navigate("/reset-password")}>
+              Forgot your password?
+            </span>
           </div>
 
           <button type="submit" className="login-button">

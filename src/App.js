@@ -17,6 +17,8 @@ import Login from "./components/Login";
 import Register from "./components/Register";
 import UserList from "./components/UserList";
 import EditProfile from "./components/EditProfile";
+import ResetPassword from "./components/ResetPassword";
+import NewPassword from "./components/NewPassword";
 import { db } from "./services/firebaseConfig";
 import { doc, getDoc, setDoc } from "firebase/firestore"; // เชื่อมต่อกับ Firestore
 import {
@@ -254,6 +256,9 @@ const App = () => {
               path="/add"
               element={<ProductForm onSubmit={handleAddProduct} />}
             />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/reset-password-confirm" element={<ResetPassword />} />
+            <Route path="/new-password" element={<NewPassword />} />
           </Routes>
           <ToastContainer
             position="top-right"
