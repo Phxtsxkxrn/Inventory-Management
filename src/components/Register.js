@@ -20,7 +20,7 @@ const schema = yup.object().shape({
   role: yup.string().required("Role is required"),
 });
 
-const Register = ({ onUserAdded, onClose }) => {
+const Register = ({ onUserAdded, onClose, currentUserRole }) => {
   const {
     register,
     handleSubmit,
@@ -35,6 +35,14 @@ const Register = ({ onUserAdded, onClose }) => {
       role: "Employee",
     },
   });
+
+  // เพิ่มฟังก์ชันสำหรับกำหนดตัวเลือก role
+  const getAvailableRoles = () => {
+    if (currentUserRole === "Manager") {
+      return ["Employee"];
+    }
+    return ["Employee", "Manager", "Admin"];
+  };
 
   const onSubmit = async (data) => {
     try {
@@ -138,9 +146,11 @@ const Register = ({ onUserAdded, onClose }) => {
           <div className="register-select-group">
             <label className="register-label">Role:</label>
             <select className="register-select" {...register("role")}>
-              <option value="Employee">Employee</option>
-              <option value="Manager">Manager</option>
-              <option value="Admin">Admin</option>
+              {getAvailableRoles().map((role) => (
+                <option key={role} value={role}>
+                  {role}
+                </option>
+              ))}
             </select>
             {errors.role && (
               <span className="error-message">{errors.role.message}</span>

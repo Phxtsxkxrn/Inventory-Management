@@ -294,6 +294,11 @@ const UserList = () => {
     );
   };
 
+  // เพิ่มการดึง current user role
+  const currentUserRole = users.find(
+    (user) => user.email === localStorage.getItem("userEmail")
+  )?.role;
+
   return (
     <div className="user-list-container">
       {/* ✅ Header: ค้นหา และปุ่ม Add User */}
@@ -488,6 +493,7 @@ const UserList = () => {
         <Register
           onUserAdded={handleUserAdded}
           onClose={() => setShowAddUser(false)}
+          currentUserRole={currentUserRole}
         />
       )}
     </div>
