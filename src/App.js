@@ -183,7 +183,6 @@ const App = () => {
         {user && <Navbar onLogout={handleLogout} />}
         <div style={{ flex: 1, padding: "20px" }}>
           <Routes>
-            {/* ...existing code... */}
             <Route
               path="/"
               element={user ? <Home /> : <Navigate to="/login" />}
@@ -258,11 +257,8 @@ const App = () => {
               element={<ProductForm onSubmit={handleAddProduct} />}
             />
             <Route path="/reset-password" element={<ResetPassword />} />
-            <Route
-              path="/new-password"
-              element={<NewPassword />} /* เพิ่ม Route สำหรับหน้า NewPassword */
-            />
-            new-password" element={<NewPassword />} />
+            {/* เพิ่ม Route สำหรับหน้า NewPassword */}
+            <Route path="/new-password" element={<NewPassword />} />
           </Routes>
           <ToastContainer
             position="top-right"
