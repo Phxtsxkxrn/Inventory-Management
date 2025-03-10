@@ -18,7 +18,7 @@ const UserList = () => {
   const [users, setUsers] = useState([]);
   const [showAddUser, setShowAddUser] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [roles] = useState(["Employee", "Stock Manager", "Admin"]);
+  const [roles] = useState(["Employee", "Manager", "Admin"]);
 
   // ✅ Pagination State
   const [usersPerPage, setUsersPerPage] = useState(10); // จำนวนผู้ใช้ต่อหน้า
@@ -198,6 +198,17 @@ const UserList = () => {
 
   // ✅ ฟังก์ชันลบผู้ใช้
   const handleDeleteUser = async (userId) => {
+    // ตรวจสอบ role ของ user ที่จะถูกลบ
+    const userToDelete = users.find((user) => user.id === userId);
+    const currentUser = users.find(
+      (user) => user.email === localStorage.getItem("userEmail")
+    );
+
+    if (currentUser?.role === "Manager" && userToDelete?.role === "Admin") {
+      showToast.error("Managers cannot delete Admin users");
+      return;
+    }
+
     Swal.fire({
       title: "Are you sure?",
       text: "You won't be able to revert this!",
@@ -223,9 +234,25 @@ const UserList = () => {
   };
 
   const handleRoleChange = async (userId, newRole) => {
+    const userToUpdate = users.find((user) => user.id === userId);
+    const currentUser = users.find(
+      (user) => user.email === localStorage.getItem("userEmail")
+    );
+
+    // ตรวจสอบเงื่อนไขสำหรับ Manager
+    if (currentUser?.role === "Manager") {
+      if (userToUpdate?.role === "Admin") {
+        showToast.error("Managers cannot modify Admin roles");
+        return;
+      }
+      if (newRole === "Admin" || newRole === "Manager") {
+        showToast.error("Managers cannot assign Admin or Manager roles");
+        return;
+      }
+    }
+
     try {
       const updatedAt = new Date();
-
       await updateDoc(doc(db, "users", userId), {
         role: newRole,
         lastUpdate: updatedAt,

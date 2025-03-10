@@ -139,7 +139,7 @@ const Register = ({ onUserAdded, onClose }) => {
             <label className="register-label">Role:</label>
             <select className="register-select" {...register("role")}>
               <option value="Employee">Employee</option>
-              <option value="Stock Manager">Stock Manager</option>
+              <option value="Manager">Manager</option>
               <option value="Admin">Admin</option>
             </select>
             {errors.role && (
