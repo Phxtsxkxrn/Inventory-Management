@@ -59,12 +59,21 @@ const ResetPassword = () => {
     }
 
     try {
-      await verifyOTP(email, enteredOtp);
-      showToast.success("OTP verified successfully");
-      navigate("/new-password", { state: { email } });
+      const result = await verifyOTP(email, enteredOtp);
+      if (result) {
+        // เพิ่มการตรวจสอบผลลัพธ์
+        showToast.success("OTP verified successfully");
+        console.log("Navigating to new-password with email:", email);
+        navigate("/new-password", {
+          state: { email },
+          replace: true,
+        });
+      } else {
+        showToast.error("Invalid OTP");
+      }
     } catch (error) {
       console.error("Error:", error);
-      showToast.error(error.message);
+      showToast.error(error.message || "Verification failed");
     }
   };
 
