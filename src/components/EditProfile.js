@@ -7,6 +7,7 @@ import { db } from "../services/firebaseConfig";
 import Swal from "sweetalert2";
 import "./EditProfile.css";
 import { useNavigate } from "react-router-dom";
+import { hashPassword, verifyPassword } from "../services/cryptoutils.service";
 
 const schema = yup.object().shape({
   firstName: yup.string().required("First name is required"),
@@ -15,10 +16,16 @@ const schema = yup.object().shape({
     .string()
     .email("Invalid email format")
     .required("Email is required"),
-  password: yup
+  newPassword: yup
     .string()
     .min(6, "Password must be at least 6 characters")
-    .required("Password is required"),
+    .nullable()
+    .transform((value) => (value === "" ? null : value)),
+  passwordConfirmation: yup
+    .string()
+    .nullable()
+    .transform((value) => (value === "" ? null : value))
+    .oneOf([yup.ref("newPassword")], "Passwords must match"),
 });
 
 const EditProfile = () => {
@@ -53,36 +60,69 @@ const EditProfile = () => {
   }, [userEmail, reset]);
 
   const onSubmit = async (data) => {
-    const result = await Swal.fire({
-      title: "Are you sure?",
-      text: "Do you want to update your profile?",
-      icon: "question",
+    // Ask for current password verification first
+    const { value: currentPassword } = await Swal.fire({
+      title: "Verify Your Identity",
+      text: "Please enter your current password to continue",
+      input: "password",
+      inputPlaceholder: "Enter your current password",
       showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, update it!",
+      confirmButtonText: "Verify and Update",
+      showLoaderOnConfirm: true,
+      inputValidator: (value) => {
+        if (!value) {
+          return "Please enter your current password";
+        }
+      },
     });
 
-    if (result.isConfirmed) {
-      try {
-        const userRef = doc(db, "users", userEmail);
-        await updateDoc(userRef, data);
+    if (!currentPassword) return; // ถ้าผู้ใช้กด cancel
 
-        Swal.fire({
-          icon: "success",
-          title: "Profile Updated!",
-          text: "Your profile has been updated successfully.",
-        });
+    try {
+      // ตรวจสอบรหัสผ่านปัจจุบัน
+      const userRef = doc(db, "users", userEmail);
+      const userSnap = await getDoc(userRef);
+      const userData = userSnap.data();
 
-        navigate("/");
-      } catch (error) {
-        console.error("Error updating profile:", error);
+      const isValid = await verifyPassword(currentPassword, userData.password);
+      if (!isValid) {
         Swal.fire({
           icon: "error",
-          title: "Error!",
-          text: "An error occurred while updating your profile.",
+          title: "Invalid Password",
+          text: "Current password is incorrect",
         });
+        return;
       }
+
+      // สร้างข้อมูลที่จะอัพเดท
+      const updateData = {
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+      };
+
+      // เพิ่มรหัสผ่านใหม่ถ้ามีการกรอก
+      if (data.newPassword) {
+        updateData.password = await hashPassword(data.newPassword);
+      }
+
+      // อัพเดทข้อมูล
+      await updateDoc(userRef, updateData);
+
+      Swal.fire({
+        icon: "success",
+        title: "Profile Updated!",
+        text: "Your profile has been updated successfully.",
+      });
+
+      navigate("/");
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error!",
+        text: "An error occurred while updating your profile.",
+      });
     }
   };
 
@@ -116,10 +156,30 @@ const EditProfile = () => {
           </div>
 
           <div className="edit-profile-input-group">
-            <label>Password:</label>
-            <input type="password" {...register("password")} />
-            {errors.password && (
-              <span className="error-message">{errors.password.message}</span>
+            <label>New Password (optional):</label>
+            <input
+              type="password"
+              {...register("newPassword")}
+              placeholder="Leave blank to keep current password"
+            />
+            {errors.newPassword && (
+              <span className="error-message">
+                {errors.newPassword.message}
+              </span>
+            )}
+          </div>
+
+          <div className="edit-profile-input-group">
+            <label>Confirm New Password:</label>
+            <input
+              type="password"
+              {...register("passwordConfirmation")}
+              placeholder="Confirm new password"
+            />
+            {errors.passwordConfirmation && (
+              <span className="error-message">
+                {errors.passwordConfirmation.message}
+              </span>
             )}
           </div>
 
