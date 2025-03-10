@@ -1,5 +1,13 @@
 import { db } from "./firebaseConfig";
-import { collection, getDocs, addDoc, deleteDoc, doc, getDoc, serverTimestamp } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  addDoc,
+  deleteDoc,
+  doc,
+  getDoc,
+  serverTimestamp,
+} from "firebase/firestore";
 
 const categoriesCollection = collection(db, "Categories");
 
@@ -20,8 +28,6 @@ export const getCategories = async () => {
     };
   });
 };
-
-
 
 // Add a new category
 export const addCategories = async (categories) => {

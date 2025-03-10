@@ -2,7 +2,7 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { addCategories } from "../services/categoriesService";
+import { addCategories } from "../services/categories.service";
 import "./AddCategories.css";
 import Swal from "sweetalert2";
 

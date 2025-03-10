@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { showToast } from "../utils/toast";
 import { useNavigate } from "react-router-dom";
-import { createOTP, verifyOTP } from "../services/otpService";
+import { createOTP, verifyOTP } from "../services/otp.service";
 import "./ResetPassword.css";
 
 const ResetPassword = () => {

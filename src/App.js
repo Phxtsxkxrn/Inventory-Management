@@ -18,7 +18,6 @@ import Register from "./components/Register";
 import UserList from "./components/UserList";
 import EditProfile from "./components/EditProfile";
 import ResetPassword from "./components/ResetPassword";
-import NewPassword from "./components/NewPassword";
 import { db } from "./services/firebaseConfig";
 import { doc, getDoc, setDoc } from "firebase/firestore"; // เชื่อมต่อกับ Firestore
 import {
@@ -26,12 +25,12 @@ import {
   addProduct,
   updateProduct,
   deleteProduct,
-} from "./services/productService";
+} from "./services/product.service";
 import {
   getCategories,
   addCategories,
   deleteCategories,
-} from "./services/categoriesService";
+} from "./services/categories.service";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -257,8 +256,6 @@ const App = () => {
               element={<ProductForm onSubmit={handleAddProduct} />}
             />
             <Route path="/reset-password" element={<ResetPassword />} />
-            <Route path="/reset-password-confirm" element={<ResetPassword />} />
-            <Route path="/new-password" element={<NewPassword />} />
           </Routes>
           <ToastContainer
             position="top-right"

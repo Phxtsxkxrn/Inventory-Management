@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { getPromotions } from "../services/promotionService";
-import { updateProduct } from "../services/productService";
+import { getPromotions } from "../services/promotion.service";
+import { updateProduct } from "../services/product.service";
 import "./ManagePromotions.css";
 import Swal from "sweetalert2";
 import { FaSave } from "react-icons/fa";

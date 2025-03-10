@@ -1,6 +1,6 @@
 import { db } from "./firebaseConfig";
 import { setDoc, doc, getDoc, serverTimestamp } from "firebase/firestore";
-import { hashPassword, verifyPassword } from "./cryptoUtils"; // ใช้ฟังก์ชันแฮชจาก cryptoUtils.js
+import { hashPassword, verifyPassword } from "./cryptoutils.service"; // ใช้ฟังก์ชันแฮชจาก cryptoUtils.js
 
 // ✅ ฟังก์ชันลงทะเบียน
 export const registerUser = async (

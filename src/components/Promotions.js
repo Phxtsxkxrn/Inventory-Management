@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { getPromotions, deletePromotion } from "../services/promotionService";
+import { getPromotions, deletePromotion } from "../services/promotion.service";
 import AddPromotion from "./AddPromotion";
 import FilterPromotion from "./FilterPromotion"; // Import FilterPromotion
 import PromotionColumnSelector from "./PromotionColumnSelector";

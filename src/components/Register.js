@@ -2,7 +2,7 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { registerUser } from "../services/authService";
+import { registerUser } from "../services/auth.service";
 import Swal from "sweetalert2";
 import "./Register.css";
 

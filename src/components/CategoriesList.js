@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import AddCategories from "./AddCategories";
-import { getCategories, deleteCategories } from "../services/categoriesService";
+import {
+  getCategories,
+  deleteCategories,
+} from "../services/categories.service";
 import "./CategoriesList.css";
 import Swal from "sweetalert2";
 import { showToast } from "../utils/toast";

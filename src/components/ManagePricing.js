@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom"; // เพิ่ม 
 import { useForm, useFieldArray } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { updateProduct } from "../services/productService";
+import { updateProduct } from "../services/product.service";
 import "./ManagePricing.css";
 import { FaSave, FaPercentage } from "react-icons/fa";
 import Swal from "sweetalert2";

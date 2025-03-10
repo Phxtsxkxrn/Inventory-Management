@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../services/firebaseConfig";
 import { showToast } from "../utils/toast";
-import { hashPassword } from "../services/cryptoUtils";
+import { hashPassword } from "../services/cryptoutils.service";
 import "./NewPassword.css";
 
 const NewPassword = () => {

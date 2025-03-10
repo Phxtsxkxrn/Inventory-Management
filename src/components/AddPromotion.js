@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import Swal from "sweetalert2";
-import { addPromotion } from "../services/promotionService";
+import { addPromotion } from "../services/promotion.service";
 import { showToast } from "../utils/toast";
 import "./AddPromotion.css";
 

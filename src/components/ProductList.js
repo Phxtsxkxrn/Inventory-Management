@@ -3,12 +3,12 @@ import AddProduct from "./AddProduct";
 import EditProduct from "./EditProduct";
 import ImportProducts from "./ImportProducts";
 import "./ProductList.css"; // นำเข้าไฟล์ CSS
-import { deleteProduct } from "../services/productService";
+import { deleteProduct } from "../services/product.service";
 import React, { useState, useEffect, useCallback } from "react"; // ✅ เพิ่ม useEffect ที่นี่
 import { useLocation } from "react-router-dom";
-import { getProducts } from "../services/productService"; // ✅ โหลดสินค้าใหม่
-import { exportProducts } from "../services/exportService";
-import { updateProductStatus } from "../services/productService";
+import { getProducts } from "../services/product.service"; // ✅ โหลดสินค้าใหม่
+import { exportProducts } from "../services/export.service";
+import { updateProductStatus } from "../services/product.service";
 import Swal from "sweetalert2";
 import { db } from "../services/firebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
