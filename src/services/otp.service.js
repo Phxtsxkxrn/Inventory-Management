@@ -5,8 +5,8 @@ import {
   query,
   where,
   getDocs,
-  updateDoc,
   doc,
+  deleteDoc,
 } from "firebase/firestore";
 import emailjs from "emailjs-com";
 
@@ -97,36 +97,38 @@ export const createOTP = async (email) => {
 // ตรวจสอบ OTP
 export const verifyOTP = async (email, enteredOTP) => {
   try {
-    const otpRef = collection(db, "otps");
+    // เปลี่ยนวิธีการค้นหา OTP
+    const otpsRef = collection(db, "otps");
     const q = query(
-      otpRef,
+      otpsRef,
       where("email", "==", email),
-      where("otp", "==", enteredOTP),
       where("used", "==", false)
     );
-    const otpSnapshot = await getDocs(q);
+    const querySnapshot = await getDocs(q);
 
-    if (otpSnapshot.empty) {
-      throw new Error("Invalid OTP");
+    if (querySnapshot.empty) {
+      return false;
     }
 
-    const otpDoc = otpSnapshot.docs[0];
+    // ใช้ OTP ล่าสุด
+    const otpDoc = querySnapshot.docs[0];
     const otpData = otpDoc.data();
+    const now = new Date();
 
-    // ตรวจสอบว่า OTP หมดอายุหรือยัง
-    if (otpData.expiresAt.toDate() < new Date()) {
+    if (now.getTime() > otpData.expiresAt.toDate().getTime()) {
+      await deleteDoc(doc(db, "otps", otpDoc.id));
       throw new Error("OTP has expired");
     }
 
-    // อัพเดตสถานะ OTP เป็น used
-    await updateDoc(doc(db, "otps", otpDoc.id), {
-      used: true,
-      usedAt: new Date(),
-    });
+    if (otpData.otp === enteredOTP) {
+      // ลบ OTP หลังจากใช้งานสำเร็จ
+      await deleteDoc(doc(db, "otps", otpDoc.id));
+      return true;
+    }
 
-    return true;
+    return false;
   } catch (error) {
-    console.error("Error in verifyOTP:", error);
+    console.error("Error verifying OTP:", error);
     throw error;
   }
 };

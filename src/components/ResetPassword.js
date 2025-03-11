@@ -33,6 +33,24 @@ const ResetPassword = () => {
     }
   };
 
+  // เพิ่มฟังก์ชัน handle paste
+  const handlePaste = (e) => {
+    e.preventDefault();
+    const pastedText = e.clipboardData.getData("text").trim();
+
+    // ตรวจสอบว่าเป็นตัวเลข 6 หลักหรือไม่
+    if (/^\d{6}$/.test(pastedText)) {
+      const newOtp = pastedText.split("");
+      setOtp(newOtp);
+
+      // โฟกัสที่ช่องสุดท้าย
+      const lastInput = document.getElementById("otp-5");
+      if (lastInput) lastInput.focus();
+    } else {
+      showToast.error("Please paste a valid 6-digit code");
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -61,19 +79,26 @@ const ResetPassword = () => {
     try {
       const result = await verifyOTP(email, enteredOtp);
       if (result) {
-        // เพิ่มการตรวจสอบผลลัพธ์
         showToast.success("OTP verified successfully");
-        console.log("Navigating to new-password with email:", email);
         navigate("/new-password", {
           state: { email },
           replace: true,
         });
       } else {
-        showToast.error("Invalid OTP");
+        showToast.error("Invalid OTP code");
+        // รีเซ็ต OTP fields
+        setOtp(["", "", "", "", "", ""]);
+        // โฟกัสที่ช่องแรก
+        const firstInput = document.getElementById("otp-0");
+        if (firstInput) firstInput.focus();
       }
     } catch (error) {
-      console.error("Error:", error);
-      showToast.error(error.message || "Verification failed");
+      if (error.message === "OTP has expired") {
+        showToast.error("OTP has expired. Please request a new one");
+        setOtpSent(false); // กลับไปหน้าขอ OTP ใหม่
+      } else {
+        showToast.error(error.message || "Verification failed");
+      }
     }
   };
 
@@ -123,6 +148,7 @@ const ResetPassword = () => {
                     value={digit}
                     onChange={(e) => handleOtpChange(index, e.target.value)}
                     onKeyDown={(e) => handleKeyDown(index, e)}
+                    onPaste={index === 0 ? handlePaste : undefined} // เพิ่ม onPaste ที่ช่องแรกเท่านั้น
                     className="rp-otp-input"
                   />
                 ))}
