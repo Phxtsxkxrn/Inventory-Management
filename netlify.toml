@@ -9,27 +9,6 @@
 
 [[redirects]]
   from = "/*"
-  to = "/_next/static/:splat"
-  status = 200
-  force = true
-  conditions = {Path = "/_next/static/*"}
-
-[[redirects]]
-  from = "/*"
-  to = "/api/:splat"
-  status = 200
-  force = true
-  conditions = {Path = "/api/*"}
-
-[[redirects]]
-  from = "/*"
-  to = "/.netlify/functions/:splat"
-  status = 200
-  force = true
-  conditions = {Path = "/.netlify/functions/*"}
-
-[[redirects]]
-  from = "/*"
   to = "/index.html"
   status = 200
 
