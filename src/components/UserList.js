@@ -196,14 +196,32 @@ const UserList = () => {
     return new Date(timestamp).toLocaleString();
   };
 
+  // Add role hierarchy constant at the top level of the component
+  const roleHierarchy = {
+    Admin: 3,
+    Manager: 2,
+    Employee: 1,
+  };
+
   // ✅ ฟังก์ชันลบผู้ใช้
   const handleDeleteUser = async (userId) => {
-    // ตรวจสอบ role ของ user ที่จะถูกลบ
     const userToDelete = users.find((user) => user.id === userId);
-    const currentUser = users.find(
-      (user) => user.email === localStorage.getItem("userEmail")
-    );
+    const currentUserEmail = localStorage.getItem("userEmail");
+    const currentUser = users.find((user) => user.email === currentUserEmail);
 
+    // Prevent self-deletion
+    if (userToDelete.email === currentUserEmail) {
+      showToast.error("You cannot delete your own account");
+      return;
+    }
+
+    // Check role hierarchy
+    if (roleHierarchy[userToDelete.role] >= roleHierarchy[currentUser.role]) {
+      showToast.error("You cannot delete users with equal or higher role");
+      return;
+    }
+
+    // If Manager role, prevent deleting Admin users (existing check)
     if (currentUser?.role === "Manager" && userToDelete?.role === "Admin") {
       showToast.error("Managers cannot delete Admin users");
       return;
