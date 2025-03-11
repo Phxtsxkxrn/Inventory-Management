@@ -36,11 +36,10 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const App = () => {
-  const [user, setUser] = useState(null); // กำหนดสถานะของผู้ใช้
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [userExists, setUserExists] = useState(false); // เช็คว่า user มีอยู่แล้วหรือไม่
 
   // ฟังก์ชันที่ใช้ในการตรวจสอบการเข้าสู่ระบบ
   const checkUserStatus = async () => {
@@ -159,7 +158,7 @@ const App = () => {
 
     if (docSnap.exists()) {
       // หากผู้ใช้มีอยู่แล้วใน Firestore
-      setUserExists(true); // แจ้งว่า user มีอยู่แล้ว
+      throw new Error("User already exists"); // ส่ง error กลับไปให้ component จัดการ
     } else {
       // ถ้าผู้ใช้ไม่มีในระบบ ให้ลงทะเบียนใหม่
       const newUser = {
@@ -168,9 +167,8 @@ const App = () => {
         createdAt: new Date(),
       };
 
-      await setDoc(userRef, newUser); // เพิ่มผู้ใช้ใหม่ใน Firestore
-      setUserExists(false); // ผู้ใช้ลงทะเบียนได้
-      localStorage.setItem("userEmail", email); // เก็บอีเมลใน localStorage
+      await setDoc(userRef, newUser);
+      localStorage.setItem("userEmail", email);
       setUser({ email });
     }
   };
@@ -200,14 +198,17 @@ const App = () => {
             <Route
               path="/register"
               element={
-                userExists ? (
+                user ? (
                   <Navigate to="/" />
                 ) : (
                   <Register onRegister={handleRegister} />
                 )
               }
             />
-            <Route path="/edit-profile" element={<EditProfile />} />
+            <Route
+              path="/edit-profile"
+              element={user ? <EditProfile /> : <Navigate to="/login" />}
+            />
             <Route
               path="/users"
               element={user ? <UserList /> : <Navigate to="/login" />}
@@ -215,49 +216,76 @@ const App = () => {
             <Route
               path="/product-list"
               element={
-                <ProductList
-                  products={products}
-                  setProducts={setProducts}
-                  categories={categories}
-                  onAdd={handleAddProduct}
-                  onEdit={handleEditProduct}
-                  onDelete={handleDeleteProduct}
-                  onImport={handleImportProducts}
-                />
+                user ? (
+                  <ProductList
+                    products={products}
+                    setProducts={setProducts}
+                    categories={categories}
+                    onAdd={handleAddProduct}
+                    onEdit={handleEditProduct}
+                    onDelete={handleDeleteProduct}
+                    onImport={handleImportProducts}
+                  />
+                ) : (
+                  <Navigate to="/login" />
+                )
               }
             />
             <Route
               path="/categories-list"
               element={
-                <CategoriesList
-                  categories={categories}
-                  onAdd={handleAddCategories}
-                  onDelete={handleDeleteCategories}
-                />
+                user ? (
+                  <CategoriesList
+                    categories={categories}
+                    onAdd={handleAddCategories}
+                    onDelete={handleDeleteCategories}
+                  />
+                ) : (
+                  <Navigate to="/login" />
+                )
               }
             />
             <Route
               path="/manage-pricing"
               element={
-                <ManagePricing products={products} setProducts={setProducts} />
+                user ? (
+                  <ManagePricing
+                    products={products}
+                    setProducts={setProducts}
+                  />
+                ) : (
+                  <Navigate to="/login" />
+                )
               }
             />
-            <Route path="/promotions" element={<Promotions />} />
+            <Route
+              path="/promotions"
+              element={user ? <Promotions /> : <Navigate to="/login" />}
+            />
             <Route
               path="/manage-promotions"
               element={
-                <ManagePromotions
-                  products={products}
-                  setProducts={setProducts}
-                />
+                user ? (
+                  <ManagePromotions
+                    products={products}
+                    setProducts={setProducts}
+                  />
+                ) : (
+                  <Navigate to="/login" />
+                )
               }
             />
             <Route
               path="/add"
-              element={<ProductForm onSubmit={handleAddProduct} />}
+              element={
+                user ? (
+                  <ProductForm onSubmit={handleAddProduct} />
+                ) : (
+                  <Navigate to="/login" />
+                )
+              }
             />
             <Route path="/reset-password" element={<ResetPassword />} />
-            {/* เพิ่ม Route สำหรับหน้า NewPassword */}
             <Route path="/new-password" element={<NewPassword />} />
           </Routes>
           <ToastContainer
