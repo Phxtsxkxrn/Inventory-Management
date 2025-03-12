@@ -641,18 +641,38 @@ const ProductList = ({
                     <th key={col.key}>
                       <input
                         type="checkbox"
-                        onChange={(e) =>
-                          setSelectedProducts(
-                            e.target.checked
-                              ? displayedProducts.map((p) => p.id)
-                              : []
+                        onChange={(e) => {
+                          // เมื่อ check/uncheck จะเพิ่ม/ลบ id ของสินค้าทั้งหมดในหน้าปัจจุบัน
+                          const currentPageIds = displayedProducts.map(
+                            (p) => p.id
+                          );
+                          if (e.target.checked) {
+                            // เพิ่มเฉพาะ id ที่ยังไม่มีใน selectedProducts
+                            setSelectedProducts((prev) => [
+                              ...new Set([...prev, ...currentPageIds]),
+                            ]);
+                          } else {
+                            // ลบเฉพาะ id ของสินค้าในหน้าปัจจุบัน
+                            setSelectedProducts((prev) =>
+                              prev.filter((id) => !currentPageIds.includes(id))
+                            );
+                          }
+                        }}
+                        disabled={isModalOpen}
+                        // เช็คว่าสินค้าทั้งหมดในหน้าปัจจุบันถูกเลือกหรือไม่
+                        checked={
+                          displayedProducts.length > 0 &&
+                          displayedProducts.every((p) =>
+                            selectedProducts.includes(p.id)
                           )
                         }
-                        disabled={isModalOpen}
-                        checked={
-                          displayedProducts.every((p) =>
-                            isProductSelected(p.id)
-                          ) && displayedProducts.length > 0
+                        indeterminate={
+                          displayedProducts.some((p) =>
+                            selectedProducts.includes(p.id)
+                          ) &&
+                          !displayedProducts.every((p) =>
+                            selectedProducts.includes(p.id)
+                          )
                         }
                       />
                     </th>
