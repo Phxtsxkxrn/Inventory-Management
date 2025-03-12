@@ -345,7 +345,7 @@ const CategoriesList = () => {
       {/* Action Bar */}
       {selectedCategories.length > 0 && (
         <div
-          className={`action-bar ${
+          className={`action-bar-cat ${
             userRole === "Employee" ? "action-bar-employee" : ""
           }`}
         >

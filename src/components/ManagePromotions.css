@@ -18,9 +18,22 @@
 .promotion-table th,
 .promotion-table td {
   padding: 10px; /* ✅ เพิ่มระยะห่างในตาราง */
-  text-align: center;
+  text-align: left !important; /* บังคับให้ชิดซ้ายทั้งหมด */
   font-size: 14px;
   color: #555;
+}
+
+/* ปรับการจัดตำแหน่งชื่อสินค้าให้ชิดซ้ายเสมอ */
+.promotion-table td:first-child {
+  text-align: left !important;
+  padding-left: 12px;
+}
+
+/* ยกเว้นให้ปุ่มและ actions อยู่ตรงกลาง */
+.save-button,
+.promotion-table td:last-child,
+.promotion-table th:last-child {
+  text-align: center !important;
 }
 
 /* ✅ ปรับระยะห่างระหว่าง Dropdown และช่องป้อนวันที่ */
@@ -29,6 +42,14 @@
   gap: 10px; /* ✅ เพิ่มระยะห่างระหว่าง Dropdown และช่องวันที่ */
   align-items: center;
   width: 100%;
+  text-align: left !important;
+}
+
+/* ปรับการจัดตำแหน่งข้อความใน select และ input */
+.promotion-select-group select,
+.promotion-select-group input,
+.promotion-select-group label {
+  text-align: left !important;
 }
 
 /* ✅ ปรับสไตล์ Dropdown (Select Box) */

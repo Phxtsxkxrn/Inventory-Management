@@ -46,6 +46,18 @@
   text-align: center !important;
 }
 
+/* จัดตำแหน่ง checkbox ให้อยู่ตรงกลาง */
+.promotion-table td:first-child {
+  text-align: center !important;
+  padding-left: 0;
+}
+
+.promotion-table td:first-child input[type="checkbox"],
+.promotion-table th:first-child input[type="checkbox"] {
+  margin: 0 auto;
+  display: block;
+}
+
 /* ลบเส้นขอบของตาราง ยกเว้นเส้นใต้หัวข้อ */
 .promotion-table,
 .promotion-table td {
@@ -404,7 +416,7 @@ input[type="checkbox"]:hover {
   left: 50%;
   transform: translateX(-50%);
   width: 1070px;
-  max-width: 20.2%;
+  max-width: 26%;
   background-color: #000;
   color: #fff;
   border-radius: 8px;

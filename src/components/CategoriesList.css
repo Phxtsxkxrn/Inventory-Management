@@ -313,13 +313,13 @@
 }
 
 /* Action Bar */
-.action-bar {
+.action-bar-cat {
   position: fixed;
   bottom: 60px;
   left: 50%;
   transform: translateX(-50%);
   width: 1070px;
-  max-width: 20.2%;
+  max-width: 26%;
   background-color: #000;
   color: #fff;
   border-radius: 8px;
