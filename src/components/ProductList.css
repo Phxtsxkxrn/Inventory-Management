@@ -451,7 +451,7 @@ input[type="checkbox"]:disabled {
 }
 
 /* Action Bar */
-.action-bar {
+.action-bar-product {
   position: fixed;
   bottom: 60px; /* ระยะห่างจากขอบล่าง */
   left: 50%;

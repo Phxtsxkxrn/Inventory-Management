@@ -876,7 +876,7 @@ const ProductList = ({
       {/* ✅ ซ่อนปุ่มบางปุ่มเมื่อเป็น Employee */}
       {selectedProducts.length > 0 && (
         <div
-          className={`action-bar ${
+          className={`action-bar-product ${
             userRole === "Employee" ? "action-bar-employee" : ""
           }`}
         >
