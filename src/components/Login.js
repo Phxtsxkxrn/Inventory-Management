@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { loginUser } from "../services/auth.service";
 import ChangePasswordModal from "./ChangePasswordModal";
 import Swal from "sweetalert2";
+import Logo from "../images/Logo.png"; // เพิ่มการ import Logo
 import "./Login.css";
 
 const Login = ({ onLoginSuccess }) => {
@@ -54,6 +55,9 @@ const Login = ({ onLoginSuccess }) => {
         <ChangePasswordModal onSuccess={handlePasswordChangeSuccess} />
       ) : (
         <div className="login-card">
+          <div className="login-logo">
+            <img src={Logo} alt="Logo" />
+          </div>
           <h3 className="login-title">Sign in</h3>
           {error && <p className="login-error">{error}</p>}
           <form className="login-form" onSubmit={handleLogin}>

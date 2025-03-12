@@ -121,3 +121,12 @@
 .forgot-password-link span:hover {
   text-decoration: underline;
 }
+
+.login-logo {
+  text-align: center;
+}
+
+.login-logo img {
+  max-width: 200px;
+  height: auto;
+}

@@ -152,7 +152,7 @@
   background-color: #f8f9fa;
   position: sticky;
   top: 0;
-  z-index: 1;
+  z-index: 2; /* Reduce z-index to be below navbar */
 }
 
 .product-table th {
@@ -403,6 +403,7 @@ input[type="checkbox"] {
   outline: none;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
+  z-index: 3; /* Above table but below navbar */
 }
 
 /* เมื่อ Checkbox ถูกเลือก */
@@ -458,7 +459,7 @@ input[type="checkbox"]:disabled {
   align-items: center;
   gap: 15px; /* ระยะห่างระหว่างปุ่ม */
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3); /* เงา */
-  z-index: 1000; /* ลอยอยู่ด้านบน */
+  z-index: 1050; /* Below navbar but above other content */
 }
 
 .action-bar-employee {
@@ -568,4 +569,14 @@ td .react-loading-skeleton {
 td:first-child .react-loading-skeleton {
   width: 20px;
   height: 20px;
+}
+
+/* ColumnSelector component z-index */
+.columns-selector-modal {
+  z-index: 1090; /* Below navbar but above other components */
+}
+
+/* Filter component z-index */
+.filter-modal {
+  z-index: 1090; /* Below navbar but above other components */
 }
