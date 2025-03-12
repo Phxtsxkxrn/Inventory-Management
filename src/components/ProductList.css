@@ -208,9 +208,16 @@
 
 .product-table td {
   padding: 12px;
-  text-align: center;
+  text-align: left !important; /* ค่าเริ่มต้นให้ชิดซ้ายทั้งหมด */
   font-size: 14px;
   color: #555;
+}
+
+/* ยกเว้นคอลัมน์ที่ต้องการให้อยู่ตรงกลาง */
+.product-table td.actions,
+.product-table td.status,
+.product-table td:has(img) {
+  text-align: center !important;
 }
 
 /* สลับสีแถว */
@@ -579,4 +586,9 @@ td:first-child .react-loading-skeleton {
 /* Filter component z-index */
 .filter-modal {
   z-index: 1090; /* Below navbar but above other components */
+}
+
+/* Text alignment classes */
+.text-left {
+  text-align: left !important;
 }

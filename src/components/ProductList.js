@@ -761,22 +761,24 @@ const ProductList = ({
                       </td>
                     )}
                     {visibleColumns.includes("SKU") && (
-                      <td>{product.SKU || "N/A"}</td>
+                      <td className="text-left">{product.SKU || "N/A"}</td>
                     )}
                     {visibleColumns.includes("Brand") && (
-                      <td>{product.Brand || "N/A"}</td>
+                      <td className="text-left">{product.Brand || "N/A"}</td>
                     )}
                     {visibleColumns.includes("Name") && (
-                      <td>{product.Name || "N/A"}</td>
+                      <td className="text-left">{product.Name || "N/A"}</td>
                     )}
                     {visibleColumns.includes("Categories") && (
-                      <td>{product.Categories || "N/A"}</td>
+                      <td className="text-left">
+                        {product.Categories || "N/A"}
+                      </td>
                     )}
                     {visibleColumns.includes("Seller") && (
-                      <td>{product.Seller || "N/A"}</td>
+                      <td className="text-left">{product.Seller || "N/A"}</td>
                     )}
                     {visibleColumns.includes("NormalPrice") && (
-                      <td>
+                      <td className="text-left">
                         {product.NormalPrice
                           ? `฿${new Intl.NumberFormat("th-TH", {
                               style: "decimal",
@@ -787,16 +789,14 @@ const ProductList = ({
                       </td>
                     )}
                     {visibleColumns.includes("Discount") && (
-                      <td>
+                      <td className="text-left">
                         {product.AppliedPromotion
                           ? `${product.AppliedPromotion.discount}% (Promo)`
-                          : product.Discount
-                          ? `${product.Discount}%`
-                          : "N/A"}
+                          : `${product.Discount || 0}%`}
                       </td>
                     )}
                     {visibleColumns.includes("finalPrice") && (
-                      <td>
+                      <td className="text-left">
                         {finalPrice
                           ? `฿${new Intl.NumberFormat("th-TH", {
                               style: "decimal",
@@ -842,14 +842,14 @@ const ProductList = ({
                       </td>
                     )}
                     {visibleColumns.includes("CreatedAt") && (
-                      <td>
+                      <td className="text-left">
                         {product.CreatedAt
                           ? new Date(product.CreatedAt).toLocaleString()
                           : "N/A"}
                       </td>
                     )}
                     {visibleColumns.includes("LastUpdate") && (
-                      <td>
+                      <td className="text-left">
                         {product.LastUpdate
                           ? new Date(product.LastUpdate).toLocaleString()
                           : "N/A"}
