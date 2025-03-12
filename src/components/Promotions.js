@@ -14,6 +14,7 @@ const Promotions = () => {
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false); // State for filter modal
   const [isColumnSelectorOpen, setIsColumnSelectorOpen] = useState(false);
   const [visibleColumns, setVisibleColumns] = useState([
+    "checkbox", // เพิ่ม checkbox ในค่าเริ่มต้น
     "name",
     "discount",
     "startDateTime",
@@ -33,6 +34,8 @@ const Promotions = () => {
   const [endDateTimeFrom, setEndDateTimeFrom] = useState("");
   const [endDateTimeTo, setEndDateTimeTo] = useState("");
   const userRole = localStorage.getItem("userRole");
+  const [selectedPromotions, setSelectedPromotions] = useState([]);
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
 
   useEffect(() => {
     const fetchPromotions = async () => {
@@ -140,20 +143,109 @@ const Promotions = () => {
       return isDiscountOk && isStartDateTimeOk && isEndDateTimeOk;
     });
 
+  // Add sorting to filteredPromotions
+  const sortedPromotions = React.useMemo(() => {
+    let sortablePromotions = [...filteredPromotions];
+    if (sortConfig.key) {
+      sortablePromotions.sort((a, b) => {
+        if (["startDateTime", "endDateTime"].includes(sortConfig.key)) {
+          const aDate = new Date(
+            `${a[sortConfig.key.replace("DateTime", "Date")]}T${
+              a[sortConfig.key.replace("DateTime", "Time")]
+            }`
+          );
+          const bDate = new Date(
+            `${b[sortConfig.key.replace("DateTime", "Date")]}T${
+              b[sortConfig.key.replace("DateTime", "Time")]
+            }`
+          );
+          return sortConfig.direction === "asc" ? aDate - bDate : bDate - aDate;
+        }
+        if (a[sortConfig.key] < b[sortConfig.key])
+          return sortConfig.direction === "asc" ? -1 : 1;
+        if (a[sortConfig.key] > b[sortConfig.key])
+          return sortConfig.direction === "asc" ? 1 : -1;
+        return 0;
+      });
+    }
+    return sortablePromotions;
+  }, [filteredPromotions, sortConfig]);
+
   // คำนวณ Pagination
-  const totalPages = Math.ceil(filteredPromotions.length / promotionsPerPage);
-  const displayedPromotions = filteredPromotions.slice(
+  const totalPages = Math.ceil(sortedPromotions.length / promotionsPerPage);
+  const displayedPromotions = sortedPromotions.slice(
     (currentPage - 1) * promotionsPerPage,
     currentPage * promotionsPerPage
   );
 
   const columns = [
+    { key: "checkbox", label: "Select" },
     { key: "name", label: "Name" },
     { key: "discount", label: "Discount (%)" },
     { key: "startDateTime", label: "Start Date & Time" },
     { key: "endDateTime", label: "End Date & Time" },
     { key: "actions", label: "Actions" },
   ];
+
+  // Add sorting functionality
+  const onSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
+    setSortConfig({ key, direction });
+  };
+
+  const SortIcon = ({ column }) => {
+    if (sortConfig.key !== column) {
+      return <span className="sort-icon">⇅</span>;
+    }
+    return sortConfig.direction === "asc" ? (
+      <span className="sort-icon">↑</span>
+    ) : (
+      <span className="sort-icon">↓</span>
+    );
+  };
+
+  // Add checkbox handlers
+  const handleCheckboxChange = (promotionId) => {
+    setSelectedPromotions((prev) =>
+      prev.includes(promotionId)
+        ? prev.filter((id) => id !== promotionId)
+        : [...prev, promotionId]
+    );
+  };
+
+  const cancelAllSelected = () => {
+    setSelectedPromotions([]);
+  };
+
+  // Handle bulk delete
+  const deleteSelectedPromotions = async () => {
+    const result = await Swal.fire({
+      title: "Are you sure?",
+      text: "Do you want to delete the selected promotions?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete them!",
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await Promise.all(selectedPromotions.map((id) => deletePromotion(id)));
+        const updatedPromotions = promotions.filter(
+          (promo) => !selectedPromotions.includes(promo.id)
+        );
+        setPromotions(updatedPromotions);
+        setSelectedPromotions([]);
+        showToast.success("Promotions deleted successfully");
+      } catch (error) {
+        showToast.error("Error deleting promotions");
+      }
+    }
+  };
 
   return (
     <div className="promotions-container-p">
@@ -306,16 +398,65 @@ const Promotions = () => {
           <tr>
             {columns
               .filter((col) => visibleColumns.includes(col.key))
-              .map((col) =>
-                col.key === "actions" && userRole === "Employee" ? null : (
-                  <th key={col.key}>{col.label}</th>
-                )
-              )}
+              .map((col) => {
+                if (col.key === "checkbox") {
+                  return (
+                    <th key={col.key}>
+                      <input
+                        type="checkbox"
+                        onChange={(e) => {
+                          const currentPageIds = displayedPromotions.map(
+                            (p) => p.id
+                          );
+                          if (e.target.checked) {
+                            setSelectedPromotions((prev) => [
+                              ...new Set([...prev, ...currentPageIds]),
+                            ]);
+                          } else {
+                            setSelectedPromotions((prev) =>
+                              prev.filter((id) => !currentPageIds.includes(id))
+                            );
+                          }
+                        }}
+                        checked={
+                          displayedPromotions.length > 0 &&
+                          displayedPromotions.every((p) =>
+                            selectedPromotions.includes(p.id)
+                          )
+                        }
+                      />
+                    </th>
+                  );
+                }
+                if (col.key === "actions" && userRole === "Employee")
+                  return null;
+                return (
+                  <th
+                    key={col.key}
+                    onClick={() =>
+                      col.key !== "actions" ? onSort(col.key) : null
+                    }
+                    className={col.key !== "actions" ? "sortable" : ""}
+                  >
+                    {col.label}{" "}
+                    {col.key !== "actions" && <SortIcon column={col.key} />}
+                  </th>
+                );
+              })}
           </tr>
         </thead>
         <tbody>
           {displayedPromotions.map((promo) => (
             <tr key={promo.id}>
+              {visibleColumns.includes("checkbox") && (
+                <td>
+                  <input
+                    type="checkbox"
+                    checked={selectedPromotions.includes(promo.id)}
+                    onChange={() => handleCheckboxChange(promo.id)}
+                  />
+                </td>
+              )}
               {visibleColumns.includes("name") && <td>{promo.name}</td>}
               {visibleColumns.includes("discount") && (
                 <td>{promo.discount}%</td>
@@ -345,6 +486,39 @@ const Promotions = () => {
           ))}
         </tbody>
       </table>
+
+      {/* Action Bar */}
+      {selectedPromotions.length > 0 && (
+        <div
+          className={`action-bar ${
+            userRole === "Employee" ? "action-bar-employee" : ""
+          }`}
+        >
+          <span className="selected-info">
+            {selectedPromotions.length} of {sortedPromotions.length} Selected
+          </span>
+
+          {userRole !== "Employee" && (
+            <>
+              <div className="divider"></div>
+              <button
+                className="action-button delete-selected"
+                onClick={deleteSelectedPromotions}
+              >
+                Delete Selected
+              </button>
+            </>
+          )}
+
+          <div className="divider"></div>
+          <button
+            className="action-button cancel-selected"
+            onClick={cancelAllSelected}
+          >
+            Cancel All
+          </button>
+        </div>
+      )}
     </div>
   );
 };

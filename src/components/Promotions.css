@@ -17,7 +17,7 @@
 /* ส่วนหัวของตาราง */
 .promotion-table th {
   background-color: #f8f9fa;
-  text-align: center;
+  text-align: left !important; /* บังคับให้หัวข้อชิดซ้าย */
   padding: 12px;
   font-size: 14px;
   font-weight: bold;
@@ -26,12 +26,24 @@
   border-bottom: 2px solid #e5e7eb;
 }
 
+/* ยกเว้น header ของ checkbox และ actions ให้อยู่ตรงกลาง */
+.promotion-table th:first-child,
+.promotion-table th:last-child {
+  text-align: center !important;
+}
+
 /* เซลล์ในตาราง */
 .promotion-table td {
   padding: 12px;
-  text-align: center;
+  text-align: left !important; /* ค่าเริ่มต้นให้ชิดซ้ายทั้งหมด */
   font-size: 14px;
   color: #555;
+}
+
+/* ยกเว้นเฉพาะคอลัมน์ที่ต้องการให้อยู่ตรงกลาง */
+.promotion-table td:first-child, /* checkbox/select column */
+.promotion-table td:last-child /* actions column */ {
+  text-align: center !important;
 }
 
 /* ลบเส้นขอบของตาราง ยกเว้นเส้นใต้หัวข้อ */
@@ -314,4 +326,132 @@
   background-color: #5e35b1;
   transform: translateY(-2px);
   box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Sort Icons Enhancement */
+.sort-icon {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: inline-block;
+  font-size: 14px;
+  color: #6b7280;
+  opacity: 0.6;
+  transition: all 0.2s ease;
+}
+
+.sortable {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  padding-right: 25px;
+}
+
+.sortable:hover {
+  background: linear-gradient(to bottom, #f8f9fa, #e9ecef);
+  color: #2563eb;
+}
+
+.sortable:hover .sort-icon {
+  opacity: 1;
+  color: #2563eb;
+}
+
+/* Checkbox styling */
+input[type="checkbox"] {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  appearance: none;
+  background-color: #fff;
+  border: 2px solid #ccc;
+  border-radius: 5px;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+input[type="checkbox"]:checked {
+  background-color: #4caf50;
+  border-color: #4caf50;
+}
+
+input[type="checkbox"]::after {
+  content: "✓";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  font-size: 14px;
+  font-weight: bold;
+  color: #fff;
+  transition: transform 0.2s ease-in-out;
+}
+
+input[type="checkbox"]:checked::after {
+  transform: translate(-50%, -50%) scale(1);
+}
+
+input[type="checkbox"]:hover {
+  border-color: #4caf50;
+}
+
+/* Action Bar */
+.action-bar {
+  position: fixed;
+  bottom: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1070px;
+  max-width: 20.2%;
+  background-color: #000;
+  color: #fff;
+  border-radius: 8px;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  z-index: 1050;
+}
+
+.action-bar-employee {
+  width: 580px;
+  max-width: 70%;
+  justify-content: center;
+}
+
+.selected-info {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.divider {
+  width: 1px;
+  height: 24px;
+  background-color: #ccc;
+}
+
+.action-button {
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+}
+
+.action-button:hover {
+  background-color: #2563eb;
+}
+
+.action-button.delete-selected:hover {
+  background-color: #b91c1c;
+}
+
+.action-button.cancel-selected:hover {
+  background-color: #b91c1c;
 }
