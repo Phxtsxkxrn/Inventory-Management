@@ -463,13 +463,25 @@ const ProductList = ({
   };
 
   const handleDelete = (id) => {
-    try {
-      onDelete(id);
-      showToast.success("Product deleted successfully");
-      closeEditModal();
-    } catch (error) {
-      showToast.error("Failed to delete product: " + error.message);
-    }
+    Swal.fire({
+      title: "Are you sure?",
+      text: "Do you want to delete this product?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "Cancel",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        try {
+          onDelete(id);
+          showToast.success("Product deleted successfully");
+        } catch (error) {
+          showToast.error("Failed to delete product: " + error.message);
+        }
+      }
+    });
   };
 
   return (
@@ -858,12 +870,22 @@ const ProductList = ({
                     {visibleColumns.includes("actions") &&
                       userRole !== "Employee" && (
                         <td className="actions">
-                          <button
-                            className="edit"
-                            onClick={() => openEditModal(product)}
+                          <select
+                            className="action-select"
+                            onChange={(e) => {
+                              const action = e.target.value;
+                              if (action === "edit") {
+                                openEditModal(product);
+                              } else if (action === "delete") {
+                                handleDelete(product.id);
+                              }
+                              e.target.value = ""; // Reset select after action
+                            }}
                           >
-                            Edit
-                          </button>
+                            <option value="">Select</option>
+                            <option value="edit">Edit</option>
+                            <option value="delete">Delete</option>
+                          </select>
                         </td>
                       )}
                   </tr>

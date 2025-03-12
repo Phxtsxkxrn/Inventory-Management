@@ -520,6 +520,40 @@ input[type="checkbox"]:disabled {
   background-color: #b91c1c;
 }
 
+/* Action select styling */
+.action-select {
+  padding: 6px 12px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  background-color: #fff;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100px;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 16px;
+}
+
+.action-select:hover {
+  border-color: #3b82f6;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.action-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.action-select option {
+  padding: 8px;
+  text-align: left; /* ทำให้ข้อความในตัวเลือกชิดซ้าย */
+}
+
 .loading-overlay {
   position: fixed;
   top: 0;
