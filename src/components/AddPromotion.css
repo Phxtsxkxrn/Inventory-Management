@@ -104,3 +104,7 @@
 .promotion-modal-btn:hover {
   transform: none;
 }
+
+.form-group {
+  padding-top: 5px;
+}

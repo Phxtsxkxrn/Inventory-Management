@@ -76,7 +76,7 @@
 
 .user-table th {
   background-color: #f9f9f9;
-  text-align: center;
+  text-align: left; /* เปลี่ยนจาก center เป็น left */
   padding: 15px;
   font-size: 14px;
   font-weight: bold;
@@ -87,10 +87,22 @@
 
 .user-table td {
   padding: 15px;
-  text-align: center;
+  text-align: left; /* เปลี่ยนจาก center เป็น left */
   font-size: 14px;
   color: #555;
   border-bottom: 1px solid #f1f5f9;
+}
+
+/* ยกเว้นคอลัมน์แรก (ลำดับ) ให้ชิดกลาง */
+.user-table td:first-child,
+.user-table th:first-child {
+  text-align: center;
+}
+
+/* ยกเว้นคอลัมน์ Actions ให้ชิดกลาง */
+.user-table td:last-child,
+.user-table th:last-child {
+  text-align: center;
 }
 
 /* ✅ สลับสีแถว */

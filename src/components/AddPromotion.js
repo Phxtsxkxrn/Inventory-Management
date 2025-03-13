@@ -74,43 +74,57 @@ const AddPromotion = ({ onPromotionAdded, onCancel }) => {
   return (
     <div className="promotion-form">
       <form onSubmit={handleSubmit(onSubmit)}>
-        <input type="text" placeholder="Promotion Name" {...register("name")} />
-        {errors.name && (
-          <span className="error-message">{errors.name.message}</span>
-        )}
-
-        <input
-          type="number"
-          placeholder="Discount (%)"
-          {...register("discount")}
-        />
-        {errors.discount && (
-          <span className="error-message">{errors.discount.message}</span>
-        )}
-
-        <label>Start Date & Time:</label>
-        <div className="datetime-group">
-          <input type="date" {...register("startDate")} />
-          <input type="time" {...register("startTime")} />
+        <div className="form-group">
+          <label>Promotion Name</label>
+          <input
+            type="text"
+            placeholder="Enter promotion name"
+            {...register("name")}
+          />
+          {errors.name && (
+            <span className="error-message">{errors.name.message}</span>
+          )}
         </div>
-        {errors.startDate && (
-          <span className="error-message">{errors.startDate.message}</span>
-        )}
-        {errors.startTime && (
-          <span className="error-message">{errors.startTime.message}</span>
-        )}
 
-        <label>End Date & Time:</label>
-        <div className="datetime-group">
-          <input type="date" {...register("endDate")} />
-          <input type="time" {...register("endTime")} />
+        <div className="form-group">
+          <label>Discount</label>
+          <input
+            type="number"
+            placeholder="Enter discount percentage"
+            {...register("discount")}
+          />
+          {errors.discount && (
+            <span className="error-message">{errors.discount.message}</span>
+          )}
         </div>
-        {errors.endDate && (
-          <span className="error-message">{errors.endDate.message}</span>
-        )}
-        {errors.endTime && (
-          <span className="error-message">{errors.endTime.message}</span>
-        )}
+
+        <div className="form-group">
+          <label>Start Date & Time:</label>
+          <div className="datetime-group">
+            <input type="date" {...register("startDate")} />
+            <input type="time" {...register("startTime")} />
+          </div>
+          {errors.startDate && (
+            <span className="error-message">{errors.startDate.message}</span>
+          )}
+          {errors.startTime && (
+            <span className="error-message">{errors.startTime.message}</span>
+          )}
+        </div>
+
+        <div className="form-group">
+          <label>End Date & Time:</label>
+          <div className="datetime-group">
+            <input type="date" {...register("endDate")} />
+            <input type="time" {...register("endTime")} />
+          </div>
+          {errors.endDate && (
+            <span className="error-message">{errors.endDate.message}</span>
+          )}
+          {errors.endTime && (
+            <span className="error-message">{errors.endTime.message}</span>
+          )}
+        </div>
 
         <div className="modal-buttons">
           <button type="submit" className="promotion-modal-btn add">
