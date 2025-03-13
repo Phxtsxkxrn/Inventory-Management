@@ -20,7 +20,7 @@
   padding: 10px; /* ✅ เพิ่มระยะห่างในตาราง */
   text-align: left !important; /* บังคับให้ชิดซ้ายทั้งหมด */
   font-size: 14px;
-  color: #555;
+  color: #000000;
 }
 
 /* ปรับการจัดตำแหน่งชื่อสินค้าให้ชิดซ้ายเสมอ */
@@ -39,7 +39,7 @@
 /* ✅ ปรับระยะห่างระหว่าง Dropdown และช่องป้อนวันที่ */
 .promotion-select-group {
   display: flex;
-  gap: 10px; /* ✅ เพิ่มระยะห่างระหว่าง Dropdown และช่องวันที่ */
+  gap: 80px; /* ✅ เพิ่มระยะห่างระหว่าง Dropdown และช่องวันที่ */
   align-items: center;
   width: 100%;
   text-align: left !important;
@@ -54,7 +54,8 @@
 
 /* ✅ ปรับสไตล์ Dropdown (Select Box) */
 .promotion-table select {
-  flex: 1; /* ✅ ทำให้ Dropdown และ Input มีขนาดเท่ากัน */
+  width: 250px; /* กำหนดความกว้างคงที่ */
+  flex: none; /* ยกเลิก flex: 1 */
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: 5px;
@@ -164,4 +165,53 @@
   font-weight: bold;
   padding-bottom: 5px;
   border-bottom: 2px solid #ddd; /* ✅ เพิ่มเส้นใต้ */
+}
+
+/* เพิ่มสไตล์สำหรับการแสดงวันที่ */
+.promotion-dates {
+  margin: 10px 0;
+}
+
+.date-display {
+  display: flex;
+  align-items: center;
+  margin: 5px 0;
+  gap: 10px;
+}
+
+.date-display label {
+  font-weight: bold;
+  color: #333;
+  min-width: 120px;
+}
+
+.date-display span {
+  color: #666;
+  font-size: 14px;
+}
+
+/* ปรับสไตล์การแสดงวันที่ */
+.date-display {
+  display: flex;
+  align-items: center;
+  margin: 8px 0;
+  gap: 10px;
+  min-height: 24px; /* กำหนดความสูงขั้นต่ำ */
+}
+
+.date-display label {
+  font-weight: bold;
+  color: #333;
+  min-width: 150px; /* เพิ่มความกว้างให้ label */
+}
+
+.date-display span {
+  color: #666;
+  font-size: 14px;
+  min-width: 200px; /* กำหนดความกว้างขั้นต่ำสำหรับค่าวันที่ */
+  display: inline-block; /* ทำให้กำหนดขนาดได้ */
+  padding: 4px 8px; /* เพิ่ม padding */
+  background-color: #f8f9fa; /* พื้นหลังอ่อนๆ */
+  border-radius: 4px; /* มุมโค้ง */
+  border: 1px solid #eee; /* เส้นขอบบางๆ */
 }

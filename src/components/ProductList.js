@@ -803,7 +803,7 @@ const ProductList = ({
                     {visibleColumns.includes("Discount") && (
                       <td className="text-left">
                         {product.AppliedPromotion
-                          ? `${product.AppliedPromotion.discount}% (Promo)`
+                          ? `${product.AppliedPromotion.discount}% (${product.AppliedPromotion.name})` // เพิ่ม name ของ promotion
                           : `${product.Discount || 0}%`}
                       </td>
                     )}

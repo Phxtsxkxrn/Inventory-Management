@@ -43,7 +43,7 @@
 /* ส่วนหัวของตาราง */
 .manage-pricing-table th {
   background-color: #f8f9fa;
-  text-align: center;
+  text-align: center !important; /* เปลี่ยนเป็น center */
   padding: 12px;
   font-size: 14px;
   font-weight: bold;
@@ -136,6 +136,17 @@
 .final-price-display.zero-price {
   color: #ff4444;
   font-weight: bold;
+}
+
+/* ✅ ปรับแต่ง Final Price */
+.manage-pricing-table td .final-price-display {
+  text-align: left;
+  display: block;
+  width: 100%;
+  font-weight: bold;
+  color: #007bff;
+  font-size: 16px;
+  padding: 5px;
 }
 
 /* ✅ ปุ่ม Save */

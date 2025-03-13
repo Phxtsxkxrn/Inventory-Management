@@ -65,29 +65,51 @@ const ManagePricing = () => {
     }).format(value);
   };
 
-  // ✅ แปลงค่าจาก Text เป็น Number
-  const parseCurrency = (value) => {
-    if (typeof value !== "string") {
-      return isNaN(value) ? "" : value;
+  // แก้ไข formatDisplayPrice สำหรับ Normal Price
+  const formatDisplayPrice = (value, isNormalPrice = false) => {
+    if (!value && value !== 0) return "";
+    if (typeof value === "string" && value.endsWith(".")) {
+      return value; // แสดงจุดทศนิยมที่พิมพ์
     }
-    const numberValue = parseFloat(
-      value.replace(/[฿,]/g, "").replace(/[^0-9.]/g, "")
-    );
-    return isNaN(numberValue) ? "" : numberValue;
+    return new Intl.NumberFormat("th-TH").format(value);
   };
 
-  // Modified handlePriceChange to work with React Hook Form
+  // แก้ไขฟังก์ชัน handlePriceChange
   const handlePriceChange = (index, field, value) => {
-    const parsedValue = parseCurrency(value);
-    setValue(`products.${index}.${field}`, parsedValue);
+    if (field === "NormalPrice") {
+      // อนุญาตเฉพาะตัวเลขและจุดทศนิยม
+      const cleanValue = value.replace(/[^0-9.]/g, "");
 
-    // Update FinalPrice
-    const product = products[index];
-    const normalPrice =
-      field === "NormalPrice" ? parsedValue : product.NormalPrice;
-    const discount = field === "Discount" ? parsedValue : product.Discount || 0;
-    const finalPrice = normalPrice - (normalPrice * discount) / 100;
-    setValue(`products.${index}.FinalPrice`, finalPrice);
+      // กรณีกรอกแค่จุด
+      if (cleanValue === ".") {
+        setValue(`products.${index}.${field}`, "0.");
+        return;
+      }
+
+      // กรณีมีจุดทศนิยมมากกว่า 1 จุด
+      if ((cleanValue.match(/\./g) || []).length > 1) {
+        return; // ไม่อนุญาตให้มีจุดทศนิยมมากกว่า 1 จุด
+      }
+
+      // อัพเดทค่าในฟอร์ม
+      setValue(`products.${index}.${field}`, cleanValue);
+
+      // คำนวณ Final Price เมื่อมีการเปลี่ยนแปลง
+      const parsedValue = parseFloat(cleanValue) || 0;
+      const discount = products[index]?.Discount || 0;
+      const finalPrice = parsedValue - (parsedValue * discount) / 100;
+      setValue(`products.${index}.FinalPrice`, finalPrice);
+    } else {
+      // สำหรับ Discount ใช้แบบเดิม
+      const cleanValue = value.replace(/[^0-9]/g, "");
+      const parsedValue = cleanValue ? parseInt(cleanValue) : 0;
+      setValue(`products.${index}.${field}`, parsedValue);
+
+      // Update FinalPrice
+      const normalPrice = products[index]?.NormalPrice || 0;
+      const finalPrice = normalPrice - (normalPrice * parsedValue) / 100;
+      setValue(`products.${index}.FinalPrice`, finalPrice);
+    }
   };
 
   // เปลี่ยนเป็นฟังก์ชัน click event แทนเพื่อป้องกัน form submission
@@ -191,10 +213,10 @@ const ManagePricing = () => {
           <table className="manage-pricing-table">
             <thead>
               <tr>
-                <th>Product</th>
-                <th>Normal Price</th>
-                <th>Discount (%)</th>
-                <th>Final Price</th>
+                <th style={{ textAlign: "center" }}>Product</th>
+                <th style={{ textAlign: "center" }}>Normal Price (฿)</th>
+                <th style={{ textAlign: "center" }}>Discount (%)</th>
+                <th style={{ textAlign: "center" }}>Final Price (฿)</th>
               </tr>
             </thead>
             <tbody>
@@ -216,11 +238,14 @@ const ManagePricing = () => {
                         errors.products?.[index]?.NormalPrice ? "error" : ""
                       }`}
                       type="text"
-                      value={formatCurrency(products[index]?.NormalPrice)}
+                      value={formatDisplayPrice(
+                        products[index]?.NormalPrice,
+                        true
+                      )}
                       onChange={(e) =>
                         handlePriceChange(index, "NormalPrice", e.target.value)
                       }
-                      placeholder="฿0.00"
+                      placeholder="0"
                     />
                     {errors.products?.[index]?.NormalPrice && (
                       <span className="error-message">
@@ -234,15 +259,11 @@ const ManagePricing = () => {
                         errors.products?.[index]?.Discount ? "error" : ""
                       }`}
                       type="text"
-                      value={
-                        products[index]?.Discount !== undefined
-                          ? products[index].Discount.toFixed(2)
-                          : ""
-                      }
+                      value={formatDisplayPrice(products[index]?.Discount || 0)}
                       onChange={(e) =>
                         handlePriceChange(index, "Discount", e.target.value)
                       }
-                      placeholder="0%"
+                      placeholder="0"
                     />
                     {errors.products?.[index]?.Discount && (
                       <span className="error-message">

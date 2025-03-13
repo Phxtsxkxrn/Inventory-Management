@@ -18,6 +18,19 @@ const ManagePromotions = () => {
   useEffect(() => {
     if (location.state?.selectedProducts) {
       setSelectedProducts(location.state.selectedProducts);
+
+      const existingPromotions = {};
+      location.state.selectedProducts.forEach((product) => {
+        if (product.promotionId) {
+          existingPromotions[product.id] = {
+            promotionId: product.promotionId,
+            startDateTime: product.startDateTime,
+            endDateTime: product.endDateTime,
+          };
+        }
+      });
+
+      setProductPromotions(existingPromotions);
     }
   }, [location.state]);
 
@@ -52,19 +65,30 @@ const ManagePromotions = () => {
   };
 
   const handlePromotionChange = (productId, promotionId) => {
+    if (!promotionId) {
+      setProductPromotions((prev) => ({
+        ...prev,
+        [productId]: {
+          promotionId: null,
+          startDateTime: null,
+          endDateTime: null,
+        },
+      }));
+      return;
+    }
+
     const selectedPromo = promotions.find((promo) => promo.id === promotionId);
     if (!selectedPromo) return;
+
+    const startDateTime = `${selectedPromo.startDate} ${selectedPromo.startTime}`;
+    const endDateTime = `${selectedPromo.endDate} ${selectedPromo.endTime}`;
 
     setProductPromotions((prev) => ({
       ...prev,
       [productId]: {
         promotionId: promotionId,
-        startDateTime: selectedPromo.startDateTime
-          ? new Date(selectedPromo.startDateTime).toISOString().slice(0, 16) // ✅ แปลงเป็น YYYY-MM-DDTHH:mm
-          : "",
-        endDateTime: selectedPromo.endDateTime
-          ? new Date(selectedPromo.endDateTime).toISOString().slice(0, 16) // ✅ แปลงเป็น YYYY-MM-DDTHH:mm
-          : "",
+        startDateTime: startDateTime,
+        endDateTime: endDateTime,
       },
     }));
   };
@@ -82,7 +106,6 @@ const ManagePromotions = () => {
           : null,
       }));
 
-      // ✅ แสดง SweetAlert2 เพื่อยืนยันก่อนบันทึก
       const result = await Swal.fire({
         title: "Are you sure?",
         text: "Do you want to save promotions for all selected products?",
@@ -114,14 +137,13 @@ const ManagePromotions = () => {
         id: productId,
         promotionId: productPromotions[productId]?.promotionId || null,
         startDateTime: productPromotions[productId]?.startDateTime
-          ? new Date(productPromotions[productId].startDateTime).toISOString() // ✅ แปลงเป็น ISO format
+          ? new Date(productPromotions[productId].startDateTime).toISOString()
           : null,
         endDateTime: productPromotions[productId]?.endDateTime
-          ? new Date(productPromotions[productId].endDateTime).toISOString() // ✅ แปลงเป็น ISO format
+          ? new Date(productPromotions[productId].endDateTime).toISOString()
           : null,
       };
 
-      // ✅ แสดง SweetAlert2 ยืนยันก่อนบันทึก
       const result = await Swal.fire({
         title: "Are you sure?",
         text: "Do you want to save this promotion for the product?",
@@ -148,7 +170,6 @@ const ManagePromotions = () => {
     <div className="manage-promotions-container">
       <h2>Manage Promotions</h2>
 
-      {/* ✅ แสดง Dropdown และปุ่ม Save Promotions เฉพาะเมื่อมีสินค้า */}
       {selectedProducts.length > 0 && (
         <div className="table-header">
           <div className="global-promotion-container">
@@ -172,7 +193,6 @@ const ManagePromotions = () => {
         </div>
       )}
 
-      {/* ✅ ถ้ายังไม่มีสินค้าเลือก ให้แสดงข้อความแทนตาราง */}
       {selectedProducts.length === 0 ? (
         <div className="no-products-message">
           No products selected for Promotions.
@@ -190,11 +210,20 @@ const ManagePromotions = () => {
             {selectedProducts.map((product) => (
               <tr key={product.id}>
                 <td>{product.Name}</td>
-                <td>฿{product.NormalPrice.toFixed(2)}</td>
+                <td>
+                  ฿
+                  {new Intl.NumberFormat("th-TH").format(
+                    product.NormalPrice.toFixed(2)
+                  )}
+                </td>
                 <td>
                   <div className="promotion-select-group">
                     <select
-                      value={productPromotions[product.id]?.promotionId || ""}
+                      value={
+                        productPromotions[product.id]?.promotionId ||
+                        product.promotionId ||
+                        ""
+                      }
                       onChange={(e) =>
                         handlePromotionChange(product.id, e.target.value)
                       }
@@ -206,34 +235,44 @@ const ManagePromotions = () => {
                         </option>
                       ))}
                     </select>
-                    <label>Start Date & Time:</label>
-                    <input
-                      type="datetime-local"
-                      value={productPromotions[product.id]?.startDateTime || ""}
-                      onChange={(e) =>
-                        setProductPromotions((prev) => ({
-                          ...prev,
-                          [product.id]: {
-                            ...prev[product.id],
-                            startDateTime: e.target.value,
-                          },
-                        }))
-                      }
-                    />
-                    <label>End Date & Time:</label>
-                    <input
-                      type="datetime-local"
-                      value={productPromotions[product.id]?.endDateTime || ""}
-                      onChange={(e) =>
-                        setProductPromotions((prev) => ({
-                          ...prev,
-                          [product.id]: {
-                            ...prev[product.id],
-                            endDateTime: e.target.value,
-                          },
-                        }))
-                      }
-                    />
+
+                    <div className="promotion-dates">
+                      <div className="date-display">
+                        <label>Start Date & Time:</label>
+                        <span>
+                          {
+                            promotions.find(
+                              (p) =>
+                                p.id ===
+                                productPromotions[product.id]?.promotionId
+                            )?.startDate
+                          }{" "}
+                          {promotions.find(
+                            (p) =>
+                              p.id ===
+                              productPromotions[product.id]?.promotionId
+                          )?.startTime || "-"}
+                        </span>
+                      </div>
+                      <div className="date-display">
+                        <label>End Date & Time:</label>
+                        <span>
+                          {
+                            promotions.find(
+                              (p) =>
+                                p.id ===
+                                productPromotions[product.id]?.promotionId
+                            )?.endDate
+                          }{" "}
+                          {promotions.find(
+                            (p) =>
+                              p.id ===
+                              productPromotions[product.id]?.promotionId
+                          )?.endTime || "-"}
+                        </span>
+                      </div>
+                    </div>
+
                     <button
                       className="save-button"
                       onClick={() => handleSavePromotion(product.id)}
