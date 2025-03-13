@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Papa from "papaparse"; // สำหรับไฟล์ CSV
 import * as XLSX from "xlsx"; // สำหรับไฟล์ Excel
+import { getProducts } from "../services/product.service"; // Add this import
 import "./ImportProducts.css";
 import { FaCloudUploadAlt } from "react-icons/fa";
 import Swal from "sweetalert2";
@@ -99,12 +100,11 @@ const ImportProducts = ({ onImport, onClose }) => {
         skipEmptyLines: true,
         complete: async function (results) {
           try {
-            setUploadStatus("Importing products...");
+            setUploadStatus("Checking for duplicates...");
             const parsedData = results.data.map((item) => {
               const normalPrice = parseCurrency(item.NormalPrice);
               const discount = parseFloat(item.Discount) || 0;
               const finalPrice = normalPrice - (normalPrice * discount) / 100;
-
               return {
                 ...item,
                 NormalPrice: normalPrice,
@@ -114,11 +114,94 @@ const ImportProducts = ({ onImport, onClose }) => {
               };
             });
 
-            await onImport(parsedData);
-            setUploadStatus("Import complete!");
-            showToast.success(
-              `${parsedData.length} products imported successfully`
+            // ตรวจสอบ SKU ซ้ำ
+            const existingProducts = await getProducts(); // เรียกข้อมูลสินค้าที่มีอยู่
+            const duplicates = parsedData.filter((item) =>
+              existingProducts.some(
+                (existingItem) => existingItem.SKU === item.SKU
+              )
             );
+
+            if (duplicates.length > 0) {
+              const duplicateSkus = duplicates
+                .map((item) => item.SKU)
+                .join(", ");
+              const result = await Swal.fire({
+                title: "Duplicate SKUs Found",
+                html: `The following SKUs already exist:<br><br><strong>${duplicateSkus}</strong>`,
+                icon: "warning",
+                showCancelButton: true,
+                showDenyButton: true,
+                confirmButtonText: "Update Existing",
+                denyButtonText: "Cancel Import",
+                cancelButtonText: "Skip Duplicates",
+                confirmButtonColor: "#3085d6",
+                denyButtonColor: "#d33",
+              });
+
+              if (result.isConfirmed) {
+                // แยกข้อมูลระหว่างอัพเดทและสร้างใหม่
+                const toUpdate = [];
+                const toCreate = [];
+
+                parsedData.forEach((item) => {
+                  const existingProduct = existingProducts.find(
+                    (p) => p.SKU === item.SKU
+                  );
+                  if (existingProduct) {
+                    // เก็บข้อมูลที่จะอัพเดท
+                    toUpdate.push({
+                      ...item,
+                      id: existingProduct.id,
+                      Status: item.Status || existingProduct.Status, // เก็บ Status เดิมถ้าไม่ได้ระบุมา
+                    });
+                  } else {
+                    // เก็บข้อมูลที่จะสร้างใหม่
+                    toCreate.push(item);
+                  }
+                });
+
+                // ส่งข้อมูลแยกระหว่างอัพเดทและสร้างใหม่
+                await onImport({ toUpdate, toCreate });
+                setUploadStatus("Import complete!");
+                showToast.success(
+                  `Updated ${toUpdate.length} and created ${toCreate.length} products`
+                );
+              } else if (result.dismiss === Swal.DismissReason.cancel) {
+                // ข้ามสินค้าที่ซ้ำ นำเข้าเฉพาะสินค้าใหม่
+                const newProducts = parsedData.filter(
+                  (item) =>
+                    !existingProducts.some(
+                      (existingItem) => existingItem.SKU === item.SKU
+                    )
+                );
+
+                if (newProducts.length > 0) {
+                  // ส่งเฉพาะข้อมูลที่จะสร้างใหม่
+                  await onImport({
+                    toCreate: newProducts,
+                    toUpdate: [],
+                  });
+                  setUploadStatus("Import complete!");
+                  showToast.success(
+                    `${newProducts.length} new products imported`
+                  );
+                } else {
+                  setUploadStatus("No new products to import");
+                  showToast.info("No new products to import");
+                }
+              } else {
+                // ถ้ากด deny (Cancel Import) จะไม่ทำอะไร
+                showToast.info("Import cancelled");
+              }
+            } else {
+              // ไม่มีสินค้าซ้ำ นำเข้าทั้งหมด
+              await onImport(parsedData);
+              setUploadStatus("Import complete!");
+              showToast.success(
+                `${parsedData.length} products imported successfully`
+              );
+            }
           } catch (error) {
             setError("Error importing products.");
             showToast.error("Failed to import products");
@@ -140,15 +223,12 @@ const ImportProducts = ({ onImport, onClose }) => {
       try {
         const binaryData = event.target.result;
         const workbook = XLSX.read(binaryData, { type: "binary" });
-
-        setUploadStatus("Importing products...");
         const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
         const parsedData = XLSX.utils.sheet_to_json(worksheet).map((item) => {
           const normalPrice = parseCurrency(item.NormalPrice);
           const discount = parseFloat(item.Discount) || 0;
           const finalPrice = normalPrice - (normalPrice * discount) / 100;
-
           return {
             ...item,
             NormalPrice: normalPrice,
@@ -158,11 +238,86 @@ const ImportProducts = ({ onImport, onClose }) => {
           };
         });
 
-        await onImport(parsedData);
-        setUploadStatus("Import complete!");
-        showToast.success(
-          `${parsedData.length} products imported successfully`
+        // ตรวจสอบ SKU ซ้ำเหมือนกับ CSV
+        const existingProducts = await getProducts();
+        const duplicates = parsedData.filter((item) =>
+          existingProducts.some((existingItem) => existingItem.SKU === item.SKU)
         );
+
+        // ใช้ logic เดียวกับ CSV
+        if (duplicates.length > 0) {
+          const duplicateSkus = duplicates.map((item) => item.SKU).join(", ");
+          const result = await Swal.fire({
+            title: "Duplicate SKUs Found",
+            html: `The following SKUs already exist:<br><br><strong>${duplicateSkus}</strong>`,
+            icon: "warning",
+            showCancelButton: true,
+            showDenyButton: true,
+            confirmButtonText: "Update Existing",
+            denyButtonText: "Cancel Import",
+            cancelButtonText: "Skip Duplicates",
+            confirmButtonColor: "#3085d6",
+            denyButtonColor: "#d33",
+          });
+
+          if (result.isConfirmed) {
+            // แยกข้อมูลระหว่างอัพเดทและสร้างใหม่
+            const toUpdate = [];
+            const toCreate = [];
+
+            parsedData.forEach((item) => {
+              const existingProduct = existingProducts.find(
+                (p) => p.SKU === item.SKU
+              );
+              if (existingProduct) {
+                // เก็บข้อมูลที่จะอัพเดท
+                toUpdate.push({
+                  ...item,
+                  id: existingProduct.id,
+                  Status: item.Status || existingProduct.Status, // เก็บ Status เดิมถ้าไม่ได้ระบุมา
+                });
+              } else {
+                // เก็บข้อมูลที่จะสร้างใหม่
+                toCreate.push(item);
+              }
+            });
+
+            // ส่งข้อมูลแยกระหว่างอัพเดทและสร้างใหม่
+            await onImport({ toUpdate, toCreate });
+            setUploadStatus("Import complete!");
+            showToast.success(
+              `Updated ${toUpdate.length} and created ${toCreate.length} products`
+            );
+          } else if (result.dismiss === Swal.DismissReason.cancel) {
+            // ข้ามสินค้าที่ซ้ำ นำเข้าเฉพาะสินค้าใหม่
+            const newProducts = parsedData.filter(
+              (item) =>
+                !existingProducts.some(
+                  (existingItem) => existingItem.SKU === item.SKU
+                )
+            );
+
+            if (newProducts.length > 0) {
+              // ส่งเฉพาะข้อมูลที่จะสร้างใหม่
+              await onImport({
+                toCreate: newProducts,
+                toUpdate: [],
+              });
+              setUploadStatus("Import complete!");
+              showToast.success(`${newProducts.length} new products imported`);
+            } else {
+              setUploadStatus("No new products to import");
+              showToast.info("No new products to import");
+            }
+          }
+          // ถ้ากด deny (Cancel Import) จะไม่ทำอะไร
+        } else {
+          await onImport({ toCreate: parsedData });
+          setUploadStatus("Import complete!");
+          showToast.success(
+            `${parsedData.length} products imported successfully`
+          );
+        }
       } catch (error) {
         setError("Error importing products.");
         showToast.error("Failed to import products");
@@ -201,7 +356,6 @@ const ImportProducts = ({ onImport, onClose }) => {
   const handleDrop = (e) => {
     e.preventDefault();
     setIsDragging(false);
-
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       handleFile(e.dataTransfer.files[0]);
     }

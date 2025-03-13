@@ -26,6 +26,7 @@ import {
   addProduct,
   updateProduct,
   deleteProduct,
+  importProducts,
 } from "./services/product.service";
 import {
   getCategories,
@@ -128,15 +129,16 @@ const App = () => {
     }
   };
 
-  const handleImportProducts = async (parsedData) => {
+  const handleImportProducts = async (importData) => {
     try {
-      for (const product of parsedData) {
-        await addProduct(product);
-      }
+      // จัดการกรณีการอัพเดทและเพิ่มใหม่
+      await importProducts(importData);
+      // โหลดข้อมูลใหม่หลังจาก import เสร็จ
       const updatedProducts = await getProducts();
       setProducts(updatedProducts);
     } catch (error) {
       console.error("Error importing products:", error);
+      throw error;
     }
   };
 

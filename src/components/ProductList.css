@@ -163,11 +163,19 @@
   letter-spacing: 0.3px;
   color: #1a365d;
   padding: 16px 12px;
-  text-align: center;
+  text-align: left; /* เปลี่ยนจาก center เป็น left */
   border-bottom: 2px solid #e5e7eb;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   text-transform: none;
   background: linear-gradient(to bottom, #ffffff, #f8f9fa);
+}
+
+/* ยกเว้นคอลัมน์ checkbox และ actions ให้อยู่ตรงกลาง */
+.product-table th:first-child, /* checkbox */
+.product-table th:last-child,  /* actions */
+.product-table td:first-child, /* checkbox */
+.product-table td:last-child /* actions */ {
+  text-align: center !important;
 }
 
 .product-table th.sortable {

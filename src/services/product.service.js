@@ -117,3 +117,34 @@ export const updateProductStatus = async (productId, newStatus) => {
     throw error;
   }
 };
+
+// เพิ่มฟังก์ชันใหม่สำหรับ import สินค้า
+export const importProducts = async ({ toUpdate = [], toCreate = [] }) => {
+  try {
+    // อัพเดทสินค้าที่มีอยู่แล้ว
+    const updatePromises = toUpdate.map((product) => {
+      const { id, ...updateData } = product;
+      const productRef = doc(db, "products", id);
+      return updateDoc(productRef, {
+        ...updateData,
+        LastUpdate: serverTimestamp(),
+        // ไม่อัพเดท CreatedAt เพื่อเก็บค่าเดิมไว้
+      });
+    });
+
+    // เพิ่มสินค้าใหม่
+    const createPromises = toCreate.map((product) => {
+      return addDoc(productsCollection, {
+        ...product,
+        CreatedAt: serverTimestamp(),
+        LastUpdate: serverTimestamp(),
+      });
+    });
+
+    // รอให้ทั้งสองการทำงานเสร็จ
+    await Promise.all([...updatePromises, ...createPromises]);
+  } catch (error) {
+    console.error("Error importing products:", error);
+    throw error;
+  }
+};
