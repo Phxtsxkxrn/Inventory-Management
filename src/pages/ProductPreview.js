@@ -70,30 +70,35 @@ const ProductPreview = () => {
       <h2>Product Preview ({products.length} products)</h2>
       <div className="products-grid">
         {products.map((product) => {
-          // คำนวณราคาหลังลด
-          const discountPercentage = product.AppliedPromotion
-            ? product.AppliedPromotion.discount
-            : 0;
+          // คำนวณส่วนลดทั้งหมด (ส่วนลดปกติ + โปรโมชั่น)
+          const normalDiscount = product.Discount || 0;
+          const promotionDiscount = product.AppliedPromotion?.discount || 0;
+          const totalDiscount = Math.max(normalDiscount, promotionDiscount);
 
+          // คำนวณราคาสุดท้าย
           const finalPrice = product.NormalPrice
-            ? product.NormalPrice -
-              (product.NormalPrice * discountPercentage) / 100
+            ? product.NormalPrice - (product.NormalPrice * totalDiscount) / 100
             : null;
 
           return (
             <div key={product.id} className="product-card">
-              <img
-                src={product.Image || "/placeholder-image.jpg"}
-                alt={product.Name}
-                className="product-image"
-                onError={(e) => {
-                  e.target.src = "/placeholder-image.jpg";
-                }}
-              />
+              <div className="image-container">
+                <img
+                  src={product.Image || "/placeholder-image.jpg"}
+                  alt={product.Name}
+                  className="product-image"
+                  onError={(e) => {
+                    e.target.src = "/placeholder-image.jpg";
+                  }}
+                />
+                {totalDiscount > 0 && (
+                  <span className="discount-badge">-{totalDiscount}%</span>
+                )}
+              </div>
               <div className="product-info">
                 <h3>{product.Name}</h3>
                 <div className="price-section">
-                  {discountPercentage > 0 && (
+                  {totalDiscount > 0 && (
                     <p className="original-price">
                       ฿{product.NormalPrice?.toLocaleString()}
                     </p>
@@ -101,16 +106,14 @@ const ProductPreview = () => {
                   <p className="final-price">
                     ฿{finalPrice?.toLocaleString() || "Price not available"}
                   </p>
-                  {discountPercentage > 0 && (
-                    <span className="discount-badge">
-                      -{discountPercentage}%
-                    </span>
-                  )}
                 </div>
+                {/* แสดง promotion tag เท่านั้น ไม่แสดง discount tag */}
                 {product.AppliedPromotion && (
                   <p className="promotion-tag">
                     <span className="promotion-icon">🏷️</span>
-                    {` ${product.AppliedPromotion.name || "Special Offer"}`}
+                    {` ${
+                      product.AppliedPromotion.name || "Special Offer"
+                    } (${promotionDiscount}%)`}
                   </p>
                 )}
                 <p className="description">
