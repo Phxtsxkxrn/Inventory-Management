@@ -69,33 +69,62 @@ const ProductPreview = () => {
     <div className="product-preview-container">
       <h2>Product Preview ({products.length} products)</h2>
       <div className="products-grid">
-        {products.map((product) => (
-          <div key={product._id || product.id} className="product-card">
-            <img
-              src={product.Image || "/placeholder-image.jpg"}
-              alt={product.Name}
-              className="product-image"
-              onError={(e) => {
-                e.target.src = "/placeholder-image.jpg";
-              }}
-            />
-            <div className="product-info">
-              <h3>{product.Name}</h3>
-              <p className="price">
-                ฿
-                {product.NormalPrice?.toLocaleString() || "Price not available"}
-              </p>
-              <p className="description">
-                {product.Description || "No description available"}
-              </p>
-              <p className="brand">Brand: {product.Brand || "N/A"}</p>
-              <p className="category">
-                Category: {product.Categories || "N/A"}
-              </p>
-              <p className="status">Status: {product.Status}</p>
+        {products.map((product) => {
+          // คำนวณราคาหลังลด
+          const discountPercentage = product.AppliedPromotion
+            ? product.AppliedPromotion.discount
+            : 0;
+
+          const finalPrice = product.NormalPrice
+            ? product.NormalPrice -
+              (product.NormalPrice * discountPercentage) / 100
+            : null;
+
+          return (
+            <div key={product.id} className="product-card">
+              <img
+                src={product.Image || "/placeholder-image.jpg"}
+                alt={product.Name}
+                className="product-image"
+                onError={(e) => {
+                  e.target.src = "/placeholder-image.jpg";
+                }}
+              />
+              <div className="product-info">
+                <h3>{product.Name}</h3>
+                <div className="price-section">
+                  {discountPercentage > 0 && (
+                    <p className="original-price">
+                      ฿{product.NormalPrice?.toLocaleString()}
+                    </p>
+                  )}
+                  <p className="final-price">
+                    ฿{finalPrice?.toLocaleString() || "Price not available"}
+                  </p>
+                  {discountPercentage > 0 && (
+                    <span className="discount-badge">
+                      -{discountPercentage}%
+                    </span>
+                  )}
+                </div>
+                {product.AppliedPromotion && (
+                  <p className="promotion-tag">
+                    <span className="promotion-icon">🏷️</span>
+                    {` ${product.AppliedPromotion.name || "Special Offer"}`}
+                  </p>
+                )}
+                <p className="description">
+                  {product.Description || "No description available"}
+                </p>
+                <p className="brand">Brand: {product.Brand || "N/A"}</p>
+                <p className="category">
+                  Category: {product.Categories || "N/A"}
+                </p>
+                <p className="status">Status: {product.Status}</p>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

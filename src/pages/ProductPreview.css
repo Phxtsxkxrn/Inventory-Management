@@ -21,7 +21,7 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  height: 450px; /* กำหนดความสูงคงที่ */
+  height: 550px; /* กำหนดความสูงคงที่ */
 }
 
 .product-card:hover {
@@ -65,6 +65,62 @@
   font-weight: bold;
   color: #2c5282;
   margin: 5px 0;
+}
+
+.price-section {
+  position: relative;
+  margin: 10px 0;
+}
+
+.original-price {
+  color: #999;
+  text-decoration: line-through;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.final-price {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #e53e3e;
+  margin: 0;
+}
+
+.discount-badge {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: #e53e3e;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.promotion-tag {
+  background: linear-gradient(45deg, #4299e1, #3182ce);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  margin: 8px 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.promotion-icon {
+  margin-right: 4px;
+  font-size: 1rem;
 }
 
 .description {
@@ -118,5 +174,16 @@
   }
   100% {
     opacity: 0.6;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

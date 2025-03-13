@@ -13,6 +13,8 @@ import {
   FaUserSecret,
   FaUsers,
   FaEdit,
+  FaEye, // เพิ่ม import icon
+  FaStore, // เพิ่ม import FaStore
 } from "react-icons/fa";
 import "./Navbar.css";
 
@@ -20,6 +22,7 @@ const Navbar = ({ children }) => {
   const [salesOpen, setSalesOpen] = useState(false);
   const [manageOpen, setManageOpen] = useState(false);
   const [usersOpen, setUsersOpen] = useState(false); // สำหรับแสดง/ซ่อน dropdown ของ Users
+  const [reviewOpen, setReviewOpen] = useState(false); // เพิ่ม state สำหรับ Review dropdown
   const userRole = localStorage.getItem("userRole");
 
   const navigate = useNavigate();
@@ -31,6 +34,7 @@ const Navbar = ({ children }) => {
   const toggleSales = () => setSalesOpen(!salesOpen);
   const toggleManage = () => setManageOpen(!manageOpen);
   const toggleUsers = () => setUsersOpen(!usersOpen); // ฟังก์ชัน toggle สำหรับ Users
+  const toggleReview = () => setReviewOpen(!reviewOpen); // เพิ่ม toggle function
 
   const handleLogout = () => {
     localStorage.removeItem("userEmail"); // ลบข้อมูลผู้ใช้จาก localStorage
@@ -69,12 +73,6 @@ const Navbar = ({ children }) => {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/product-preview" className="dropdown-link">
-                    <FaListAlt className="icon" />
-                    Product Preview
-                  </Link>
-                </li>
-                <li>
                   <Link to="/categories-list" className="dropdown-link">
                     <FaTags className="icon" />
                     Categories
@@ -84,6 +82,27 @@ const Navbar = ({ children }) => {
                   <Link to="/promotions" className="dropdown-link">
                     <FaPercentage className="icon" />
                     Promotions
+                  </Link>
+                </li>
+              </ul>
+            )}
+          </li>
+
+          {/* เพิ่มปุ่ม Review */}
+          <li className="navbar-item">
+            <button className="navbar-link" onClick={toggleReview}>
+              <FaEye className="icon" />
+              Review
+              <span className={`dropdown-arrow ${reviewOpen ? "open" : ""}`}>
+                ▼
+              </span>
+            </button>
+            {reviewOpen && (
+              <ul className="dropdown-menu">
+                <li>
+                  <Link to="/product-preview" className="dropdown-link">
+                    <FaStore className="icon" />
+                    Product Preview
                   </Link>
                 </li>
               </ul>
