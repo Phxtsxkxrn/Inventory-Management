@@ -69,6 +69,12 @@ const Navbar = ({ children }) => {
                   </Link>
                 </li>
                 <li>
+                  <Link to="/product-preview" className="dropdown-link">
+                    <FaListAlt className="icon" />
+                    Product Preview
+                  </Link>
+                </li>
+                <li>
                   <Link to="/categories-list" className="dropdown-link">
                     <FaTags className="icon" />
                     Categories

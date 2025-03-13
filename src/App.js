@@ -19,6 +19,7 @@ import UserList from "./components/UserList";
 import EditProfile from "./components/EditProfile";
 import ResetPassword from "./components/ResetPassword";
 import NewPassword from "./components/NewPassword"; // เพิ่มบรรทัดนี้
+import ProductPreview from "./pages/ProductPreview";
 import { db } from "./services/firebaseConfig";
 import { doc, getDoc, setDoc } from "firebase/firestore"; // เชื่อมต่อกับ Firestore
 import {
@@ -35,6 +36,7 @@ import {
 } from "./services/categories.service";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Protected from "./components/Protected";
 
 const App = () => {
   const [user, setUser] = useState(null);
@@ -289,6 +291,14 @@ const App = () => {
             />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/new-password" element={<NewPassword />} />
+            <Route
+              path="/product-preview"
+              element={
+                <Protected>
+                  <ProductPreview />
+                </Protected>
+              }
+            />
           </Routes>
           <ToastContainer
             position="top-right"
