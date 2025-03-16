@@ -204,11 +204,11 @@
 .product-table th {
   white-space: nowrap;
   font-weight: 600;
-  font-size: 13px;
+  font-size: 12px; /* ลดขนาด font header */
   font-family: "Helvetica Neue", Arial, sans-serif;
   letter-spacing: 0.3px;
   color: #1a365d;
-  padding: 16px 12px;
+  padding: 12px 8px; /* ลด padding */
   text-align: left; /* เปลี่ยนจาก center เป็น left */
   border-bottom: 2px solid #e5e7eb;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
@@ -227,7 +227,7 @@
   cursor: pointer;
   transition: all 0.2s ease;
   position: relative;
-  padding-right: 25px;
+  padding-right: 2px;
 }
 
 .product-table th.sortable:hover {
@@ -259,10 +259,24 @@
   background: linear-gradient(to bottom, #eff6ff, #dbeafe);
 }
 
+/* กำหนดความกว้างคอลัมน์ Status */
+.product-table th[data-column="Status"],
+.product-table td:nth-child(11) {
+  width: 80px;
+  min-width: 80px;
+}
+
+.product-table th:last-child,
+.product-table td:last-child {
+  width: 80px;
+  min-width: 80px;
+  max-width: 80px;
+}
+
 .product-table td {
-  padding: 12px;
+  padding: 8px; /* ลด padding */
   text-align: left !important; /* ค่าเริ่มต้นให้ชิดซ้ายทั้งหมด */
-  font-size: 14px;
+  font-size: 12px; /* ลดขนาด font content */
   color: #555;
 }
 
@@ -282,13 +296,21 @@
   background-color: #f1f5f9;
 }
 
+/* ปรับขนาด Status Dropdown */
 .status-dropdown {
-  padding: 4px 8px;
-  border-radius: 5px;
-  font-size: 14px;
+  padding: 2px 4px; /* ลด padding */
+  border-radius: 4px;
+  font-size: 12px; /* ลดขนาด font dropdown */
+  width: 70px;
+  min-width: 70px;
   cursor: pointer;
   border: 1px solid #ccc;
   background: white;
+}
+
+.status-active,
+.status-inactive {
+  font-size: 12px;
 }
 
 .status-active {
@@ -604,7 +626,7 @@ input[type="checkbox"]:disabled {
   border-radius: 5px;
   border: 1px solid #ddd;
   background-color: #fff;
-  font-size: 14px;
+  font-size: 12px;
   color: #333;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -614,6 +636,13 @@ input[type="checkbox"]:disabled {
   background-repeat: no-repeat;
   background-position: right 8px center;
   background-size: 16px;
+}
+
+.action-select {
+  width: 70px;
+  min-width: 70px;
+  padding: 2px 16px 2px 4px; /* ปรับ padding ให้เหมาะสม */
+  font-size: 12px;
 }
 
 .action-select:hover {
@@ -630,6 +659,49 @@ input[type="checkbox"]:disabled {
 .action-select option {
   padding: 8px;
   text-align: left; /* ทำให้ข้อความในตัวเลือกชิดซ้าย */
+}
+
+/* จัดการ cell ของ actions */
+.product-table td:last-child {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 4px 8px;
+  min-height: 32px; /* กำหนดความสูงขั้นต่ำให้เท่ากับแถวอื่น */
+}
+
+.action-select {
+  margin: auto;
+  width: 70px;
+  min-width: 70px;
+  padding: 2px 16px 2px 4px;
+  font-size: 12px;
+  height: 24px; /* กำหนดความสูงให้พอดี */
+}
+
+/* ปรับ select ในคอลัมน์ Actions */
+.product-table td:last-child {
+  padding: 8px;
+  vertical-align: middle;
+}
+
+.product-table td:last-child .action-select {
+  width: 70px;
+  min-width: 70px;
+  height: 24px;
+  padding: 2px 16px 2px 4px;
+  font-size: 12px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  background-color: white;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 4px center;
+  background-size: 12px;
+  margin: 0 auto;
 }
 
 .loading-overlay {
