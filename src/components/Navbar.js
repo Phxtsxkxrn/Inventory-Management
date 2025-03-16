@@ -92,7 +92,7 @@ const Navbar = ({ children }) => {
           <li className="navbar-item">
             <button className="navbar-link" onClick={toggleReview}>
               <FaEye className="icon" />
-              Review
+              Preview
               <span className={`dropdown-arrow ${reviewOpen ? "open" : ""}`}>
                 ▼
               </span>

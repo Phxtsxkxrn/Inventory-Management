@@ -183,7 +183,7 @@ const App = () => {
     <Router>
       <div style={{ display: "flex" }}>
         {user && <Navbar onLogout={handleLogout} />}
-        <div style={{ flex: 1, padding: "20px" }}>
+        <div style={{ flex: 1, padding: "14px" }}>
           <Routes>
             <Route
               path="/"

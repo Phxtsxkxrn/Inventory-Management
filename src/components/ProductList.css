@@ -140,11 +140,57 @@
 .product-table {
   margin-top: 20px;
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate; /* เปลี่ยนเป็น separate เพื่อให้ border-radius ทำงานได้ */
+  border-spacing: 0;
   background-color: #fff;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
   overflow: hidden;
+}
+
+/* Container สำหรับตาราง */
+.table-container {
+  width: 100%;
+  overflow-x: auto; /* เพิ่ม horizontal scroll */
+  border-radius: 8px;
+  position: relative;
+  max-height: calc(100vh - 300px); /* กำหนดความสูงสูงสุด */
+  min-height: 400px; /* กำหนดความสูงต่ำสุด */
+}
+
+/* ปรับ header ให้อยู่กับที่ */
+.product-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: #f8f9fa;
+}
+
+.product-table thead th {
+  position: sticky;
+  top: 0;
+  background: linear-gradient(to bottom, #ffffff, #f8f9fa);
+  z-index: 2;
+}
+
+/* จัดการ scrollbar */
+.table-container::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.table-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.table-container::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }
 
 /* Table Header Style Enhancement */
@@ -167,7 +213,6 @@
   border-bottom: 2px solid #e5e7eb;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   text-transform: none;
-  background: linear-gradient(to bottom, #ffffff, #f8f9fa);
 }
 
 /* ยกเว้นคอลัมน์ checkbox และ actions ให้อยู่ตรงกลาง */
@@ -461,26 +506,51 @@ input[type="checkbox"]:disabled {
 /* Action Bar */
 .action-bar-product {
   position: fixed;
-  bottom: 60px; /* ระยะห่างจากขอบล่าง */
+  bottom: 60px;
   left: 50%;
   transform: translateX(-50%);
-  width: 1070px;
+  width: fit-content; /* ปรับความกว้างตามเนื้อหา */
+  min-width: 300px; /* กำหนดความกว้างขั้นต่ำ */
   max-width: 90%;
-  background-color: #000; /* สีดำ */
-  color: #fff; /* สีข้อความ */
+  background-color: #000;
+  color: #fff;
   border-radius: 8px;
   padding: 10px 20px;
   display: flex;
   align-items: center;
-  gap: 15px; /* ระยะห่างระหว่างปุ่ม */
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3); /* เงา */
-  z-index: 1050; /* Below navbar but above other content */
+  gap: 15px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  z-index: 1050;
+  margin-left: 115px;
+  flex-wrap: nowrap; /* ป้องกันการขึ้นบรรทัดใหม่ */
 }
 
 .action-bar-employee {
-  width: 580px; /* ✅ ลดขนาดความกว้าง */
-  max-width: 70%; /* ✅ ป้องกันการล้น */
-  justify-content: center; /* ✅ ปรับให้ปุ่มอยู่ตรงกลาง */
+  width: fit-content; /* ปรับความกว้างตามเนื้อหา */
+  min-width: 200px; /* กำหนดความกว้างขั้นต่ำสำหรับ employee */
+  justify-content: center;
+  margin-left: 115px;
+}
+
+/* เพิ่ม Media Queries สำหรับการรองรับหน้าจอขนาดต่างๆ */
+@media screen and (max-width: 1200px) {
+  .action-bar-product {
+    margin-left: 0;
+    transform: translateX(calc(-50% + 115px));
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .action-bar-product {
+    flex-wrap: wrap; /* อนุญาตให้ขึ้นบรรทัดใหม่บนหน้าจอเล็ก */
+    justify-content: center;
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .divider {
+    display: none; /* ซ่อนเส้นแบ่งบนหน้าจอเล็ก */
+  }
 }
 
 /* ข้อมูลการเลือก */
