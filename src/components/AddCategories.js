@@ -12,8 +12,8 @@ const schema = yup.object().shape({
     .required("Category name is required")
     .min(2, "Category name must be at least 2 characters")
     .matches(
-      /^[a-zA-Z0-9\s]+$/,
-      "Only letters, numbers and spaces are allowed"
+      /^[a-zA-Z0-9\s\W]+$/, // อนุญาตให้ใช้ตัวอักษร ตัวเลข เว้นวรรค และอักขระพิเศษ
+      "Please enter a valid category name"
     ),
 });
 
