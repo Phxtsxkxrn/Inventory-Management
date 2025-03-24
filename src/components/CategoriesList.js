@@ -22,11 +22,6 @@ const CategoriesList = () => {
   const [selectedCategories, setSelectedCategories] = useState([]); // เพิ่ม state สำหรับ selected items
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" }); // เพิ่ม state สำหรับ sorting
 
-  // เพิ่มฟังก์ชัน getCategoryNames
-  const getCategoryNames = () => {
-    return categories.map((category) => category.Name);
-  };
-
   useEffect(() => {
     const fetchCategories = async () => {
       const data = await getCategories();

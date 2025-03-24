@@ -484,31 +484,6 @@ const ProductList = ({
     });
   };
 
-  const handleImportProducts = async (importData) => {
-    console.log("Received import data in ProductList:", importData);
-    try {
-      let dataToImport;
-      if (importData.toCreate) {
-        console.log("Processing toCreate data:", importData.toCreate);
-        dataToImport = importData.toCreate;
-      } else {
-        console.log("Processing direct array data:", importData);
-        dataToImport = importData;
-      }
-
-      await onImport(dataToImport);
-      console.log("Import successful");
-
-      // Refresh products list
-      const updatedProducts = await getProducts();
-      setProducts(updatedProducts);
-    } catch (error) {
-      console.error("Import error in ProductList:", error);
-      showToast.error("Import failed: " + error.message);
-      throw error;
-    }
-  };
-
   return (
     <div className="product-list">
       <h2>Product List</h2>
