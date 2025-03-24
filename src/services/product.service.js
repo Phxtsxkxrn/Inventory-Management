@@ -7,6 +7,7 @@ import {
   deleteDoc,
   doc,
   serverTimestamp,
+  writeBatch,
 } from "firebase/firestore";
 
 // คอลเลกชันสินค้าและโปรโมชั่น
@@ -119,32 +120,39 @@ export const updateProductStatus = async (productId, newStatus) => {
 };
 
 // เพิ่มฟังก์ชันใหม่สำหรับ import สินค้า
-export const importProducts = async ({ toUpdate = [], toCreate = [] }) => {
+export const importProducts = async (products) => {
+  console.log("Service receiving products:", products);
   try {
-    // อัพเดทสินค้าที่มีอยู่แล้ว
-    const updatePromises = toUpdate.map((product) => {
-      const { id, ...updateData } = product;
-      const productRef = doc(db, "products", id);
-      return updateDoc(productRef, {
-        ...updateData,
-        LastUpdate: serverTimestamp(),
-        // ไม่อัพเดท CreatedAt เพื่อเก็บค่าเดิมไว้
-      });
-    });
+    // ตรวจสอบและแยกข้อมูล toCreate
+    let productsToCreate = [];
+    if (products.toCreate) {
+      productsToCreate = products.toCreate;
+    } else if (Array.isArray(products)) {
+      productsToCreate = products;
+    } else {
+      throw new Error("Invalid products format");
+    }
 
-    // เพิ่มสินค้าใหม่
-    const createPromises = toCreate.map((product) => {
-      return addDoc(productsCollection, {
+    console.log("Processing products to create:", productsToCreate.length);
+
+    const batch = writeBatch(db);
+
+    productsToCreate.forEach((product) => {
+      const productRef = doc(collection(db, "products"));
+      console.log("Adding product to batch:", product);
+      batch.set(productRef, {
         ...product,
         CreatedAt: serverTimestamp(),
         LastUpdate: serverTimestamp(),
       });
     });
 
-    // รอให้ทั้งสองการทำงานเสร็จ
-    await Promise.all([...updatePromises, ...createPromises]);
+    console.log("Committing batch to Firebase...");
+    await batch.commit();
+    console.log("Batch committed successfully");
+    return productsToCreate;
   } catch (error) {
-    console.error("Error importing products:", error);
+    console.error("Error in importProducts service:", error);
     throw error;
   }
 };
