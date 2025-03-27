@@ -74,17 +74,13 @@ const AddProduct = ({ onAdd, onClose }) => {
     }).format(discountedPrice);
   };
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     const finalPrice =
       parseFloat(data.NormalPrice) -
       (parseFloat(data.NormalPrice) * parseFloat(data.Discount || 0)) / 100;
+    const formData = { ...data, FinalPrice: finalPrice };
 
-    const formData = {
-      ...data,
-      FinalPrice: finalPrice,
-    };
-
-    Swal.fire({
+    const result = await Swal.fire({
       title: "Are you sure?",
       text: "Do you want to add this product?",
       icon: "question",
@@ -92,17 +88,20 @@ const AddProduct = ({ onAdd, onClose }) => {
       confirmButtonColor: "#3085d6",
       cancelButtonColor: "#d33",
       confirmButtonText: "Yes, add it!",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        try {
-          onAdd(formData);
-          showToast.success("Product added successfully!");
-          onClose();
-        } catch (error) {
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await onAdd(formData); // Await here to catch error
+        onClose();
+      } catch (error) {
+        if (error.message.includes("SKU ซ้ำ")) {
+          showToast.error("Cannot add product because SKU is duplicate");
+        } else {
           showToast.error("Failed to add product: " + error.message);
         }
       }
-    });
+    }
   };
 
   return (

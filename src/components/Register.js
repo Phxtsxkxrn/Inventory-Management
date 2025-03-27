@@ -4,6 +4,9 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { registerUser } from "../services/auth.service";
 import Swal from "sweetalert2";
+import { doc, getDoc } from "firebase/firestore"; // Added for duplicate check
+import { db } from "../services/firebaseConfig"; // Added for duplicate check
+import { showToast } from "../utils/toast"; // Added for toast notifications
 import "./Register.css";
 
 const schema = yup.object().shape({
@@ -45,6 +48,14 @@ const Register = ({ onUserAdded, onClose, currentUserRole }) => {
   };
 
   const onSubmit = async (data) => {
+    // Check if email already exists in the document
+    const userDocRef = doc(db, "users", data.email);
+    const userDocSnap = await getDoc(userDocRef);
+    if (userDocSnap.exists()) {
+      showToast.error("User already exists");
+      return;
+    }
+
     try {
       const { success, message, userId } = await registerUser(
         data.firstName,

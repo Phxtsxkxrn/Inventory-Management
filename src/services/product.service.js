@@ -65,8 +65,18 @@ export const getProducts = async () => {
   });
 };
 
-// เพิ่มสินค้า
+// เพิ่มฟังก์ชันตรวจสอบ SKU ซ้ำ
+export const checkDuplicateSKU = async (sku) => {
+  const snapshot = await getDocs(productsCollection);
+  return snapshot.docs.some((doc) => doc.data().SKU === sku);
+};
+
+// แก้ไขฟังก์ชันเพิ่มสินค้าเพื่อเช็ค SKU ซ้ำก่อนเพิ่ม
 export const addProduct = async (product) => {
+  const isDuplicate = await checkDuplicateSKU(product.SKU);
+  if (isDuplicate) {
+    throw new Error("ไม่สามารถเพิ่มสินค้าได้ เนื่องจาก SKU ซ้ำ");
+  }
   const docRef = await addDoc(productsCollection, {
     ...product,
     Image: product.Image || "",

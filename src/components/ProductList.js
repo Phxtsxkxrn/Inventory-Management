@@ -611,8 +611,8 @@ const ProductList = ({
 
       {isAddModalOpen && (
         <AddProduct
-          onAdd={(newProduct) => {
-            onAdd(newProduct);
+          onAdd={async (newProduct) => {
+            await onAdd(newProduct);
             closeAddModal();
           }}
           onClose={closeAddModal}

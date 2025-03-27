@@ -2,9 +2,11 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { addCategories } from "../services/categories.service";
+// Updated import to include getCategories for duplicate check
+import { addCategories, getCategories } from "../services/categories.service";
 import "./AddCategories.css";
 import Swal from "sweetalert2";
+import { showToast } from "../utils/toast"; // Added to enable toast notifications
 
 const schema = yup.object().shape({
   Name: yup
@@ -43,6 +45,16 @@ const AddCategories = ({ onClose, onCategoryAdded }) => {
 
     if (result.isConfirmed) {
       try {
+        // Check for duplicate category name (case-insensitive)
+        const existingCategories = await getCategories();
+        const duplicate = existingCategories.find(
+          (cat) => cat.Name.toLowerCase() === data.Name.toLowerCase()
+        );
+        if (duplicate) {
+          showToast.error("This category already exists.");
+          return;
+        }
+
         const newCategory = await addCategories(data);
         const formattedCategory = {
           ...newCategory,

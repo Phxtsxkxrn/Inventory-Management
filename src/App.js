@@ -37,6 +37,7 @@ import {
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Protected from "./components/Protected";
+import { showToast } from "./utils/toast"; // Added missing import
 
 const App = () => {
   const [user, setUser] = useState(null);
@@ -86,8 +87,11 @@ const App = () => {
     try {
       const addedProduct = await addProduct(newProduct);
       setProducts((prevProducts) => [...prevProducts, addedProduct]);
+      showToast.success("Product added successfully!");
+      return addedProduct;
     } catch (error) {
-      console.error("Error adding product:", error);
+      // Removed console.error to prevent duplicate error logging
+      throw error; // rethrow so that AddProduct's onSubmit can catch it
     }
   };
 
